@@ -1,0 +1,1664 @@
+# Circuit Synchronization Precedes Generalization: A Causal Precursor to Grokking
+# id: 17 | lang: en | category: 因果前兆
+# source: https://arxiv.org/html/2606.12966v1
+# extracted_via: article | chars: 56084 | figures: 7
+==============================================================================
+
+Circuit Synchronization Precedes Generalization: Causal Evidence from
+ Fourier Structure in Grokking Transformers
+
+ Achyuthan Sivasankar
+ 
+ Affiliation: New York University
+ 
+ Email: as21154@nyu.edu 
+
+ Abstract
+
+ Grokking—the delayed generalisation phenomenon where a transformer trained on
+modular arithmetic abruptly transitions from near-chance to near-perfect
+validation accuracy—has been attributed to the formation of a Fourier-based
+algorithmic circuit, but the timing , causal structure , and
+ controllability of this formation remain poorly understood.
+We introduce the Frequency Synchronization Degree (FSD) , a formally
+normalised, permutation-tested metric for Fourier circuit synchronisation that
+requires no prior knowledge of the circuit.
+Across nine modular addition configurations (primes p ∈ { 53 , 71 , 97 , 113 , 131 } p\in\{53,71,97,113,131\} , three seeds), FSD reaches its post-grokking level
+ 500–3,000 steps before grokking (mean lead + 1,722 +1{,}722 steps; every
+configuration positive, sign-test p ≈ 0.004 p\approx 0.004 ), and synchronises
+ before a restricted-logit loss baseline (our instantiation of Nanda
+et al.’s excluded loss) in all nine configurations, establishing FSD as the
+earliest available predictor of Fourier circuit formation.
+We provide direct causal evidence that the inter-phase gap is a
+regularisation phenomenon: forking training at the FSD-ceiling step with
+weight decay λ ∈ { 1 , 2 , 3 , 4 , 5 , 10 } \lambda\in\{1,2,3,4,5,10\} induces strictly monotonically
+earlier grokking for the stable branches ( λ ≤ 3 \lambda\leq 3 ), with
+ Δ ​ t ∝ 1 / λ \Delta t\propto 1/\lambda —the Fourier circuit was computation-complete
+3,000 steps before grokking; only the rate of memorisation weight decay
+determined when generalisation occurred.
+The inverse- λ \lambda law replicates across three primes 
+( p ∈ { 53 , 97 , 131 } p\!\in\!\{53,97,131\} ; R 2 = 1.00 R^{2}=1.00 and R 2 = 0.99 R^{2}=0.99 for the two clean
+cases), captured as an empirical scaling law Δ ​ t ≈ C / λ \Delta t\approx C/\lambda 
+consistent with Δ ​ t ≈ ( 1 / λ ) ​ log ⁡ ( ‖ W mem ‖ / τ ) \Delta t\approx(1/\lambda)\log(\|W_{\mathrm{mem}}\|/\tau) .
+An attention-only variant groks with a strong FSD precursor while an MLP-only
+model never groks; a single-layer model groks but its FSD lags ,
+indicating the precursor is a property of multi-block circuits.
+
+ 1 Introduction
+
+ A transformer trained to compute ( a + b ) mod p (a+b)\bmod p on 30% of all input pairs
+will, after prolonged training, exhibit a sudden phase transition: validation
+accuracy leaps from near-chance to near-perfect in hundreds of steps. This
+phenomenon, termed grokking by Power et al. (2022) , reveals that
+neural networks can discover compact symbolic algorithms through gradient
+descent—but only after apparent overfitting.
+
+ Nanda et al. (2023) showed via mechanistic interpretability that a
+one-layer transformer solves modular addition with a Fourier algorithm :
+inputs are embedded as sinusoidal superpositions, attention computes cosine
+products, and a logit-lens reads off the answer. The key frequencies
+( K = { 14 , 35 , 41 , 47 , 62 , 72 , 76 } K=\{14,35,41,47,62,72,76\} for p = 97 p=97 ) are those at which the
+model concentrates representational power.
+
+ Despite this rich characterisation, two questions remain open:
+
+ (1) 
+ 
+ Timing. When does the Fourier circuit form relative to
+grokking? Can circuit formation be detected before generalisation?
+
+ (2) 
+ 
+ Causal structure. Which model components are causally necessary
+for generalisation, and in what order of importance?
+
+ We train a two-layer transformer on five modular arithmetic configurations and
+address both questions. Our contributions are:
+
+ • 
+ 
+ FSD : a normalised, permutation-tested metric for Fourier circuit
+synchronisation that requires no prior knowledge of the circuit and
+predicts grokking 500–3,000 steps in advance across all nine
+addition experiments (three seeds, five primes; mean lead + 1,722 +1{,}722 ).
+
+ • 
+ 
+ FSD vs. restricted-logit loss : FSD synchronises before a
+restricted-logit baseline in all nine configurations,
+establishing FSD as the earliest available predictor
+(§ 5.2 ).
+
+ • 
+ 
+ Causal intervention : forking training at the FSD-ceiling step
+with λ ∈ { 1 , 2 , 3 , 4 , 5 , 10 } \lambda\in\{1,2,3,4,5,10\} produces monotonically earlier
+grokking (stable branches), confirming Phase 2 is a regularisation
+phase, not a computation phase; the inverse- λ \lambda timing law
+replicates across three primes (§ 5.3 ,
+§ 6 ).
+
+ • 
+ 
+ Formal timing prediction : Δ ​ t ≈ ( 1 / λ ) ​ log ⁡ ( ‖ W mem ​ ( t ∗ ) ‖ / τ ) \Delta t\approx(1/\lambda)\log(\|W_{\mathrm{mem}}(t^{*})\|/\tau) , validated by the intervention
+experiment (§ 6 ).
+
+ • 
+ 
+ Fourier rank : an exact analytical measure of per-neuron
+representational compression, showing smooth rank collapse (6 → \to 1)
+entirely within Phase 1.
+
+ • 
+ 
+ Architecture ablation : an attention-only transformer groks with
+a strong FSD precursor and an MLP-only model never groks; a single-layer
+model groks but its FSD lags, showing the precursor is a property of
+multi-block circuits (§ 5.7 ).
+
+ • 
+ 
+ Operation contrast : modular subtraction shows the same FSD
+precursor as addition; multiplication shows lagging FSD, mechanistically
+distinguishing these operations (§ 5.6 ).
+
+ • 
+ 
+ Zero-ablation causal hierarchy : block 1 attention drives
+generalisation while block 0 MLP is an organisational precursor.
+
+ 2 Background
+
+ Grokking.
+
+ Power et al. (2022) discovered that transformers on group-operation
+datasets exhibit long memorisation phases before sudden generalisation.
+ Nanda et al. (2023) characterised this as a three-phase process:
+restricted circuit formation, cleanup of memorisation, and full generalisation,
+and proposed “excluded loss” as a progress measure. Our FSD and Fourier rank
+are progress measures that do not require knowing the circuit in advance.
+ Liu et al. (2022) connected grokking to phase transitions in effective
+representation learning.
+
+ Fourier circuits.
+
+ The algorithm exploits the identity
+
+ cos ⁡ ( 2 ​ π ​ k ​ ( a + b ) / p ) = cos ⁡ ( 2 ​ π ​ k ​ a / p ) ​ cos ⁡ ( 2 ​ π ​ k ​ b / p ) − sin ⁡ ( 2 ​ π ​ k ​ a / p ) ​ sin ⁡ ( 2 ​ π ​ k ​ b / p ) , \cos\!\bigl(2\pi k(a+b)/p\bigr)=\cos(2\pi ka/p)\cos(2\pi kb/p)-\sin(2\pi ka/p)\sin(2\pi kb/p), 
+ 
+ (1) 
+
+ implemented via sinusoidal embeddings and attention dot-products. Each key
+frequency k k contributes a term proportional to cos ⁡ ( 2 ​ π ​ k ​ ( a + b − c ) / p ) \cos(2\pi k(a+b-c)/p) to the
+logit for answer c c ; summing over K K key frequencies produces the correct
+prediction.
+
+ Mechanistic interpretability.
+
+ Elhage et al. (2021) introduced the circuits framework.
+ Geiger et al. (2021) formalised causal intervention for circuits. We use
+ zero-ablation (setting a component’s output to zero) as an unambiguous
+test of causal necessity, avoiding the need for a specific reconstruction
+assumption.
+
+ 3 Setup
+
+ Model.
+
+ A 2-layer transformer: d model = 128 d_{\mathrm{model}}=128 , n heads = 4 n_{\mathrm{heads}}=4 ,
+ d mlp = 512 d_{\mathrm{mlp}}=512 (Linear–GELU–Linear per block), with residual
+connections and LayerNorm. Input tokens are [ a , b , sep ] [a,\;b,\;\texttt{sep}] 
+( sep = p \texttt{sep}=p ); the model predicts from the last position via a
+LayerNorm–Linear head. Full details are in Appendix B .
+
+ Training.
+
+ AdamW, η = 10 − 3 \eta=10^{-3} , weight decay λ = 1.0 \lambda=1.0 , batch size 512, 30%
+train / 70% validation split of all p 2 p^{2} pairs (split deterministically by
+seed). Checkpoints saved every 500 steps.
+
+ Experiments.
+
+ Eleven configurations covering five primes ( p ∈ { 53 , 71 , 97 , 113 , 131 } p\in\{53,71,97,113,131\} ),
+three seeds, one subtraction and one multiplication task (Table 1 ).
+
+ Table 1: Experimental configurations and grokking step (first checkpoint with
+validation accuracy ≥ 95 % \geq 95\% ). FSD synchronisation and lead times are reported
+in Table 2 after FSD is defined (§ 4 ).
+
+ Experiment 
+ Op 
+ p p 
+ Seed 
+ Grok Step 
+
+ add_mod97_s42 
+ + + 
+ 97 
+ 42 
+ 4,000 
+
+ add_mod97_s123 
+ + + 
+ 97 
+ 123 
+ 3,000 
+
+ add_mod97_s0 
+ + + 
+ 97 
+ 0 
+ 4,000 
+
+ add_mod97_s1 
+ + + 
+ 97 
+ 1 
+ 3,000 
+
+ add_mod97_s2 
+ + + 
+ 97 
+ 2 
+ 3,000 
+
+ add_mod53_s42 
+ + + 
+ 53 
+ 42 
+ 5,000 
+
+ add_mod71_s42 
+ + + 
+ 71 
+ 42 
+ 3,500 
+
+ add_mod113_s42 
+ + + 
+ 113 
+ 42 
+ 2,500 
+
+ add_mod131_s42 
+ + + 
+ 131 
+ 42 
+ 2,500 
+
+ mult_mod97_s42 
+ × \times 
+ 97 
+ 42 
+ 3,000 
+
+ sub_mod97_s42 
+ − - 
+ 97 
+ 42 
+ 5,500 
+
+ 4 Methods
+
+ Sum-conditioned activations.
+
+ For each checkpoint, partition all p 2 p^{2} inputs by sum value
+ s = ( a + b ) mod p s=(a+b)\bmod p and compute mean GELU activations:
+
+ A [ s , j ] = 1 | 𝒮 s | ∑ ( a , b ) : ( a + b ) ≡ s GELU ( W 1 𝐡 a ​ b ) j , A[s,j]\;=\;\frac{1}{|\mathcal{S}_{s}|}\sum_{(a,b):\,(a+b)\equiv s}\mathrm{GELU}\!\bigl(W_{1}\mathbf{h}_{ab}\bigr)_{j}, 
+ 
+ (2) 
+
+ where 𝐡 a ​ b \mathbf{h}_{ab} is the LayerNorm-normalised residual stream at the last
+position and j j indexes neurons. The matrix A ∈ ℝ p × d mlp A\in\mathbb{R}^{p\times d_{\mathrm{mlp}}} captures each neuron’s response to the sum value, with
+individual-token effects cancelled in the average.
+
+ Definition 1 (Fourier Rank) . 
+
+ The Fourier rank R j ​ ( τ ) R_{j}(\tau) of neuron j j at threshold τ \tau is the
+minimum number of DFT frequency components (excluding DC) explaining fraction
+ τ \tau of the sum-conditioned activation variance: 
+
+ R j ​ ( τ ) = min ⁡ { k | ∑ i = 1 k v ^ ( i ) , j ∑ f = 1 ⌊ p / 2 ⌋ v ^ f , j ≥ τ } , R_{j}(\tau)=\min\!\left\{\,k\;\middle|\;\frac{\sum_{i=1}^{k}\hat{v}_{(i),j}}{\sum_{f=1}^{\lfloor p/2\rfloor}\hat{v}_{f,j}}\;\geq\;\tau\,\right\}, 
+
+ where v ^ f , j = 2 ​ | A ^ ​ [ f , j ] | 2 \hat{v}_{f,j}=2|\hat{A}[f,j]|^{2} is the two-sided spectral power at
+positive frequency f f , and v ^ ( 1 ) , j ≥ v ^ ( 2 ) , j ≥ ⋯ \hat{v}_{(1),j}\geq\hat{v}_{(2),j}\geq\cdots 
+are sorted in descending order. 
+
+ We set τ = 0.90 \tau=0.90 . The median Fourier rank 
+ R ~ = median j ⁡ R j ​ ( 0.90 ) \tilde{R}=\operatorname{median}_{j}R_{j}(0.90) summarises circuit complexity;
+ R ~ = 1 \tilde{R}=1 indicates each neuron’s sum-conditioned response is explained
+by a single sinusoid.
+
+ Definition 2 (Frequency Synchronization Degree) . 
+
+ Let par ⁡ ( k ) \mathrm{par}(k) be the fraction of neurons whose dominant positive
+frequency equals k k : 
+
+ par ( k ) = 1 d mlp ∑ j [ k = argmax f ≥ 1 v ^ f , j ] . \mathrm{par}(k)=\frac{1}{d_{\mathrm{mlp}}}\sum_{j}\mathbf{1}\!\left[k=\operatorname*{argmax}_{f\geq 1}\hat{v}_{f,j}\right]. 
+
+ The FSD normalises peak participation against chance level
+ c = 1 / ⌊ p / 2 ⌋ c=1/\lfloor p/2\rfloor : 
+
+ FSD = max k ⁡ par ⁡ ( k ) − c 1 − c ∈ [ 0 , 1 ] . \mathrm{FSD}\;=\;\frac{\max_{k}\mathrm{par}(k)-c}{1-c}\;\in\;[0,1]. 
+
+ FSD = 0 \mathrm{FSD}=0 is uniform (no synchronisation);
+ FSD = 1 \mathrm{FSD}=1 is complete (all neurons share one dominant frequency). 
+
+ Top- k k extension. 
+For tasks where multiple key frequencies share representation (e.g.,
+add_mod113 where post-grokking rank = 2 =2 ), a natural generalisation replaces
+argmax with the set of top- k k dominant frequencies per neuron: 
+
+ FSD k = max S : | S | = k par ¯ ( S ) − c k 1 − c k , c k = k / ⌊ p / 2 ⌋ , \mathrm{FSD}_{k}=\frac{\max_{S:|S|=k}\bar{\mathrm{par}}(S)-c_{k}}{1-c_{k}},\quad c_{k}=k\big/\lfloor p/2\rfloor, 
+
+ where par ¯ ​ ( S ) \bar{\mathrm{par}}(S) is the mean participation of the k k chosen
+frequencies. We use k = 1 k=1 throughout this work; for add_mod113 we verify the
+conclusion holds with k = 2 k=2 . 
+
+ Statistical significance is assessed via permutation test (1,000 shuffles of
+the dominant-frequency assignment across neurons); we report p p -values and flag
+significance at α = 0.05 \alpha=0.05 .
+
+ FourierKAN symbolic extractor.
+
+ We fit a sparse Fourier regression to each neuron’s sum-conditioned activation:
+
+ A ^ ​ [ s , j ] = ∑ k = 0 K ( a k , j ​ cos ⁡ ( 2 ​ π ​ k ​ s / p ) + b k , j ​ sin ⁡ ( 2 ​ π ​ k ​ s / p ) ) , \hat{A}[s,j]=\sum_{k=0}^{K}\bigl(a_{k,j}\cos(2\pi ks/p)+b_{k,j}\sin(2\pi ks/p)\bigr), 
+
+ with L 1 L_{1} regularisation on the coefficients to enforce sparsity. The
+resulting fit provides both a quantitative R 2 R^{2} and an interpretable symbolic
+formula for each neuron.
+
+ Zero-component ablation.
+
+ For each component c c (block 0 MLP, block 1 MLP, block 0 attention, block 1
+attention), we register a PyTorch forward hook that replaces the component’s
+output tensor with zeros, then evaluate accuracy on the full p 2 p^{2} dataset. The
+accuracy drop Δ c = acc orig − acc c = 0 \Delta_{c}=\mathrm{acc}_{\mathrm{orig}}-\mathrm{acc}_{c=0} 
+measures causal necessity : a large drop indicates the rest of the model
+cannot compensate when component c c is silent. We note this is a conservative,
+component-level test; it measures whether a component is load-bearing in the
+residual stream, not whether it specifically computes any particular
+sub-algorithm.
+
+ Memorisation trajectory.
+
+ To directly evidence the Phase 2 mechanism, we reconstruct the exact 30%
+training split (using the checkpoint’s stored seed) and evaluate train and
+validation accuracy at every checkpoint. The generalisation gap 
+ gap ⁡ ( t ) = acc train ​ ( t ) − acc val ​ ( t ) \mathrm{gap}(t)=\mathrm{acc}_{\mathrm{train}}(t)-\mathrm{acc}_{\mathrm{val}}(t) 
+is a direct measure of active memorisation: it is large when the model has
+memorised training pairs without generalising, and collapses to near zero at
+grokking.
+
+ 5 Results
+
+ 5.1 FSD as a Leading Indicator of Grokking
+
+ Table 2 summarises all eleven experiments. For addition mod 97
+(seed 42), FSD rises to ≈ 0.84 \approx 0.84 at step 1,000, first crosses the
+synchronisation threshold (FSD ≥ 0.80 \geq 0.80 ) at step 1,500, and stabilises at
+ ≈ 0.97 \approx 0.97 post-grokking at step 4,000—a 2,500-step lead. Across all
+ nine addition configurations (five primes p ∈ { 53 , 71 , 97 , 113 , 131 } p\in\{53,71,97,113,131\} , three seeds), FSD synchronises before grokking with lead times ranging
+from 500 to 3,000 steps. Every one of the nine configurations has a
+positive lead (exact sign test, p = 2 − 9 × 2 ≈ 0.004 p=2^{-9}\times 2\approx 0.004 ). The mean
+lead is +1,722 steps (config-level bootstrap 95% CI: [ + 1,111 , + 2,333 ] [+1{,}111,+2{,}333] , B = 10 5 B=10^{5} resamples). Because five configurations share p = 97 p=97 , we
+also average within prime first and bootstrap over the five distinct primes
+(addressing pseudo-replication): the prime-clustered mean lead is
+ +1,740 steps (95% CI [ + 1,240 , + 2,400 ] [+1{,}240,+2{,}400] ), still entirely above
+zero. Pearson correlations between FSD and validation accuracy range from 0.49
+to 0.78. Modular subtraction shows FSD leads of +1,000 and +2,000 steps (two
+seeds), consistent with its shared algebraic structure. Modular multiplication
+shows FSD lagging grokking by 10,000 steps, confirming the precursor is
+operation-specific.
+
+ Table 2: Cross-experiment summary (11 configurations). Sync step = first checkpoint with
+FSD ≥ 0.80 \geq 0.80 (block 0 MLP). Lead time = = grok step − - sync step; negative means FSD lags
+grokking. Precursor = = FSD synchronises before grokking.
+Mean lead (9 addition configs): + 1,722 \mathbf{+1{,}722} steps; config-level 95% CI: [ + 1,111 , + 2,333 ] [+1{,}111,+2{,}333] ;
+prime-clustered 95% CI: [ + 1,240 , + 2,400 ] [+1{,}240,+2{,}400] (both entirely above zero).
+
+ Experiment 
+ p p 
+ Grok 
+ Sync 
+ Lead 
+ Precursor? 
+
+ add_mod97_s42 
+ 97 
+ 4000 
+ 1500 
+ +2500 
+ ✓ 
+
+ add_mod53_s42 
+ 53 
+ 5000 
+ 2000 
+ +3000 
+ ✓ 
+
+ add_mod113_s42 
+ 113 
+ 2500 
+ 1500 
+ +1000 
+ ✓ 
+
+ add_mod131_s42 
+ 131 
+ 2500 
+ 1000 
+ +1500 
+ ✓ 
+
+ add_mod71_s42 
+ 71 
+ 3500 
+ 2000 
+ +1500 
+ ✓ 
+
+ add_mod97_s0 
+ 97 
+ 4000 
+ 1000 
+ +3000 
+ ✓ 
+
+ add_mod97_s1 
+ 97 
+ 3000 
+ 2500 
+ +500 
+ ✓ 
+
+ add_mod97_s2 
+ 97 
+ 3000 
+ 2500 
+ +500 
+ ✓ 
+
+ add_mod97_s123 
+ 97 
+ 3000 
+ 1000 
+ +2000 
+ ✓ 
+
+ sub_mod97_s42 
+ 97 
+ 5500 
+ 4500 
+ +1000 
+ ✓ 
+
+ mult_mod97_s42 
+ 97 
+ 3000 
+ 13000 
+ − 10000 -10000 
+ × \times 
+
+ 5.2 FSD vs. Restricted-Logit Loss
+
+ To assess whether FSD is merely a proxy for existing progress measures, we
+compare it against a restricted-logit baseline : the cross-entropy loss
+computed when block 1 MLP hidden activations are filtered to retain only the
+top-7 key-frequency Fourier components. This is our instantiation of Nanda et
+al.’s “excluded loss” ( Nanda et al., 2023 ) , which measures how
+functionally capable the Fourier circuit is even before the model generalises.
+
+ Procedure.
+
+ For each checkpoint: (1) compute per-neuron DFT on block 1 activations; (2) identify
+the top-7 frequencies by neuron participation; (3) reconstruct activations
+using only those components; (4) complete the forward pass and compute
+cross-entropy loss. A low restricted loss signals a functional Fourier circuit;
+we declare sync when this loss first drops below 0.5 nats.
+
+ Results.
+
+ Table 3 shows FSD synchronises before restricted-logit loss in
+ all nine addition experiments , with FSD leads ranging from 500 to
+3,000 steps (mean + 1,722 +1{,}722 steps). In add_mod113_s42 , the
+restricted-logit loss does not drop below 0.5 nats until step 4,000—
+ 1,500 steps after grokking —while FSD synchronises 1,000 steps
+ before grokking. FSD is thus not only a better predictor than
+restricted-logit loss; for p = 113 p=113 (rank-2 representations) restricted-logit
+loss is not a valid predictor at all.
+
+ Table 3: FSD synchronisation step (FSD ≥ 0.80 \geq 0.80 , block 0) vs. restricted-logit
+loss threshold step (restricted loss ≤ 0.5 \leq 0.5 nats, block 1). FSD lead = = grok
+step − - FSD sync. ExLoss lead = = grok step − - ExLoss sync. Negative lead
+means the metric lags grokking.
+
+ Experiment 
+ Grok 
+ FSD sync 
+ FSD lead 
+ ExLoss sync 
+ ExLoss lead 
+ FSD wins? 
+
+ add_mod97_s42 
+ 4,000 
+ 1,500 
+ +2,500 
+ 4,000 
+ 0 
+ ✓ 
+
+ add_mod53_s42 
+ 5,000 
+ 2,000 
+ +3,000 
+ 5,000 
+ 0 
+ ✓ 
+
+ add_mod113_s42 
+ 2,500 
+ 1,500 
+ +1,000 
+ 4,000 
+ − 1,500 -1,500 
+ ✓✓ 
+
+ add_mod97_s123 
+ 3,000 
+ 1,000 
+ +2,000 
+ 3,000 
+ 0 
+ ✓ 
+
+ add_mod97_s0 
+ 4,000 
+ 1,000 
+ +3,000 
+ 4,000 
+ 0 
+ ✓ 
+
+ add_mod97_s1 
+ 3,000 
+ 2,500 
+ +500 
+ 3,000 
+ 0 
+ ✓ 
+
+ add_mod97_s2 
+ 3,000 
+ 2,500 
+ +500 
+ 3,000 
+ 0 
+ ✓ 
+
+ add_mod71_s42 
+ 3,500 
+ 2,000 
+ +1,500 
+ 3,500 
+ 0 
+ ✓ 
+
+ add_mod131_s42 
+ 2,500 
+ 1,000 
+ +1,500 
+ 2,500 
+ 0 
+ ✓ 
+
+ Mean (9 exps) 
+ — 
+ — 
+ + 1,722 +1{,}722 
+ — 
+ − 167 -167 
+ 9/9 
+
+ FSD’s advantage is particularly notable for p = 113 p=113 : this prime requires a
+rank-2 Fourier representation (two dominant frequencies sharing the circuit).
+The restricted-logit filter, targeting the top single frequency, fails to
+capture the full circuit state, while FSD’s top- k k generalisation correctly
+tracks multi-frequency synchronisation. Across all nine experiments, ExLoss
+never syncs before grokking (mean ExLoss lead = − 167 =-167 , dragged down by
+ p = 113 p=113 ’s − 1,500 -1{,}500 case); FSD consistently does.
+Figure 1 summarises the lead times visually.
+
+ Figure 1: 
+FSD lead (orange) vs. restricted-logit loss lead (blue) for all nine
+addition experiments. Positive values = metric synchronises before 
+grokking. FSD wins in every case; ExLoss ties grokking or lags it.
+
+ 5.3 Two-Phase Theory of Grokking
+
+ Figure 2 shows the three-panel trajectory for addition
+mod 97. Two distinct pre-grokking phases are visible.
+
+ Figure 2: 
+Two-phase grokking, addition mod 97 (seed 42).
+ Top : validation accuracy. Orange dashed line = rank-1 onset
+(step 2,500); red dashed = grokking (step 4,000); green shading = Phase 2.
+ Middle : median Fourier rank of block 0 MLP neurons, collapsing
+6  → \to  1 in Phase 1, then held flat through Phase 2.
+ Bottom : total Frobenius weight norm (solid) and block 0 MLP input
+norm (dashed), both declining continuously. The 1,500-step gap between rank
+collapse and grokking defines the circuit-liberation period.
+
+ Phase 1 — Circuit Formation (steps 0–2,500). 
+Median Fourier rank descends monotonically 6 → \,\to\, 1 (Table 5 ).
+Total weight norm drops from 76.72 to 28.60, a 62.7% reduction.
+Validation accuracy oscillates near 0–17%.
+
+ Phase 2 — Circuit Liberation (steps 2,500–4,000). 
+Fourier rank holds at 1 for 1,500 steps; weight norm declines a further 19.8%
+(28.60 → \to 22.94). Validation accuracy does not exceed 35%.
+Figure 4 provides direct evidence for the memorisation
+mechanism: train accuracy reaches 100% by step 1,000 and the generalisation
+gap (train − - val) peaks at 0.894. Throughout Phase 2, the gap holds at
+0.52–0.72 while the circuit is fully formed (rank = 1 =1 ). At grokking (step
+4,000), the gap collapses to 0.003 in a single checkpoint interval—a 99.4%
+drop—confirming that Phase 2 is the model pruning memorisation capacity while
+the Fourier circuit is already complete.
+
+ Grokking (step 4,000). 
+Validation accuracy jumps to 99.7% as weight norm reaches its minimum and the
+generalisation gap collapses simultaneously.
+
+ Causal validation via weight-decay intervention.
+
+ The two-phase account predicts that Phase 2 duration is determined by the
+regularisation rate, not by circuit formation time. To test this causally,
+we load the add_mod97_s42 checkpoint at step 1,000 (FSD = 0.84 =0.84 ,
+val acc = 10.6 % =10.6\% ) and fork into six independent branches with
+ λ ∈ { 1.0 , 2.0 , 3.0 , 4.0 , 5.0 , 10.0 } \lambda\in\{1.0,2.0,3.0,4.0,5.0,10.0\} , training each branch to step 8,000.
+
+ Table 4: Weight-decay intervention. Training forked at step 1,000 (FSD = 0.84 =0.84 ,
+val acc = 10.6 % =10.6\% ) with different λ \lambda . Grok step = first step with
+val acc ≥ 95 % \geq 95\% . Δ ​ t \Delta t = grok step − - 1,000. † \dagger : model grokked
+but training subsequently destabilised under high regularisation.
+ ‡ \ddagger : training destabilised; never grokked within 8,000 steps.
+
+ λ \lambda 
+ Grok step 
+ Δ ​ t \Delta t from fork 
+ Speedup vs. λ = 1 \lambda=1 
+
+ 1.0 
+ 4,000 
+ 3,000 
+ 1 × 1\times (control) 
+
+ 2.0 
+ 2,500 
+ 1,500 
+ 2 × 2\times 
+
+ 3.0 
+ 2,000 
+ 1,000 
+ 3 × 3\times 
+
+ 4.0 
+ 2,000 † 
+ 1,000 † 
+ 3 × † 3\times^{\dagger} 
+
+ 5.0 
+ 2,000 † 
+ 1,000 † 
+ 3 × † 3\times^{\dagger} 
+
+ 10.0 
+ — ‡ 
+ — ‡ 
+ n/a 
+
+ Higher weight decay produces earlier grokking monotonically for λ ∈ { 1 , 2 , 3 } \lambda\in\{1,2,3\} 
+(the stable branches), each consistent with Δ ​ t = 3,000 / λ \Delta t=3{,}000/\lambda :
+ λ = 2.0 \lambda=2.0 halves Phase 2 duration (3,000 → \to 1,500 steps) and
+ λ = 3.0 \lambda=3.0 reduces it by 3 × 3\times (3,000 → \to 1,000 steps).
+ λ ∈ { 4 , 5 } \lambda\in\{4,5\} also grokked at step 2,000 but training subsequently
+destabilised due to over-regularisation; λ = 10.0 \lambda=10.0 destabilised before
+grokking. The strict monotone ordering for λ ∈ { 1 , 2 , 3 } \lambda\in\{1,2,3\} causally
+confirms Phase 2 is a regularisation phase: the Fourier circuit was
+computation-complete at step 1,000; only the weight-decay rate determined when
+generalisation occurred. Figure 3 shows validation accuracy
+curves for all six branches alongside the 1 / λ 1/\lambda theory prediction.
+
+ Figure 3: 
+Weight-decay intervention (fork at step 1,000). Left : validation
+accuracy over time for λ ∈ { 1 , … , 5 , 10 } \lambda\in\{1,\ldots,5,10\} . Right :
+observed Δ ​ t \Delta t (bars) vs. theory prediction Δ ​ t = 3,000 / λ \Delta t=3{,}000/\lambda 
+(dashed). Stable branches ( λ ≤ 3 \lambda\leq 3 ) follow the theory exactly.
+
+ Figure 4: 
+Memorisation trajectory, addition mod 97 (seed 42).
+ Top : train accuracy (green, 30% split) and validation accuracy
+(blue, 70% split). Train accuracy reaches 100% by step 1,000; validation
+accuracy stays near zero until grokking at step 4,000.
+ Bottom : generalisation gap (train − - val, red fill). The gap
+peaks at 0.894 (step 1,000), is maintained throughout Phase 2 at 0.52–0.72,
+then collapses to 0.003 at grokking. This directly evidences that Phase 2
+is active memorisation being pruned, not a gradual transition.
+
+ Table 5: Rank and weight-norm trajectory, addition mod 97 (seed 42).
+
+ Step 
+ Val Acc 
+ Median Rank 
+ Total Norm 
+ Phase 
+
+ 500 
+ 0.006 
+ 6 
+ 76.72 
+ 1 (formation) 
+
+ 1,000 
+ 0.106 
+ 4 
+ 51.93 
+ 1 
+
+ 1,500 
+ 0.020 
+ 3 
+ 37.78 
+ 1 
+
+ 2,000 
+ 0.174 
+ 2 
+ 30.56 
+ 1 
+
+ 2,500 
+ 0.053 
+ 1 
+ 28.60 
+ 2 (liberation) 
+
+ 3,000 
+ 0.275 
+ 1 
+ 26.67 
+ 2 
+
+ 3,500 
+ 0.352 
+ 1 
+ 24.40 
+ 2 
+
+ 4,000 
+ 0.997 
+ 1 
+ 22.94 
+ Grokking 
+
+ 5,000 
+ 1.000 
+ 1 
+ 23.94 
+ post-grokking 
+
+ 5.4 FourierKAN Symbolic Extraction
+
+ Table 6 shows FourierKAN results across all nine addition
+experiments (block 0 MLP). The pattern is consistent: post-grokking,
+neurons converge to rank-1 (single-sinusoid) representations with
+analytical R 2 > 0.92 R^{2}>0.92 in eight of nine experiments. The FourierKAN
+independently recovers the same dominant frequency as the analytical DFT
+with 88–100% neuron agreement in eight experiments.
+
+ The exception is add_mod113_s42 ( p = 113 p=113 ): median rank converges
+to 2, rank-1 fraction is only 23%, and R 2 = 0.69 R^{2}=0.69 at rank 1 (vs. 0.92 0.92 at
+rank 2). This is not a failure of the model; it reflects that p = 113 p=113 
+requires two simultaneously active Fourier frequencies for the correct
+modular identity (consistent with the rank-2 representation in
+Table 1 ). The FSD 2 \mathrm{FSD}_{2} extension
+(Definition 2) confirms that the two-frequency synchronisation follows the
+same pre-grokking pattern.
+ add_mod131_s42 ( p = 131 p=131 ) shows strong analytical rank collapse
+( R 2 = 0.989 R^{2}=0.989 , rank 5 → 1 5{\to}1 , rank-1 frac 0.96) but FourierKAN training
+failed to converge for this prime (KAN R 2 = 0.04 R^{2}=0.04 ); we report analytical
+results only and mark the KAN column with † \dagger .
+
+ Table 6: FourierKAN symbolic extraction across nine addition experiments,
+block 0 MLP. Rank ↓ \downarrow = median rank before → \to after grokking.
+Rank-1 frac, R 2 R^{2} , KAN R 2 R^{2} , agree = post-grokking values.
+ † \dagger : KAN training did not converge; analytical result only.
+
+ Experiment 
+ Rank ↓ \downarrow 
+ Rank-1 frac 
+ R 2 R^{2} (rank 1) 
+ KAN R 2 R^{2} 
+ Agree 
+ Dom. freq 
+
+ add_mod97_s42 
+ 6 → 1 6{\to}1 
+ 0.94 
+ 0.986 
+ 0.992 
+ 1.00 
+ k ∗ = 5 k^{*}=5 
+
+ add_mod53_s42 
+ 3 → 1 3{\to}1 
+ 0.95 
+ 0.989 
+ 0.999 
+ 0.88 
+ k ∗ = 3 k^{*}=3 
+
+ add_mod113_s42 
+ 7 → 2 7{\to}2 
+ 0.23 
+ 0.690 
+ 0.920 
+ 0.96 
+ k ∗ = 9 k^{*}=9 
+
+ add_mod97_s123 
+ 5 → 1 5{\to}1 
+ 0.98 
+ 0.994 
+ 0.999 
+ 1.00 
+ k ∗ = 14 k^{*}=14 
+
+ add_mod97_s0 
+ 6 → 1 6{\to}1 
+ 0.89 
+ 0.971 
+ 0.989 
+ 0.99 
+ k ∗ = 11 k^{*}=11 
+
+ add_mod97_s1 
+ 6 → 1 6{\to}1 
+ 0.69 
+ 0.923 
+ 0.999 
+ 1.00 
+ k ∗ = 6 k^{*}=6 
+
+ add_mod97_s2 
+ 5 → 1 5{\to}1 
+ 0.77 
+ 0.930 
+ 0.939 
+ 0.97 
+ k ∗ = 39 k^{*}=39 
+
+ add_mod71_s42 
+ 4 → 1 4{\to}1 
+ 0.62 
+ 0.918 
+ 1.000 
+ 1.00 
+ k ∗ = 21 k^{*}=21 
+
+ add_mod131_s42 
+ 5 → 1 5{\to}1 
+ 0.96 
+ 0.989 
+ — † 
+ — † 
+ k ∗ = 54 k^{*}=54 
+
+ 5.5 Zero-Ablation Causal Hierarchy
+
+ Table 7 reports zero-ablation results for the post-grokking
+addition mod 97 model. Block 1 attention is the most critical component:
+zeroing it reduces accuracy to 5.4% (near chance, 1 / 97 ≈ 1 % 1/97\approx 1\% ).
+Block 0 attention and block 1 MLP are equally critical at 89 and 88 pp drops.
+Block 0 MLP—the layer tracked by FSD and Fourier rank—contributes
+only 11.8 pp, leaving 87.97% accuracy when removed.
+
+ Table 7: Zero-ablation results, addition mod 97 (seed 42), step 4,000.
+Chance level = 1 / 97 ≈ 1 % =1/97\approx 1\% .
+
+ Ablated component 
+ Accuracy (%) 
+ Drop (pp) 
+ Interpretation 
+
+ None (original) 
+ 99.82 
+ — 
+ baseline 
+
+ Zero block 0 MLP 
+ 87.97 
+ 11.8 
+ important sub-circuit 
+
+ Zero block 1 MLP 
+ 11.82 
+ 88.0 
+ critical 
+
+ Zero block 0 attention 
+ 10.78 
+ 89.0 
+ critical 
+
+ Zero block 1 attention 
+ 5.40 
+ 94.4 
+ most critical 
+
+ 5.6 Operation Contrast: Addition, Subtraction, and Multiplication
+
+ Modular multiplication under the same architecture shows reversed timing
+(Table 2 ): FSD synchronises at step 13,000, 10,000 steps
+after grokking at step 3,000. This confirms that the FSD precursor is specific
+to addition. Multiplication lacks the sum-to-product identity
+(Eq. 1 ) that makes a Fourier circuit the efficient solution; the
+model likely implements a different algorithm (e.g., discrete logarithm), with
+Fourier-like organisation emerging only post-hoc as a side effect of weight
+decay compressing the generalising solution. That a model can grok the same
+operation via qualitatively different procedures is established
+ ( Zhong et al., 2023 ; Stander et al., 2024 ) ; FSD, by construction, tracks only
+the Fourier-synchronisation route, which is why it leads for addition and lags
+for multiplication.
+
+ Modular subtraction.
+
+ ( a − b ) mod p (a-b)\bmod p is algebraically equivalent to addition modulo p p (same
+group structure, same Fourier identity). We predict FSD should synchronise
+before grokking for subtraction with the same dominant frequency.
+Results: sub_mod97_s42 groks at step 5,500 with FSD sync at
+step 4,500 (lead = + 1,000 =+1{,}000 ); sub_mod97_s123 groks at step 5,000
+with FSD sync at step 3,000 (lead = + 2,000 =+2{,}000 ). In both cases FSD synchronises
+before grokking, confirming the precursor pattern extends to modular subtraction.
+Subtraction groks approximately 1,500 steps later than addition (step 5,000–5,500
+vs. 3,000–4,000), consistent with slightly more complex group structure under
+the same training configuration.
+
+ 5.7 Architecture Ablation
+
+ To establish that FSD measures general Fourier circuit synchronisation rather
+than a feature specific to the 2-layer transformer, we train three variants on
+ add_mod97_s42 : (1) a 1-layer standard transformer ( n layers = 1 n_{\mathrm{layers}}=1 ),
+(2) a 2-layer attention-only model (MLP blocks replaced with identity,
+so all computation is residual attention), and (3) a 2-layer MLP-only
+model (attention replaced with identity).
+
+ Table 8: Architecture ablation on add_mod97_s42 . FSD computed on the
+dominant computational unit (MLP hidden for standard/MLP-only; attention output
+for attention-only).
+
+ Architecture 
+ Grok step 
+ FSD sync 
+ Lead 
+ FSD precursor? 
+
+ 2-layer standard (baseline) 
+ 4,000 
+ 2,500 
+ +1,500 
+ ✓ 
+
+ 1-layer standard 
+ 4,500 
+ 5,500 
+ − 1,000 -1,000 
+ × \times 
+
+ 2-layer attention-only 
+ 4,000 
+ 1,000 
+ +3,000 
+ ✓ 
+
+ 2-layer MLP-only 
+ — 
+ 500 
+ n/a 
+ n/a 
+
+ Figure 5: 
+Architecture ablation FSD lead times. The 2-layer attention-only model
+shows the strongest precursor (+3,000 steps). The 2-layer standard baseline
+shows +1,500. The 1-layer standard is negative (FSD lags). The MLP-only
+model never grokked (hatched).
+
+ The results confirm two hypotheses and reveal one nuance. The 2-layer
+attention-only model groks at step 4,000 and shows block-0 attention FSD
+leading by 3,000 steps—the same magnitude as the 2-layer standard baseline.
+The 2-layer MLP-only model does not grok within 15,000 steps, confirming
+that attention is a necessary component for the Fourier algorithm on addition.
+The 1-layer standard result is informative: the model groks at step 4,500
+but block-0 MLP FSD doesn’t reach 0.80 until step 5,500 (after grokking).
+In a single-layer model, block-0 MLP has no downstream circuit to precede;
+it must carry the full computational load simultaneously. The 2-layer finding
+that block-0 MLP is an upstream organisational precursor (not load-bearing)
+is specific to architectures where a secondary circuit can consolidate after the
+primary sub-circuit organises.
+
+ 6 Theory: Predicting Phase 2 Duration
+
+ Setup.
+
+ Let λ \lambda denote weight decay and ‖ W mem ​ ( t ∗ ) ‖ F \|W_{\mathrm{mem}}(t^{*})\|_{F} the total
+parameter norm at the circuit-formation step t ∗ t^{*} (the fork point, detected
+via FSD). Under gradient descent with weight decay, once the Fourier circuit is
+stable and gradient updates are dominated by the decay term, the norm decays
+approximately as ‖ W ‖ ​ ( t ) ≈ ‖ W ⁡ ( t ∗ ) ‖ ⋅ e − λ ⁡ ( t − t ∗ ) \|W\|(t)\approx\|W(t^{*})\|\cdot e^{-\lambda(t-t^{*})} .
+Grokking occurs when the memorisation component drops below a threshold τ \tau 
+at which the circuit’s logits dominate:
+
+ Δ ​ t ≈ 1 λ ​ log ⁡ ‖ W mem ​ ( t ∗ ) ‖ τ . \Delta t\;\approx\;\frac{1}{\lambda}\log\!\frac{\|W_{\mathrm{mem}}(t^{*})\|}{\tau}. 
+ 
+ (3) 
+
+ Prediction.
+
+ Eq. 3 makes the falsifiable prediction Δ ​ t ∝ 1 / λ \Delta t\propto 1/\lambda :
+increasing λ \lambda at the fork point should reduce Phase 2 duration
+proportionally, with the constant C = log ⁡ ( ‖ W ⁡ ( t ∗ ) ‖ / τ ) C=\log(\|W(t^{*})\|/\tau) fixed by the state
+at t ∗ t^{*} and independent of which λ \lambda branch is taken. We emphasise that it
+is the inverse- λ \lambda scaling that is tested here, not the absolute
+value of τ \tau : because C C enters only through a logarithm, τ \tau is not
+separately identifiable from the timing data alone (any ( ‖ W mem ‖ , τ ) (\|W_{\mathrm{mem}}\|,\tau) pair with the same ratio yields the same fit). We therefore treat
+Eq. 3 as motivating an empirical one-parameter scaling law 
+ Δ ​ t = C / λ \Delta t=C/\lambda , and report C C rather than claiming a measured τ \tau .
+
+ Numerical validation.
+
+ We fit Δ ​ t = C / λ \Delta t=C/\lambda against all five grokked branches
+( λ ∈ { 1 , 2 , 3 , 4 , 5 } \lambda\in\{1,2,3,4,5\} ; λ = 10 \lambda=10 destabilised training before grokking)
+using the single parameter C = mean ⁡ ( λ i ⋅ Δ ​ t i ) C=\mathrm{mean}(\lambda_{i}\cdot\Delta t_{i}) .
+This gives C = 3,600 C=3{,}600 and R 2 = 0.81 R^{2}=0.81 (Table 9 ).
+The three fully stable branches ( λ ∈ { 1 , 2 , 3 } \lambda\in\{1,2,3\} ) give C = 3,000 C=3{,}000 
+with perfect fit ( R 2 = 1.00 R^{2}=1.00 ), consistent with checkpoint-resolution aliasing
+at λ ≥ 4 \lambda\geq 4 where predicted Δ ​ t < 1,000 \Delta t<1{,}000 approaches the 500-step
+measurement granularity.
+
+ Table 9: Phase 2 timing model fit. Fit: Δ ​ t = 3,600 / λ \Delta t=3{,}600/\lambda (all branches);
+ Δ ​ t = 3,000 / λ \Delta t=3{,}000/\lambda (stable branches, λ ≤ 3 \lambda\leq 3 ).
+Fork norm ‖ W ⁡ ( t ∗ ) ‖ F = 51.93 \|W(t^{*})\|_{F}=51.93 . λ = 10 \lambda=10 excluded (training instability).
+ † \dagger : grokked but later destabilised; Δ ​ t \Delta t measurement reliable.
+
+ λ \lambda 
+ Δ ​ t obs \Delta t_{\mathrm{obs}} 
+ Δ ​ t pred \Delta t_{\mathrm{pred}} 
+ Error 
+ Status 
+
+ 1.0 
+ 3,000 
+ 3,600 
+ 600 
+ stable 
+
+ 2.0 
+ 1,500 
+ 1,800 
+ 300 
+ stable 
+
+ 3.0 
+ 1,000 
+ 1,200 
+ 200 
+ stable 
+
+ 4.0 
+ 1,000 † 
+ 900 
+ 100 
+ unstable post-grokking 
+
+ 5.0 
+ 1,000 † 
+ 720 
+ 280 
+ unstable post-grokking 
+
+ 10.0 
+ — 
+ 360 
+ — 
+ destabilised 
+
+ The monotone ordering ( λ = 1 , 2 , 3 \lambda=1,2,3 : Δ ​ t = 3000 , 1500 , 1000 \Delta t=3000,1500,1000 ) perfectly
+tracks 1 / λ 1/\lambda , confirming the inverse-linear relationship. The deviation
+for λ ≥ 4 \lambda\geq 4 is attributable to checkpoint-resolution aliasing (predicted
+ Δ ​ t < 1,000 \Delta t<1{,}000 below the 500-step measurement granularity) rather than model
+failure: both branches grokked on schedule before destabilising.
+This points to a practical refinement: increase λ \lambda at the FSD ceiling,
+then decrease it back to a stable value after grokking.
+
+ Cross-prime replication.
+
+ To test whether the inverse- λ \lambda law is specific to p = 97 p=97 or a general
+property of the regularisation phase, we repeat the intervention on two
+additional primes, forking each at its own FSD-ceiling step (FSD ≥ 0.80 \geq 0.80 ,
+val acc still low): p = 53 p=53 at step 2,000 and p = 131 p=131 at step 1,000. We measure
+ Δ ​ t \Delta t at 100-step checkpoint resolution (eliminating the aliasing
+caveat above) and fit Δ ​ t = C p / λ \Delta t=C_{p}/\lambda independently per prime
+(Table 10 , Figure 6 ). All three primes
+show monotone acceleration of grokking with increasing λ \lambda . The
+inverse- λ \lambda law fits cleanly for p = 131 p=131 ( C = 1,767 C=1{,}767 , R 2 = 0.99 R^{2}=0.99 over the
+stable branches) and p = 97 p=97 ( R 2 = 1.00 R^{2}=1.00 ), and the over-regularisation ceiling
+replicates— p = 131 p=131 fails to grok at λ = 5 \lambda=5 , mirroring p = 97 p=97 at
+ λ = 10 \lambda=10 . For p = 53 p=53 the trend is monotone but the fit is weaker
+( C = 5,150 C=5{,}150 , R 2 = 0.49 R^{2}=0.49 ): Δ ​ t \Delta t saturates at ≈ \approx 1,400 steps for
+ λ ∈ { 3 , 5 } \lambda\in\{3,5\} , and the single-seed control is noisier. The constant
+ C p C_{p} decreases with p p (5,150, 3,000, 1,767 for p = 53 , 97 , 131 p=53,97,131 ),
+consistent with Eq. 3 , in which C p = log ⁡ ( ‖ W mem ​ ( t ∗ ) ‖ / τ ) C_{p}=\log(\|W_{\mathrm{mem}}(t^{*})\|/\tau) 
+varies with the per-prime memorisation scale at the fork; we do not fit a
+ C p C_{p} -vs- p p law from three points.
+
+ Table 10: Cross-prime weight-decay intervention. Each prime forked at its
+FSD-ceiling step; Δ ​ t \Delta t = grok step − - fork step at 100-step resolution.
+Fit Δ ​ t = C p / λ \Delta t=C_{p}/\lambda over grokked branches. ‡ \ddagger : did not grok
+(over-regularised).
+
+ p p 
+ fork 
+ Δ ​ t ​ ( λ = 1 ) \Delta t(\lambda{=}1) 
+ Δ ​ t ​ ( λ = 2 ) \Delta t(\lambda{=}2) 
+ Δ ​ t ​ ( λ = 3 ) \Delta t(\lambda{=}3) 
+ Δ ​ t ​ ( λ = 5 ) \Delta t(\lambda{=}5) 
+ C p C_{p} 
+ R 2 R^{2} 
+
+ 53 
+ 2,000 
+ 3,800 
+ 2,800 
+ 1,400 
+ 1,400 
+ 5,150 
+ 0.49 
+
+ 97 
+ 1,000 
+ 3,000 
+ 1,500 
+ 1,000 
+ 1,000 † 
+ 3,000 
+ 1.00 
+
+ 131 
+ 1,000 
+ 1,700 
+ 900 
+ 600 
+ — ‡ 
+ 1,767 
+ 0.99 
+
+ Figure 6: 
+Cross-prime Phase-2 timing law. (a) Δ ​ t \Delta t vs. λ \lambda with
+independent C p / λ C_{p}/\lambda fits (dashed). (b) Log–log: p = 97 p=97 and
+ p = 131 p=131 track the slope − 1 -1 reference; p = 53 p=53 is monotone but flattens at
+high λ \lambda . The inverse- λ \lambda law replicates across primes (cleanly
+for p = { 97,131 } p=\{97,131\} , directionally for p = 53 p=53 ).
+
+ Implication.
+
+ Eq. 3 separates Phase 1 (circuit formation) from Phase 2
+(regularisation): circuit formation time depends on the task and architecture;
+Phase 2 duration depends only on λ \lambda and the initial memorisation scale.
+This suggests a practical training strategy: monitor FSD; when it plateaus,
+ increase λ \lambda to accelerate grokking without restarting training.
+
+ 7 Discussion
+
+ Why block 0 MLP predicts without causing.
+
+ The zero-ablation results (Table 7 ) show block 0 MLP
+contributes only 11.8 pp, yet its rank collapse robustly predicts grokking
+500–3,000 steps ahead. These are not contradictory. Block 0 MLP forms a
+ leading-indicator sub-circuit : it organises around the correct
+frequency k ∗ k^{*} first, in Phase 1, and this organised state is a precondition
+for the primary attention-based circuit to consolidate. The 1,500-step Phase 2
+gap corresponds to block 1 attention and block 1 MLP consolidating after
+block 0 MLP has become Fourier-organised.
+
+ Why the amplitude is small.
+
+ The FourierKAN formula has amplitude c j ≈ 10 − 4 c_{j}\approx 10^{-4} , two orders of
+magnitude below the typical activation scale. This is because A ⁡ [ s , j ] A[s,j] averages
+over p p pairs sharing sum s s ; large individual-token features (driven by
+specific values of a a and b b ) cancel, leaving only the tiny but coherently
+organised sum-dependent residual. The zero-ablation drop being 12 pp rather
+than catastrophic is consistent: the residual stream carries substantial
+individual-token information through block 0’s output even without its MLP.
+
+ Causal structure of Phase 2.
+
+ Our weight-decay intervention provides a direct causal test of the two-phase
+account. Since FSD reaches its ceiling at step 1,000 (FSD = 0.84 =0.84 ), the
+Fourier circuit is computation-complete long before grokking at step 4,000.
+If Phase 2 is a regularisation phase, increasing λ \lambda at step 1,000
+should shorten Phase 2 proportionally. The intervention data confirm this
+prediction (§ 5.3 , § 6 ): grokking accelerates
+monotonically with λ \lambda , and the inverse- λ \lambda law replicates across
+three primes. The memorisation trajectory
+(Figure 4 ) already provides direct evidence: train
+accuracy is 100% throughout Phase 2 while validation accuracy stays below
+35%, and the generalisation gap collapses by 99.4% at grokking—a direct
+measurement of memorisation removal, not mere correlation.
+
+ On zero-ablation as a causal tool.
+
+ Zero-ablation measures causal necessity within the residual stream: a
+component with a large drop is load-bearing. It does not, however, distinguish
+“this component computes the Fourier algorithm” from “this component
+transmits important residual stream information that another component uses.”
+A sharper test would patch individual attention heads ( Geiger et al., 2021 ) .
+Our interpretation—that block 0 MLP is an organisational precursor while
+block 1 attention is the primary pathway—is consistent with both the ablation
+results and the Fourier rank evidence, but head-level patching remains a
+valuable extension.
+
+ Limitations and scope.
+
+ Experiments are restricted to 2-layer transformers with p ∈ { 53 , 71 , 97 , 113 , 131 } p\in\{53,71,97,113,131\} .
+These are small primes, and the two-phase theory and FSD precursor have not been
+tested beyond toy modular arithmetic. Our nine addition configurations are not
+fully independent: five share p = 97 p=97 (differing only in seed), so the effective
+number of distinct primes is four. We mitigate this by reporting a
+prime-clustered confidence interval (§ 5.1 ), which remains
+entirely above zero, but a larger sweep of distinct primes would strengthen the
+estimate. The causal intervention is replicated across three primes
+( p ∈ { 53 , 97 , 131 } p\!\in\!\{53,97,131\} ) but a single seed per ( prime , λ ) (\text{prime},\lambda) cell;
+the p = 53 p=53 fit is correspondingly noisy, and whether the inverse- λ \lambda law
+extends to other operations (e.g. subtraction) is untested. The timing
+law is an empirical one-parameter
+fit ( τ \tau is not separately identifiable; § 6 ), not a
+first-principles derivation. FourierKAN extraction converged for eight of nine
+primes but failed to fit p = 131 p=131 (KAN R 2 = 0.04 R^{2}=0.04 ) despite a clean analytical
+rank collapse, indicating the trained-basis variant is less robust than the
+analytical DFT it validates. The natural extension is to larger primes,
+deeper models, and other algorithmic tasks (sorting, permutation groups, finite
+field arithmetic). We expect the FSD metric to generalise wherever a small set
+of Fourier frequencies dominates the algorithm; the top- k k extension in
+Definition 2 handles multi-frequency regimes. The Fourier rank collapse may not
+be the right progress measure for non-Fourier algorithms—identifying analogous
+spectral signatures for other operations is an open direction.
+Omnigrok ( Liu et al., 2023 ) showed grokking extends beyond modular
+arithmetic; our analysis of multiplication already suggests the mechanisms
+differ, and applying these tools to the broader Omnigrok suite is future work.
+
+ 8 Related Work
+
+ Grokking and progress measures.
+
+ Power et al. (2022) discovered and named grokking.
+ Nanda et al. (2023) provided the Fourier circuit account and proposed
+excluded loss as a progress measure, which requires knowing the circuit
+components in advance. Barak et al. (2022) showed that SGD exhibits
+“hidden progress” on parity learning—improvement invisible from the
+training loss that manifests as a sudden accuracy jump—an observation
+directly analogous to our FSD precursor. Liu et al. (2022) gave a
+statistical mechanics characterisation of grokking as a phase transition, and
+ Olsson et al. (2022) documented an analogous abrupt emergence (induction
+heads) detectable before the downstream capability appears. Liu et al. (2023) 
+demonstrated that grokking extends to non-modular tasks (image classification,
+language models), motivating the extension of our tools to broader settings.
+A complementary line characterises the dynamics of the transition:
+ Thilak et al. (2022) link grokking to a “slingshot” optimisation
+instability under adaptive optimisers—which we observe as the post-grokking
+destabilisation at high λ \lambda (Table 4 )—
+ Kumar et al. (2024) frame it as a lazy-to-rich transition,
+ Merrill et al. (2023) as competition between a dense and a sparse subnetwork,
+and Davies et al. (2023) relate grokking to double descent. Our two-phase
+FSD account is consistent with these but adds a circuit-agnostic leading
+indicator and a controlled causal handle.
+
+ Mechanisms of modular arithmetic.
+
+ The specific algorithm a transformer learns for modular arithmetic is not
+unique: Zhong et al. (2023) show that small hyperparameter changes induce
+qualitatively different procedures (a “clock” and a “pizza” algorithm),
+both Fourier-based. Gromov (2023) derived an analytic solution for
+the grokked Fourier circuit, and Stander et al. (2024) reverse-engineered
+grokked group multiplication via coset structure. This multiplicity is
+directly relevant to our operation contrast (§ 5.6 ):
+the FSD precursor tracks the Fourier algorithm that dominates addition, and its
+absence for multiplication is consistent with a different underlying procedure.
+
+ Relationship to circuit-efficiency accounts.
+
+ Closest to our causal claim is Varma et al. (2023) , who explain grokking
+through circuit efficiency : a generalising circuit achieves lower
+parameter norm per unit logit than the memorising circuit, so weight decay
+eventually favours it, and they characterise grokking (and “ungrokking”) in
+terms of this efficiency gap. Our contribution is complementary and more
+fine-grained in three ways. First, we supply a leading indicator (FSD)
+that fires before generalisation and before excluded loss, whereas the
+efficiency account is primarily explanatory rather than predictive. Second, our
+fork-and-vary- λ \lambda intervention holds circuit formation fixed (same
+step-1,000 checkpoint, same FSD) and varies only λ \lambda , isolating the
+regularisation rate as the sole free variable controlling Phase 2 duration—a
+sharper manipulation than comparing runs that differ from initialisation. Third,
+we give an explicit inverse- λ \lambda timing law for the transition. We view our
+results as direct, controlled evidence for the mechanism that
+ Varma et al. (2023) argue for on efficiency grounds. On the practical side
+of accelerating grokking, Lee et al. (2024) amplify slow-varying
+gradient components; our intervention is complementary, controlling the
+transition through the regularisation rate from a diagnosed circuit-formation
+point rather than through the optimiser.
+
+ Mechanistic interpretability.
+
+ Elhage et al. (2021) established the circuits framework.
+ Geiger et al. (2021) formalised causal abstraction via activation
+patching, and Meng et al. (2022) used activation patching to localise and
+edit factual associations. Wang et al. (2022) applied patching to
+identify the IOI circuit in GPT-2, and Conmy et al. (2023) automated this
+search; our zero-ablation is a coarser but more systematic analogue that trades
+circuit-level precision for an unambiguous necessity test.
+
+ Spectral analysis and symbolic regression.
+
+ Rahaman et al. (2019) showed that neural networks exhibit a spectral
+bias toward low frequencies during training; our Fourier rank collapse is
+consistent with this bias compressing the Fourier circuit representation to
+its minimal frequency set. Liu et al. (2024) introduced Kolmogorov-Arnold
+Networks with learnable basis functions; our FourierKAN is a single-basis
+variant used here solely for symbolic extraction and validation of the
+analytical DFT decomposition.
+
+ 9 Conclusion
+
+ We have provided a quantitative, mechanistic account of grokking as a
+two-phase process, with new causal and comparative evidence. FSD and Fourier
+rank, computed from raw MLP activations without prior circuit knowledge, predict
+grokking 500–3,000 steps in advance across all nine addition experiments (mean
+lead + 1,722 +1{,}722 steps; every configuration positive). FSD synchronises
+ before restricted-logit loss (Nanda’s excluded loss) in all nine
+configurations, establishing it as the earliest available predictor of Fourier
+circuit formation. A weight-decay intervention—forking at a fixed step-1,000
+checkpoint and varying only λ \lambda —causally confirms Phase 2 is a
+regularisation phase: the circuit is computation-complete 3,000 steps before
+grokking; only the rate of memorisation weight decay determines when
+generalisation occurs. This provides direct, controlled support for the
+circuit-efficiency account of Varma et al. (2023) , and we summarise the
+transition with an empirical inverse- λ \lambda timing law Δ ​ t = C / λ \Delta t=C/\lambda 
+(motivated by Δ ​ t ≈ ( 1 / λ ) ​ log ⁡ ( ‖ W mem ‖ / τ ) \Delta t\approx(1/\lambda)\log(\|W_{\mathrm{mem}}\|/\tau) ) that
+replicates across three primes ( p ∈ { 53 , 97 , 131 } p\!\in\!\{53,97,131\} ; clean for p = { 97,131 } p=\{97,131\} ,
+ R 2 ≥ 0.99 R^{2}\geq 0.99 ). Zero-ablation establishes that attention
+layers—not block 0 MLP—carry the primary computational load, clarifying
+the leading-indicator role of block 0 MLP. The multiplication and subtraction
+contrasts confirm the signal is operation-specific. Grokking is best understood
+as a two-step process: a leading sub-circuit forms and compresses (Phase 1),
+creating preconditions for the primary circuit to consolidate (Phase 2), after
+which generalisation follows once memorisation capacity is pruned away—a
+process that can be directly controlled by adjusting weight decay.
+
+ Reproducibility.
+
+ All experiments run on a single Apple Silicon Mac (MPS backend). Addition
+models converge in under 10 minutes per run; multiplication takes ≈ \approx 1
+hour (55,000 steps). Cross-architecture ablations and multi-seed experiments
+run concurrently. Code will be made available upon publication.
+
+ Acknowledgements
+
+ The author thanks the mechanistic interpretability community and the framework
+of Nanda et al. (2023) , which provided the interpretive scaffold for
+this work.
+
+ References
+
+ Conmy et al. [2023] 
+ 
+A. Conmy, A. Mavor-Parker, A. Lynch, S. Heimersheim, and A. Garriga-Alonso.
+
+ Towards automated circuit discovery for mechanistic interpretability.
+
+ In Advances in Neural Information Processing Systems (NeurIPS) ,
+volume 36, 2023.
+
+ Davies et al. [2023] 
+ 
+X. Davies, L. Langosco, and D. Krueger.
+
+ Unifying grokking and double descent.
+
+ arXiv preprint arXiv:2303.06173 , 2023.
+
+ Gromov [2023] 
+ 
+A. Gromov.
+
+ Grokking modular arithmetic.
+
+ arXiv preprint arXiv:2301.02679 , 2023.
+
+ Kumar et al. [2024] 
+ 
+T. Kumar, B. Bordelon, S. J. Gershman, and C. Pehlevan.
+
+ Grokking as the transition from lazy to rich training dynamics.
+
+ In International Conference on Learning Representations (ICLR) ,
+2024.
+
+ Lee et al. [2024] 
+ 
+J. Lee, B. G. Kang, K. Kim, and K. M. Lee.
+
+ Grokfast: Accelerated grokking by amplifying slow gradients.
+
+ arXiv preprint arXiv:2405.20233 , 2024.
+
+ Meng et al. [2022] 
+ 
+K. Meng, D. Bau, A. Andonian, and Y. Belinkov.
+
+ Locating and editing factual associations in GPT.
+
+ In Advances in Neural Information Processing Systems (NeurIPS) ,
+volume 35, 2022.
+
+ Merrill et al. [2023] 
+ 
+W. Merrill, N. Tsilivis, and A. Shukla.
+
+ A tale of two circuits: Grokking as competition of sparse and dense
+subnetworks.
+
+ arXiv preprint arXiv:2303.11873 , 2023.
+
+ Olsson et al. [2022] 
+ 
+C. Olsson, N. Elhage, N. Nanda, N. Joseph, N. DasSarma, T. Henighan, B. Mann,
+A. Askell, Y. Bai, A. Chen, et al.
+
+ In-context learning and induction heads.
+
+ Transformer Circuits Thread , 2022.
+
+ Stander et al. [2024] 
+ 
+D. Stander, Q. Yu, H. Fan, and S. Biderman.
+
+ Grokking group multiplication with cosets.
+
+ In International Conference on Machine Learning (ICML) , 2024.
+
+ Thilak et al. [2022] 
+ 
+V. Thilak, E. Littwin, S. Zhai, O. Saremi, R. Paiss, and J. Susskind.
+
+ The slingshot mechanism: An empirical study of adaptive optimizers and
+the grokking phenomenon.
+
+ arXiv preprint arXiv:2206.04817 , 2022.
+
+ Zhong et al. [2023] 
+ 
+Z. Zhong, Z. Liu, M. Tegmark, and J. Andreas.
+
+ The clock and the pizza: Two stories in mechanistic explanation of
+neural networks.
+
+ In Advances in Neural Information Processing Systems (NeurIPS) ,
+volume 36, 2023.
+
+ Elhage et al. [2021] 
+ 
+N. Elhage, N. Nanda, C. Olsson, T. Henighan, N. Joseph, B. Mann, A. Askell,
+Y. Bai, A. Chen, T. Conerly, N. DasSarma, D. Drain, D. Ganguli,
+Z. Hatfield-Dodds, D. Hernandez, A. Jones, J. Kernion, L. Lovitt, K. Ndousse,
+D. Amodei, T. Brown, J. Clark, J. Kaplan, S. McCandlish, and C. Olah.
+
+ A mathematical framework for transformer circuits.
+
+ Transformer Circuits Thread , 2021.
+
+ Barak et al. [2022] 
+ 
+B. Barak, B. Edelman, S. Goel, S. Kakade, E. Malach, and C. Zhang.
+
+ Hidden progress in deep learning: SGD learns parities near the
+computational limit.
+
+ In Advances in Neural Information Processing Systems (NeurIPS) ,
+volume 35, 2022.
+
+ Geiger et al. [2021] 
+ 
+A. Geiger, H. Lu, T. Icard, and C. Potts.
+
+ Causal abstractions of neural networks.
+
+ In Advances in Neural Information Processing Systems (NeurIPS) ,
+volume 34, 2021.
+
+ Liu et al. [2022] 
+ 
+Z. Liu, Z. Zhu, and M. Tegmark.
+
+ Towards understanding grokking: An effective theory of representation
+learning.
+
+ In NeurIPS , volume 35, 2022.
+
+ Liu et al. [2023] 
+ 
+Z. Liu, E. J. Michaud, and M. Tegmark.
+
+ Omnigrok: Grokking beyond algorithmic data.
+
+ In International Conference on Learning Representations (ICLR) ,
+2023.
+
+ Liu et al. [2024] 
+ 
+Z. Liu, Y. Wang, S. Vaidya, F. Ruehle, J. Halverson, M. Soljacic, T. Y. Hou,
+and M. Tegmark.
+
+ KAN: Kolmogorov-Arnold networks.
+
+ arXiv preprint arXiv:2404.19756 , 2024.
+
+ Nanda et al. [2023] 
+ 
+N. Nanda, L. Chan, T. Lieberum, J. Smith, and J. Steinhardt.
+
+ Progress measures for grokking via mechanistic interpretability.
+
+ In International Conference on Learning Representations (ICLR) ,
+2023.
+
+ Power et al. [2022] 
+ 
+A. Power, Y. Burda, H. Edwards, I. Babuschkin, and V. Misra.
+
+ Grokking: Generalization beyond overfitting on small algorithmic
+datasets.
+
+ arXiv preprint arXiv:2201.02177 , 2022.
+
+ Rahaman et al. [2019] 
+ 
+N. Rahaman, A. Baratin, D. Arpit, F. Draxler, M. Lin, F. Hamprecht, Y. Bengio,
+and A. Courville.
+
+ On the spectral bias of neural networks.
+
+ In International Conference on Machine Learning (ICML) , 2019.
+
+ Varma et al. [2023] 
+ 
+V. Varma, R. Shah, Z. Kenton, J. Kramár, and R. Kumar.
+
+ Explaining grokking through circuit efficiency.
+
+ arXiv preprint arXiv:2309.02390 , 2023.
+
+ Wang et al. [2022] 
+ 
+K. Wang, A. Variengien, A. Conmy, B. Shlegeris, and J. Steinhardt.
+
+ Interpretability in the wild: A circuit for indirect object
+identification in GPT-2 small.
+
+ In ICLR , 2022.
+
+ Appendix A FSD Algorithm
+
+ Algorithm 1 FSD with Permutation Test
+
+ 0: 
+
+  Activations A ∈ ℝ p × d A\!\in\!\mathbb{R}^{p\times d} , shuffles B = 1000 B=1000 
+
+ 1: 
+
+  Centre: A c ← A − A ¯ A_{c}\leftarrow A-\bar{A} 
+
+ 2: 
+
+  DFT: A ^ ← FFT ⁡ ( A c , axis = 0 ) \hat{A}\leftarrow\mathrm{FFT}(A_{c},\;\mathrm{axis}=0) 
+
+ 3: 
+
+  Power: v ^ f , j ← 2 ​ | A ^ f , j | 2 \hat{v}_{f,j}\leftarrow 2|\hat{A}_{f,j}|^{2} for f ≥ 1 f\geq 1 
+
+ 4: 
+
+  Dominant freq: k j ∗ ← argmax f ⁡ v ^ f , j k^{*}_{j}\leftarrow\operatorname{argmax}_{f}\hat{v}_{f,j} 
+
+ 5: 
+
+   par ( k ) ← 1 d ∑ j 𝟏 [ k j ∗ = k ] \mathrm{par}(k)\leftarrow\frac{1}{d}\sum_{j}\mathbf{1}[k^{*}_{j}=k] 
+
+ 6: 
+
+   FSD ← ( max k ⁡ par ⁡ ( k ) − c ) / ( 1 − c ) \mathrm{FSD}\leftarrow\bigl(\max_{k}\mathrm{par}(k)-c\bigr)/(1-c) , where c = 1 / ⌊ p / 2 ⌋ c=1/\lfloor p/2\rfloor 
+
+ 7: 
+
+   for b = 1 b=1 to B B do 
+
+ 8: 
+
+    k ~ j ∗ ∼ Uniform ⁡ { 1 , … , ⌊ p / 2 ⌋ } \tilde{k}^{*}_{j}\!\sim\!\mathrm{Uniform}\{1,\ldots,\lfloor p/2\rfloor\} for each j j 
+
+ 9: 
+
+   Compute FSD null ( b ) \mathrm{FSD}^{(b)}_{\mathrm{null}} 
+
+ 10: 
+
+   end for 
+
+ 11: 
+
+   p -value ← 1 B ∑ b 𝟏 [ FSD null ( b ) ≥ FSD ] p\text{-value}\leftarrow\frac{1}{B}\sum_{b}\mathbf{1}[\mathrm{FSD}^{(b)}_{\mathrm{null}}\!\geq\!\mathrm{FSD}] 
+
+ 12: 
+
+   return FSD \mathrm{FSD} , p ​ -value p\text{-value} 
+
+ Appendix B Architecture Details
+
+ • 
+ 
+ Token embedding: ℝ ( p + 1 ) × 128 \mathbb{R}^{(p+1)\times 128} 
+
+ • 
+ 
+ Positional embedding: ℝ 3 × 128 \mathbb{R}^{3\times 128} (sequence length 3)
+
+ • 
+ 
+ Block 0: LayerNorm → \to MHA ( h = 4 h=4 , d head = 32 d_{\mathrm{head}}=32 )
+ → \to residual → \to LayerNorm → \to MLP
+(Linear 128→512 –GELU–Linear 512→128 ) → \to residual
+
+ • 
+ 
+ Block 1: identical structure
+
+ • 
+ 
+ Output head: LayerNorm → \to Linear 128→p 
+
+ Training: AdamW, η = 10 − 3 \eta=10^{-3} , λ = 1.0 \lambda=1.0 , batch 512, 30%/70%
+train/val split (deterministic by seed), checkpoints every 500 steps.

@@ -1,0 +1,34 @@
+[
+ {
+  "file": "11_grokking_01.png",
+  "w": 447,
+  "h": 412,
+  "bytes": 32486,
+  "src": "https://arxiv.org/html/2502.01774v1/group_eqdist.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "11_grokking_02.png",
+  "w": 604,
+  "h": 600,
+  "bytes": 82481,
+  "src": "https://arxiv.org/html/2502.01774v1/group_eqvariant.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "11_grokking_03.png",
+  "w": 424,
+  "h": 452,
+  "bytes": 23040,
+  "src": "https://arxiv.org/html/2502.01774v1/figures/result_exp_samples_100-200_frac_0.0-0.2-1.0_1_cut.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "11_grokking_04.png",
+  "w": 1500,
+  "h": 375,
+  "bytes": 33443,
+  "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+  "alt": "Simons Foundation International"
+ }
+]

@@ -1,0 +1,106 @@
+[
+ {
+  "file": "03_grokking_01.png",
+  "w": 589,
+  "h": 481,
+  "bytes": 69923,
+  "src": "https://arxiv.org/html/2210.01117v1/mnist_train_error.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "03_grokking_02.png",
+  "w": 589,
+  "h": 481,
+  "bytes": 96633,
+  "src": "https://arxiv.org/html/2210.01117v1/mnist_val_error.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "03_grokking_03.png",
+  "w": 615,
+  "h": 480,
+  "bytes": 88838,
+  "src": "https://arxiv.org/html/2210.01117v1/imdb_train.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "03_grokking_04.png",
+  "w": 615,
+  "h": 480,
+  "bytes": 100602,
+  "src": "https://arxiv.org/html/2210.01117v1/imdb_test.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "03_grokking_05.png",
+  "w": 534,
+  "h": 480,
+  "bytes": 75448,
+  "src": "https://arxiv.org/html/2210.01117v1/qm9_train.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "03_grokking_06.png",
+  "w": 534,
+  "h": 480,
+  "bytes": 68634,
+  "src": "https://arxiv.org/html/2210.01117v1/qm9_test.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "03_grokking_07.png",
+  "w": 535,
+  "h": 480,
+  "bytes": 53654,
+  "src": "https://arxiv.org/html/2210.01117v1/arithmetic_training_landscape.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "03_grokking_08.png",
+  "w": 535,
+  "h": 480,
+  "bytes": 71641,
+  "src": "https://arxiv.org/html/2210.01117v1/arithmetic_validation_landscape.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "03_grokking_09.png",
+  "w": 535,
+  "h": 480,
+  "bytes": 74025,
+  "src": "https://arxiv.org/html/2210.01117v1/arithmetic_45_contour.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "03_grokking_10.png",
+  "w": 549,
+  "h": 480,
+  "bytes": 85932,
+  "src": "https://arxiv.org/html/2210.01117v1/mnist_train_loss_repr.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "03_grokking_11.png",
+  "w": 549,
+  "h": 480,
+  "bytes": 83459,
+  "src": "https://arxiv.org/html/2210.01117v1/mnist_test_loss_repr.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "03_grokking_12.png",
+  "w": 480,
+  "h": 480,
+  "bytes": 26254,
+  "src": "https://arxiv.org/html/2210.01117v1/mnist-phase-diagram.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "03_grokking_13.png",
+  "w": 1500,
+  "h": 375,
+  "bytes": 33443,
+  "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+  "alt": "Simons Foundation International"
+ }
+]

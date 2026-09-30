@@ -1,0 +1,1422 @@
+# A Spectral Theory of Grokking: Weight Decay Induces Feature Learning
+# id: 16 | lang: en | category: 谱理论
+# source: https://arxiv.org/html/2609.26679v1
+# extracted_via: article | chars: 106965 | figures: 4
+==============================================================================
+
+A Spectral Theory of Grokking: Weight Decay induces Feature Learning
+
+ Lenz Pracher
+ 
+ Affiliation: Arnold-Sommerfeld-Center for Theoretical Physics,
+ 
+ Affiliation: Ludwig-Maximilians-Universität München, Munich, Germany
+
+ Pascal de Jong
+ 
+ Affiliation: Arnold-Sommerfeld-Center for Theoretical Physics,
+ 
+ Affiliation: Ludwig-Maximilians-Universität München, Munich, Germany
+
+ Oskar Lieshaus
+ 
+ Affiliation: Arnold-Sommerfeld-Center for Theoretical Physics,
+ 
+ Affiliation: Ludwig-Maximilians-Universität München, Munich, Germany
+
+ Alan Jeffares
+ 
+ Affiliation: Department of Mathematics, University of Cambridge, Cambridge, UK * Equal contribution.    † Corresponding author ( rulands@lmu.de ).
+
+ Steffen Rulands
+
+ Affiliation: Department of Applied Physics, Standford University, Standford, CA, USA
+
+ Abstract
+
+ In grokking an early fit to the training data separates from a much later improvement in generalization. During this delay, training can move from a fixed neural tangent kernel (NTK) regime to one in which task-relevant kernel eigendirections continue to evolve. We provide a quantitative theory for how this transition from lazy to rich learning can produce delayed generalization. For homogeneous networks trained with squared loss and L 2 L_{2} weight decay, we show that a finite residual remains after memorization, with larger residual fractions in target components associated with smaller NTK eigenvalues. These residuals feed back into the dynamics of the NTK itself, and projecting the resulting dynamics onto task-relevant spectral directions yields a reduced system in which residual-driven kernel growth competes with weight decay. This system predicts that the grokking timescale is controlled by the product of learning rate and weight decay, that feature learning slows logarithmically near a critical decay above which task-aligned NTK structure can no longer support generalization, and that stronger decay can prevent fitting altogether. We test these predictions in modular addition. In a homogeneous MLP, task-aligned Fourier structure continues to emerge in the NTK after training accuracy has saturated, and an 84 × \times 90-grid of trained networks across varying learning rate and weight decay recovers the predicted phase geometry and inverse-product scaling of the generalization time with learning rate and weight decay. A one-block Transformer shows similar macroscopic phase structure in a 42 × \times 45-grid, as well as the same transition-time scaling despite violating exact homogeneity. Together, these results provide a mechanistic derivation connecting post-fit feature learning to both the onset of generalization and its phase structure in the learning rate and weight decay plane.
+
+ 1 Introduction
+
+ Analyzing the dynamics of generalization in deep neural networks is challenging, because optimization processes that lead to memorizing or overfitting, representation learning, and changes in validation set predictions usually occur together. However, grokking separates these timescales, as a network can reach high training accuracy, while remaining inaccurate on held-out examples for thousands of additional updates and only then generalize ( Power et al., 2022 ) . This separation lets us ask what happens after the training labels are already fitted and predicted correctly. What error remains after the training labels are already fitted, how does it reshape the learned features, and what sets the delay before those changes improve held-out predictions? 
+
+ The neural tangent kernel (NTK) provides a framework for distinguishing approximately fixed-feature dynamics from feature learning. Let 𝐟 \mathbf{f} denote the network outputs, J = ∇ 𝜽 𝐟 J=\nabla_{\boldsymbol{\theta}}\mathbf{f} the parameter Jacobian, and K = J ​ J ⊤ K=JJ^{\top} the empirical NTK, which quantifies how network outputs adapt to changes to the parameters. For gradient flow on a differentiable data loss ℒ data \mathcal{L}_{\mathrm{data}} , the chain rule gives
+
+ 𝐟 ˙ data = − K ​ ∇ 𝐟 ℒ data , \dot{\mathbf{f}}_{\rm data}=-K\nabla_{\mathbf{f}}\mathcal{L}_{\mathrm{data}}\,, 
+ 
+ (1) 
+
+ which is architecture-independent. When K K remains constant, training is thus described by a fixed kernel. On the other hand, changes in K K reflect changes in the tangent features of the network ( Jacot et al., 2018 ) . The neural tangent hierarchy extends this description by expressing the evolution of K K in terms of higher-order tangent tensors ( Huang & Yau, 2020 ) . The residual error, the deviation between the network prediction and the true output, then enters the dynamics of K K itself. Hence, the neural tangent hierarchy framework links the residual that is left after saturation of the training accuracy to subsequent changes in the NTK structure that are relevant to the task at hand.
+
+ Here, we derive a post-fit mechanism for delayed generalization in homogeneous networks trained with squared loss and coupled L 2 L_{2} weight decay. Weight decay leaves residual error after fitting, and this drives continued task-aligned evolution of the empirical NTK. For an approximately fixed NTK during the initial fit, we prove that the fraction of each target component remaining as residual error decreases monotonically with the corresponding NTK eigenvalue. The neural tangent hierarchy couples these residuals to the evolution of the NTK, allowing task-aligned tangent structure to continue developing after memorization. Modular addition provides a natural Fourier basis for projecting these dynamics onto a reduced residual-NTK system in which residual-driven growth competes with weight decay. Its adiabatic limit predicts a slow post-fit timescale controlled by the product η ​ λ W \eta\lambda_{W} of learning rate and weight decay, together with finite-training boundaries in the corresponding ( η , λ W \eta,\lambda_{W} )-phase space. Empirically, we observe the corresponding post-fit NTK organization and optimizer-space structure in a homogeneous MLP, with the same scaling of generalization time with learning rate and weight decay also appearing in a Transformer. Figure 1 summarizes the proposed mechanism.
+
+ Figure 1: A fast, near-fixed-kernel stage fits the training data but leaves a finite residual under coupled weight decay. In the reduced dynamics that follow, the residual and task-aligned NTK strength evolve together. That is, the kernel reshapes the residual, and the residual reshapes the kernel, until task-aligned structure is strong enough to move held-out predictions across their decision margins. The lower panel separates the training fit from the later generalization transition and shows the slow coordinate τ ≃ η ​ λ W ​ ( s − s fit ) \tau\simeq\eta\lambda_{W}(s-s_{\rm fit}) .
+
+ Related works.
+
+ Delayed generalization can arise without evolving neural features. Linear estimators, Gaussian processes, and logistic models exhibit grokking under suitable conditions ( Levi et al., 2024 ; Miller et al., 2024 ; Beck et al., 2025 ) . Most directly, Xu et al. (2026) prove end-to-end grokking in overparameterized ridge regression trained by gradient descent with weight decay and derive quantitative hyperparameter dependence of the grokking time, while Kim (2026) derives an exactly solvable late-time weight-decay relaxation recovering the ( η ​ λ W ) − 1 (\eta\lambda_{W})^{-1} scale in linear models. These results show that ( η ​ λ W ) − 1 (\eta\lambda_{W})^{-1} -type timing alone does not distinguish feature learning from fixed-feature dynamics.
+
+ Mechanistic work on neural-network grokking instead points to gradual representation change during the apparent plateau. In modular arithmetic, this includes the emergence of Fourier-structured circuits ( Nanda et al., 2023 ) , structured features and competition between memorizing and generalizing solutions ( Liu et al., 2022 ; Liu et al., 2023a ; Varma et al., 2024 ; Merrill et al., 2023 ; Ding et al., 2024 ) , and transitions from an early kernel-like regime to later feature learning ( Kumar et al., 2024 ; Lyu et al., 2024 ; Mohamadi et al., 2024 ; Rubin et al., 2024 ; Tian, 2026 ) . A related line of empirical work tracks how the tangent features of the network reorganize over this transition. In particular, leading empirical-NTK eigenfunctions become increasingly task-relevant as delayed generalization emerges ( Sanguino Bautiste et al., 2024 ) , while substantial empirical-NTK movement can precede the representational changes that more closely track generalization ( Zheng et al., 2024 ) , and empirical-NTK eigenspaces in modular-arithmetic MLPs and Transformers align increasingly with Fourier features used by the learned solution ( Lin, 2025 ) . These works show that learned representations and the empirical NTK can continue to evolve during grokking, but leave open what drives this post-memorization feature learning and how the evolution of task-aligned features is linked to generalization. As pointed out by Xu et al. (2026) , a rigorous theoretical analysis that connects grokking to the transition from the lazy to the rich regime of training neural networks is missing.
+
+ In this work, we provide, to the best of our knowledge, the first quantitative theory linking this transition from lazy to rich training to delayed generalization. Appendix A develops the connections to other works in more detail. Specifically, we make the following contributions:
+
+ Contributions.
+
+ We study delayed generalization in homogeneous networks trained with squared loss and coupled L 2 L_{2} weight decay and derive a mechanism connecting post-fit residual error to continued task-aligned feature learning:
+
+ • 
+ 
+ We prove that, after the initial fit, coupled weight decay leaves a finite residual in the eigendirections of an approximately fixed NTK, with the largest relative residuals in directions that are weakly represented by the current features (Theorem 1 ).
+
+ • 
+ 
+ We show that these residuals enter the subsequent evolution of the empirical NTK. Projecting the neural tangent hierarchy onto a task-aligned Fourier direction yields a reduced residual–NTK system in which residual-driven growth competes with weight decay (Theorem 2 ).
+
+ • 
+ 
+ We derive a decay-controlled slow timescale for post-fit feature learning, predicting ( η ​ λ W ) − 1 (\eta\lambda_{W})^{-1} scaling in the grokking regime and high-decay cutoffs where feature growth or training fit fails (Section 2.3 ).
+
+ • 
+ 
+ We test these predictions in homogeneous MLPs on modular addition, observing continued Fourier organization of the NTK and the predicted weak-decay timing and optimizer-space structure. A non-homogeneous one-block Transformer shows similar macroscopic behavior (Section 3 ).
+
+ 2 Post-fit residuals drive tangent feature learning
+
+ We start by deriving the post-fit residual under coupled weight decay, and we show how it drives subsequent NTK evolution and reduce the dynamics to a task-aligned spectral mode. We then connect this mode growth to held-out generalization and the resulting optimizer-space grokking boundaries.
+
+ 2.1 Weak target modes retain larger residual fractions
+
+ We perform our analysis in the setting of modular arithmetic, where the task is to learn the mapping ( a , b ) ↦ c = ( a + b ) mod p (a,b)\mapsto c=(a+b)\bmod p , for a given prime p p . Inputs and targets are one-hot encoded such that the network has p p output coordinates. Let ℤ p \mathbb{Z}_{p} denote the additive group of integers modulo p p . Its characters are χ k ​ ( z ) = exp ⁡ ( 2 ​ π ​ i ​ k ​ z / p ) \chi_{k}(z)=\exp(2\pi ikz/p) , k ∈ ℤ p k\in\mathbb{Z}_{p} , such that for output class c c the target can be written as
+
+ y c ( a , b ) = 1 p ∑ k = 0 p − 1 e − 2 π i k c / p χ k ( a ) χ k ( b ) . y_{c}(a,b)=\frac{1}{p}\sum_{k=0}^{p-1}e^{-2\pi ikc/p}\,\chi_{k}(a)\chi_{k}(b). 
+ 
+ (2) 
+
+ Because the target contains only products χ k ​ ( a ) ​ χ k ​ ( b ) \chi_{k}(a)\chi_{k}(b) with the same frequency k k , this specifies the relevant, task-aligned Fourier components that a successful model must learn to generalize. Note that the fixed-kernel residual dynamics derived below are not specific to modular addition, but hold for arbitrary datasets and targets under the homogeneous squared-loss setting. Modularity enters only when we use the task symmetry to identify an explicit Fourier basis for the subsequent spectral reduction.
+
+ Let n n be the number of training examples and stack all p p -dimensional predictions and targets into 𝐟 , 𝐲 ∈ ℝ n ​ p \mathbf{f},\mathbf{y}\in\mathbb{R}^{np} . With residual 𝝈 = 𝐟 − 𝐲 ∈ ℝ n ​ p \boldsymbol{\sigma}=\mathbf{f}-\mathbf{y}\in\mathbb{R}^{np} , the training objective can be written as
+
+ ℒ ⁡ ( 𝜽 ) = 𝒩 2 ​ ‖ 𝝈 ‖ 2 + λ W 2 ​ ‖ 𝜽 ‖ 2 , \mathcal{L}(\boldsymbol{\theta})=\frac{\mathcal{N}}{2}\left\lVert\boldsymbol{\sigma}\right\rVert^{2}+\frac{\lambda_{W}}{2}\left\lVert\boldsymbol{\theta}\right\rVert^{2}\,, 
+ 
+ (3) 
+
+ where 𝒩 \mathcal{N} is an arbitrary normalization factor 1 1 
+ 1 
+
+ As shown below, the slow update time governing grokking dynamics is invariant to the specific normalization. , and λ W \lambda_{W} is the coefficient of the L 2 L_{2} penalty. Throughout, lowercase λ W \lambda_{W} denotes optimizer weight decay, whereas capital Λ \Lambda denotes an NTK spectral strength or eigenvalue. We define λ W norm = λ W / 𝒩 {\lambda_{W}^{\mathrm{norm}}}=\lambda_{W}/\mathcal{N} as the decay coefficient in normalized gradient-flow time. One gradient-descent update with learning rate η \eta advances this time by 𝒩 ​ η \mathcal{N}\eta to first order. For P P trainable parameters, J = ∇ 𝜽 𝐟 ∈ ℝ n ​ p × P J=\nabla_{\boldsymbol{\theta}}\mathbf{f}\in\mathbb{R}^{np\times P} is the parameter Jacobian and K = J ​ J ⊤ ∈ ℝ n ​ p × n ​ p K=JJ^{\top}\in\mathbb{R}^{np\times np} is the empirical NTK, which measures how strongly the network output can change along any direction in output space under parameter updates. Gradient flow then leads to
+
+ 𝜽 ˙ = − J ⊤ ​ 𝝈 − λ W norm ​ 𝜽 , 𝝈 ˙ = − K ​ 𝝈 − λ W norm ​ J ​ 𝜽 . \dot{\boldsymbol{\theta}}=-J^{\top}\boldsymbol{\sigma}-{\lambda_{W}^{\mathrm{norm}}}\boldsymbol{\theta},\qquad\dot{\boldsymbol{\sigma}}=-K\boldsymbol{\sigma}-{\lambda_{W}^{\mathrm{norm}}}J\boldsymbol{\theta}. 
+ 
+ (4) 
+
+ Furthermore, if 𝐟 𝜽 \mathbf{f}_{\boldsymbol{\theta}} is D D -homogeneous under uniform parameter rescaling, Euler’s identity gives J ​ 𝜽 = D ​ 𝐟 J\boldsymbol{\theta}=D\mathbf{f} . Bias-free feed-forward ReLU networks satisfy this identity, whereas biases, normalization, mixed-degree residual paths, and standard attention generally break it. Substituting this identity into Eq. ( 4 ) closes the dynamics in residual space.
+
+ Theorem 1 (Persistent ridge residual under homogeneous dynamics) . 
+
+ Let 𝐟 𝛉 \mathbf{f}_{\boldsymbol{\theta}} be D D -homogeneous and let λ W norm > 0 {\lambda_{W}^{\mathrm{norm}}}>0 . Gradient flow on Eq. ( 3 ) obeys 
+
+ 𝝈 ˙ = − ( K + D ​ λ W norm ​ I ) ​ 𝝈 − D ​ λ W norm ​ 𝐲 . \dot{\boldsymbol{\sigma}}=-(K+D{\lambda_{W}^{\mathrm{norm}}}I)\boldsymbol{\sigma}-D{\lambda_{W}^{\mathrm{norm}}}\mathbf{y}. 
+ 
+ (5) 
+
+ If K ⁡ ( t ) ≡ K K(t)\equiv K , then 
+
+ 𝝈 ⁡ ( t ) ⟶ 𝝈 ∗ = − D ​ λ W norm ​ ( K + D ​ λ W norm ​ I ) − 1 ​ 𝐲 . \boldsymbol{\sigma}(t)\longrightarrow\boldsymbol{\sigma}_{*}=-D{\lambda_{W}^{\mathrm{norm}}}(K+D{\lambda_{W}^{\mathrm{norm}}}I)^{-1}\mathbf{y}. 
+ 
+ (6) 
+
+ Every finite-eigenvalue direction with a nonzero target projection therefore retains a nonzero residual. 
+
+ For ReLU networks, the derivation holds on each time interval along the gradient-flow trajectory over which the activation pattern is fixed, and extends piecewise across activation-boundary crossings. We prove the theorem in Appendix B.1 . Now, we diagonalize K K , writing K ​ 𝐮 j = Λ j ​ 𝐮 j K\mathbf{u}_{j}=\Lambda_{j}\mathbf{u}_{j} , where 𝐮 j \mathbf{u}_{j} is an eigenvector of K K with eigenvalue Λ j \Lambda_{j} , and denote the corresponding target and residual coefficients by y j = 𝐮 j ⊤ ​ 𝐲 y_{j}=\mathbf{u}_{j}^{\top}\mathbf{y} and σ j = 𝐮 j ⊤ ​ 𝝈 \sigma_{j}=\mathbf{u}_{j}^{\top}\boldsymbol{\sigma} . The fixed-kernel limit in Eq. ( 6 ) then gives the equilibrium residual coefficient in the j j th NTK eigendirection,
+
+ σ j , ∗ = − D ​ λ W norm Λ j + D ​ λ W norm ​ y j . \sigma_{j,*}=-\frac{D{\lambda_{W}^{\mathrm{norm}}}}{\Lambda_{j}+D{\lambda_{W}^{\mathrm{norm}}}}\,y_{j}. 
+ 
+ (7) 
+
+ This shows that for fixed | y j | |y_{j}| , the fraction of the j j th target component that remains as residual error is larger for smaller Λ j \Lambda_{j} . These weaker modes correspond to directions that the current features represent poorly. However, in a finite network the NTK can continue to evolve after training accuracy has saturated. Therefore, we now study whether the larger relative residuals in weak task-aligned modes can drive continued task-aligned NTK evolution.
+
+ 2.2 Residuals drive task-aligned tangent growth
+
+ For a one-hidden-layer, D = 2 D=2 , bias-free ReLU MLP, combining the neural tangent hierarchy ( Huang & Yau, 2020 ) with the two-homogeneous weight-decay terms gives
+
+ 𝝈 ˙ = − ( K + 2 ​ λ W norm ​ I ) ​ 𝝈 − 2 ​ λ W norm ​ 𝐲 , K ˙ = − K ( 2 ) ​ 𝝈 − 2 ​ λ W norm ​ K . \dot{\boldsymbol{\sigma}}=-(K+2{\lambda_{W}^{\mathrm{norm}}}I)\boldsymbol{\sigma}-2{\lambda_{W}^{\mathrm{norm}}}\mathbf{y},\qquad\dot{K}=-K^{(2)}\boldsymbol{\sigma}-2{\lambda_{W}^{\mathrm{norm}}}K. 
+ 
+ (8) 
+
+ Here K ( 2 ) K^{(2)} is a third-order tangent tensor, and K ( 2 ) ​ 𝝈 K^{(2)}\boldsymbol{\sigma} denotes contraction over its residual index,
+ ( K ( 2 ) ​ 𝝈 ) i ​ j := ∑ k K i ​ j ​ k ( 2 ) ​ σ k . (K^{(2)}\boldsymbol{\sigma})_{ij}:=\sum_{k}K^{(2)}_{ijk}\sigma_{k}. 
+This contraction couples the residual and kernel dynamics, and again employing two-homogeneity the parameter decay term becomes − 2 ​ λ W norm ​ K -2{\lambda_{W}^{\mathrm{norm}}}K . Although this term shrinks the NTK, the residual-dependent part − K ( 2 ) ​ 𝝈 -K^{(2)}\boldsymbol{\sigma} can simultaneously increase NTK strength along task-aligned directions.
+
+ To proceed, choose a normalized real Fourier direction 𝐮 \mathbf{u} with nonzero target projection and orient it so that y = 𝐮 ⊤ ​ 𝐲 ≥ 0 y=\mathbf{u}^{\top}\mathbf{y}\geq 0 . We define the task-aligned NTK strength Λ \Lambda and projected residual σ \sigma by
+
+ Λ = 𝐮 ⊤ ​ K ​ 𝐮 , σ = 𝐮 ⊤ ​ 𝝈 . \Lambda=\mathbf{u}^{\top}K\mathbf{u},\qquad\sigma=\mathbf{u}^{\top}\boldsymbol{\sigma}. 
+ 
+ (9) 
+
+ Λ \Lambda measures how strongly the network can change its output along the selected task direction under parameter updates.
+
+ The Fourier structure of modular addition makes 𝐮 \mathbf{u} a natural task direction. This motivates a local one-mode approximation in which 𝐮 \mathbf{u} remains approximately an eigendirection of the NTK, K ​ 𝐮 ≃ Λ ​ 𝐮 K\mathbf{u}\simeq\Lambda\mathbf{u} , with weak mixing into other directions, and its dynamics are driven mainly by the residual component along 𝐮 \mathbf{u} . Appendix C.1 states these conditions explicitly. Section 3 later shows the corresponding Fourier organization empirically. Projecting the hierarchy dynamics onto 𝐮 \mathbf{u} then gives
+
+ σ ˙ ≃ − ( Λ + 2 ​ λ W norm ) ​ σ − 2 ​ λ W norm ​ y , Λ ˙ ≃ − a ​ σ − 2 ​ λ W norm ​ Λ . \dot{\sigma}\simeq-(\Lambda+2{\lambda_{W}^{\mathrm{norm}}})\sigma-2{\lambda_{W}^{\mathrm{norm}}}y,\qquad\dot{\Lambda}\simeq-a\sigma-2{\lambda_{W}^{\mathrm{norm}}}\Lambda. 
+ 
+ (10) 
+
+ Here, a ⁡ ( 𝜽 ) a(\boldsymbol{\theta}) is the local coupling between the projected residual and the residual-driven change in Λ \Lambda , as defined in Appendix C.1 . We consider a ⁡ ( 𝜽 ) > 0 a(\boldsymbol{\theta})>0 , qualitatively consistent with the observed post-fit emergence of task-aligned NTK structure. It implies that correcting the output along 𝐮 \mathbf{u} tends to increase the NTK strength in the same direction. This sign is a dynamical condition rather than a consequence of homogeneity or symmetry. Equation ( 10 ) then describes a feedback. For σ < 0 \sigma<0 , larger Λ \Lambda accelerates residual relaxation, while the remaining residual drives Λ \Lambda upward.
+
+ We further assume that a ⁡ ( 𝜽 ) a(\boldsymbol{\theta}) is locally constant over the post-fit interval considered. Appendix C.1 shows that once the residual is close to its instantaneous ridge value, weight decay does not introduce an additional fast timescale for a a , supporting this approximation in the slow regime considered below. After the fast ridge relaxation, σ < 0 \sigma<0 for y > 0 y>0 , so − a ​ σ > 0 -a\sigma>0 and the residual increases the NTK strength along the selected task direction. Under the locally constant- a a approximation, the fixed points of Eq. ( 10 ) and their stability can be characterized exactly.
+
+ Theorem 2 (Spectral selection in the reduced tangent-mode system) . 
+
+ Under the locally constant- a a approximation, for λ W norm > 0 {\lambda_{W}^{\mathrm{norm}}}>0 , a > 0 a>0 , and y ≥ 0 y\geq 0 , Eq. ( 10 ) has one equilibrium with Λ ≥ 0 \Lambda\geq 0 : 
+
+ Λ ∗ = − λ W norm + λ W norm 2 + a ​ y , σ ∗ = − 2 ​ λ W norm a ​ Λ ∗ . \Lambda_{*}=-{\lambda_{W}^{\mathrm{norm}}}+\sqrt{{\lambda_{W}^{\mathrm{norm}}}^{2}+ay},\qquad\sigma_{*}=-\frac{2{\lambda_{W}^{\mathrm{norm}}}}{a}\Lambda_{*}. 
+ 
+ (11) 
+
+ The equilibrium is locally asymptotically stable. It satisfies Λ ∗ = 0 \Lambda_{*}=0 for y = 0 y=0 and Λ ∗ > 0 \Lambda_{*}>0 for y > 0 y>0 . 
+
+ We give the fixed-point and stability calculations in Appendix C.2 . Within the reduced system, unsupported directions decay, while positive residual-to-NTK coupling sustains NTK strength for target-aligned directions. Under the adiabatic approximation that residual relaxation is faster than mode motion, we set σ ˙ ≃ 0 \dot{\sigma}\simeq 0 at the current Λ \Lambda and obtain
+
+ σ ad ​ ( Λ ) = − 2 ​ λ W norm ​ y Λ + 2 ​ λ W norm , Λ ˙ = 2 ​ λ W norm ​ ( a ​ y Λ + 2 ​ λ W norm − Λ ) . \sigma_{\rm ad}(\Lambda)=-\frac{2{\lambda_{W}^{\mathrm{norm}}}y}{\Lambda+2{\lambda_{W}^{\mathrm{norm}}}},\qquad\dot{\Lambda}=2{\lambda_{W}^{\mathrm{norm}}}\left(\frac{ay}{\Lambda+2{\lambda_{W}^{\mathrm{norm}}}}-\Lambda\right). 
+ 
+ (12) 
+
+ This shows that mode evolution occurs on a normalized-time scale 1 / λ W norm 1/{\lambda_{W}^{\mathrm{norm}}} . Since t ≃ 𝒩 ​ η ​ s t\simeq\mathcal{N}\eta s after s s updates, we define the normalization-invariant slow time
+
+ τ := λ W norm ​ t ≃ η ​ λ W ​ s . \tau:={\lambda_{W}^{\mathrm{norm}}}t\simeq\eta\lambda_{W}s\,. 
+ 
+ (13) 
+
+ Here, s s is the optimizer update index and η ​ λ W \eta\lambda_{W} is the per-update decay scale. If s fit s_{\rm fit} denotes the end of the initial fitting stage, the subsequent slow-time increment is Δ ​ τ ≃ η ​ λ W ​ ( s − s fit ) \Delta\tau\simeq\eta\lambda_{W}(s-s_{\rm fit}) . Thus the reduced dynamics predict the leading scaling of post-fit transition times with ( η ​ λ W ) − 1 (\eta\lambda_{W})^{-1} .
+
+ 2.3 Grokking boundaries in the ( η , λ W ) (\eta,\lambda_{W}) plane
+
+ The same adiabatic calculation shows how the task-aligned NTK strength Λ \Lambda controls how much of the corresponding target component is expressed in the network output. Since σ = 𝐮 ⊤ ​ ( 𝐟 − 𝐲 ) \sigma=\mathbf{u}^{\top}(\mathbf{f}-\mathbf{y}) , the projected output coefficient f = 𝐮 ⊤ ​ 𝐟 f=\mathbf{u}^{\top}\mathbf{f} satisfies
+
+ f = y + σ ad ​ ( Λ ) = g ⁡ ( Λ ) ​ y , g ⁡ ( Λ ) = Λ Λ + 2 ​ λ W norm . f=y+\sigma_{\rm ad}(\Lambda)=g(\Lambda)y,\quad g(\Lambda)=\frac{\Lambda}{\Lambda+2{\lambda_{W}^{\mathrm{norm}}}}. 
+ 
+ (14) 
+
+ Hence, increasing Λ \Lambda along a task-aligned mode increases the corresponding component of the training outputs continuously. This training coordinate is related to generalization through the evolution of held-out margins, the difference between the correct-class logit and the largest competing logit, along the same trajectory. Because modular addition is represented by several matched Fourier components as shown in Eq. ( 2 ), these margins can change smoothly as the corresponding components grow, while the predicted label changes only when a margin crosses zero. If many held-out examples cross that threshold at similar mode strengths, smooth spectral growth can therefore produce a sharp rise in validation accuracy. Appendix D.1 formalizes this connection using the empirical distribution of the mode strengths at which individual held-out examples change class.
+
+ The scalar dynamics in Eq. ( 10 ) track a single task-aligned Fourier mode and do not resolve the individual held-out margins that produce the sharp accuracy transition. We therefore now replace the collection of margin crossings by a threshold Λ g \Lambda_{\mathrm{g}} on the task-aligned NTK strength Λ \Lambda . Reaching Λ g \Lambda_{\mathrm{g}} represents reaching a chosen held-out-accuracy threshold. We denote the NTK strength at the beginning of the slow stage by Λ 0 \Lambda_{0} . Further, we consider a total of T T training updates, and recall the stable equilibrium Λ ∗ \Lambda_{*} from Eq. ( 11 ). Since Eq. ( 12 ) gives Λ ˙ > 0 \dot{\Lambda}>0 for Λ < Λ ∗ \Lambda<\Lambda_{*} , a trajectory with Λ 0 < Λ g < Λ ∗ \Lambda_{0}<\Lambda_{\mathrm{g}}<\Lambda_{*} crosses the threshold Λ g \Lambda_{\mathrm{g}} in finite time. Separating variables in Eq. ( 12 ) and integrating then gives the boundary in the ( η , λ W ) (\eta,\lambda_{W}) plane between trajectories that reach Λ g \Lambda_{\mathrm{g}} within T T updates and those that remain below it.
+
+ Corollary 1 (Finite-training grokking boundary) . 
+
+ Under the one-mode, adiabatic, and gradient-flow approximations, 
+
+ η ∗ ​ ( λ W ) = 1 2 ​ λ W ​ T ​ ∫ Λ 0 Λ g Λ + 2 ​ λ W norm a ​ y − Λ 2 − 2 ​ λ W norm ​ Λ ​ 𝑑 Λ . \eta_{*}(\lambda_{W})=\frac{1}{2\lambda_{W}T}\int_{\Lambda_{0}}^{\Lambda_{\mathrm{g}}}\frac{\Lambda+2{\lambda_{W}^{\mathrm{norm}}}}{ay-\Lambda^{2}-2{\lambda_{W}^{\mathrm{norm}}}\Lambda}\,d\Lambda\,. 
+ 
+ (15) 
+
+ At small normalized decay and away from the fixed-point boundary, the leading dependence is η ∗ ∝ 1 / λ W \eta_{*}\propto 1/\lambda_{W} . 
+
+ A derivation and closed form solution of this integral can be found in Appendices D.2 – D.3 . Equation ( 15 ) predicts that increasing Λ 0 \Lambda_{0} removes a positive portion of the crossing-time integral and thereby shortens the delay before grokking occurs. We elaborate on this prediction and provide an empirical test in Appendices F.1 – F.2 . This finite-training grokking boundary is obtained under the assumption that the threshold is reachable in the first place, Λ g < Λ ∗ \Lambda_{\mathrm{g}}<\Lambda_{*} . Whether or not this is possible follows from the limiting case Λ g = Λ ∗ \Lambda_{\mathrm{g}}=\Lambda_{*} , which gives
+
+ λ W mode = 𝒩 ​ a ​ y − Λ g 2 2 ​ Λ g , \lambda_{W}^{\mathrm{mode}}=\mathcal{N}\,\frac{ay-\Lambda_{\mathrm{g}}^{2}}{2\Lambda_{\mathrm{g}}}, 
+ 
+ (16) 
+
+ provided a ​ y > Λ g 2 ay>\Lambda_{\mathrm{g}}^{2} . For λ W < λ W mode \lambda_{W}<\lambda_{W}^{\mathrm{mode}} , the equilibrium lies above Λ g \Lambda_{\mathrm{g}} so the mode can reach Λ g \Lambda_{\mathrm{g}} in finite time, with Corollary 1 determining whether this occurs within T T updates. For λ W ≥ λ W mode \lambda_{W}\geq\lambda_{W}^{\mathrm{mode}} the threshold cannot be crossed in finite time. As λ W \lambda_{W} approaches this cutoff from below, the net growth rate of the task-aligned mode at Λ = Λ g \Lambda=\Lambda_{\mathrm{g}} approaches zero, causing η ∗ ​ ( λ W ) \eta_{*}(\lambda_{W}) to diverge logarithmically as λ W → λ W mode \lambda_{W}\to\lambda_{W}^{\mathrm{mode}} (Appendix D.3 ). This shows that as λ W \lambda_{W} approaches λ W mode \lambda_{W}^{\mathrm{mode}} from below, reaching Λ g \Lambda_{\mathrm{g}} and thereby generalizing within a fixed update budget requires an increasingly large learning rate. In the ( η , λ W ) (\eta,\lambda_{W}) plane, this produces an upward turn of the finite-time boundary near the cutoff at λ W mode \lambda_{W}^{\mathrm{mode}} .
+
+ A further constraint arises from fitting the training data. This boundary depends on the relative gains of multiple output modes and is therefore not fixed exactly by the one-mode dynamics. To retain a scalar description, we summarize the onset of fitting failure by the gain of an effective training mode. Requiring g ⁡ ( Λ fit ) ≥ g min g(\Lambda_{\mathrm{fit}})\geq g_{\min} gives
+
+ λ W ≤ 𝒩 ​ Λ fit ​ ( 1 − g min ) 2 ​ g min , \lambda_{W}\leq\mathcal{N}\,\frac{\Lambda_{\mathrm{fit}}(1-g_{\min})}{2g_{\min}}, 
+ 
+ (17) 
+
+ This provides an approximately vertical effective decay scale beyond which the network no longer reaches the chosen training-accuracy criterion.
+
+ Finally, sufficiently large learning rates encounter the discrete-time stability edge of the approximately fixed-kernel dynamics. As derived in Appendix D.4 , linear stability requires
+
+ η < 2 𝒩 ​ Λ max ​ ( K ) + 2 ​ λ W , \eta<\frac{2}{\mathcal{N}\Lambda_{\max}(K)+2\lambda_{W}}\,, 
+ 
+ (18) 
+
+ where Λ max ​ ( K ) \Lambda_{\max}(K) is the largest eigenvalue of the frozen NTK. This is the frozen-kernel analogue of the usual edge-of-stability condition ( Cohen et al., 2021 ) . Because the NTK subsequently evolves, it provides only a local estimate of the large- η \eta boundary of the full training dynamics. Appendices D.3 – D.4 give the derivations and validity conditions for the fitting and stability bounds.
+
+ To summarize, these constraints predict the following organization of the ( η , λ W ) (\eta,\lambda_{W}) plane. When the training data are fitted and Λ g \Lambda_{\mathrm{g}} is reachable but the finite-training condition in Corollary 1 is not satisfied, the network remains in the memorization regime over the available training interval. Grokking is possible when the training fit succeeds (Eq. ( 17 )), the task-aligned NTK strength can reach Λ g \Lambda_{\mathrm{g}} (Eq. ( 16 )), the threshold is crossed within T T updates (Eq. ( 15 )), and gradient descent remains stable (Eq. ( 18 )). Increasing weight decay can eventually prevent either task-mode growth or training fit, while sufficiently large learning rates produce a separate instability boundary.
+
+ 3 Experiments
+
+ We now test these predictions and measure post-fit NTK reorganization as well as the ( η , λ W ) (\eta,\lambda_{W}) -plane boundaries, and whether similar transition-time behavior appears in Transformers. Appendix G provides experimental details, and all results can be reproduced from our GitHub page 2 2 
+ 2 
+
+ The code will be made publicly available upon publication. .
+
+ 3.1 Task-aligned NTK structure develops after fitting
+
+ Figure 2: Post-fit change in the normalized label-space NTK for a bias-free MLP on addition modulo 97 97 . (a) We project the sample NTK onto the true-label, average by output label, and normalize the resulting 97 × 97 97\times 97 label kernel. (b) Training and held-out accuracy for the same run. (c) Four leading eigenvectors of the same normalized label kernel, showing Fourier-like standing waves that sharpen after training accuracy is already high.
+
+ We trained a bias-free one-hidden-layer ReLU MLP on addition modulo 97 97 , using half of the samples for training and the remainder for evaluation. We computed the empirical NTK, projected it onto the true-label output of each sample, and averaged the resulting entries by output label. This isolates tangent feature organization with respect to the task labels rather than individual examples. To further isolate structure from changes in overall NTK scale, we normalized the resulting 97 × 97 97\times 97 kernel. Figure 2 a shows that periodic structure in this kernel strengthens between updates 3,000 3{,}000 and 20,000 20{,}000 , while Figure 2 b shows that training accuracy has already saturated during much of this evolution. In Figure 2 c, the leading eigenvectors dynamics show the emergence of standing-wave profiles in label space, consistent with the Fourier task structure in Eq. ( 2 ). Their continued organization after fitting is also qualitatively consistent with the post-fit growth of task-aligned NTK modes described by Eq. ( 10 ).
+
+ 3.2 Grokking boundaries in the MLP optimizer plane
+
+ Figure 3: Optimizer-plane structure for the homogeneous MLP on addition modulo 23 23 . (a) Outcomes after 24,000 24{,}000 updates on an 84 × 90 84\times 90 learning-rate/decay grid. The overlays show the calibrated finite-time boundary, a separately fitted inverse-decay relation, the mode-reachability cutoff, the training-fit cutoff, and the calibrated frozen-kernel stability form. (b) First held-out 10 % 10\% crossing among runs that eventually meet the 90 % 90\% grokking criterion, plotted against ( η ​ λ W ) − 1 (\eta\lambda_{W})^{-1} . The dashed segment indicates the predicted scaling s 10 ∝ ( η ​ λ W ) − 1 s_{10}\propto(\eta\lambda_{W})^{-1} and is not fitted to the data.
+
+ Next, we trained an (84 × \times 90)-grid of MLPs for varying ( η , λ W ) (\eta,\lambda_{W}) on addition modulo 23 23 for a fixed total of 24,000 24{,}000 updates. Figure 3 shows the resulting ( η CLOSE (\eta , OPEN λ W ) \lambda_{W}) -plane, categorized into memorizing, grokking, forgetting, and non-fitting runs, as described in Appendix G.2 . At small η ​ λ W \eta\lambda_{W} , the task-aligned NTK strength Λ \Lambda does not have enough time to reach the generalization threshold Λ g \Lambda_{\mathrm{g}} within the fixed training budget, producing the broad memorization region in Figure 3 a. The red curve fits the finite-training grokking boundary from Eq. ( 15 ). Note that since the fit-parameters are inferred from the boundary, they are not direct measurements of Λ ⁡ ( t ) \Lambda(t) . Hence, this comparison tests the predicted optimizer dependence of the crossing time rather than the absolute amount of task-aligned NTK growth. At weak decay, it follows the transition from memorization to grokking and closely tracks the yellow η ∝ λ W − 1 \eta\propto\lambda_{W}^{-1} fit. As λ W \lambda_{W} increases, the finite-time curve turns upward toward the blue mode-reachability cutoff from Eq. ( 16 ), beyond which the task-aligned NTK strength cannot reach the required threshold. The green line shows the training-fit cutoff from Eq. ( 17 ), while the black line corresponds to the frozen-kernel stability condition in Eq. ( 18 ), fitted to the observed large-learning-rate boundary. The full fitting procedures for all curves are given in Appendix G.2.1 .
+
+ Figure 3 b tests the predicted slow-time scaling. For every run that reaches 90 % 90\% held-out accuracy, we plot the first update s 10 s_{10} at which that accuracy reaches 10 % 10\% against ( η ​ λ W ) − 1 (\eta\lambda_{W})^{-1} . Equation ( 13 ) predicts s 10 ∝ ( η ​ λ W ) − 1 s_{10}\propto(\eta\lambda_{W})^{-1} if the transition is governed by the slow time τ ≃ η ​ λ W ​ s \tau\simeq\eta\lambda_{W}s . Indeed, the observed crossing times follow this scaling across the grokking region.
+
+ 3.3 Grokking boundaries and transition-time scaling in a Transformer
+
+ Figure 4: Phase and transition-time measurements for a one-block Transformer on the same modulo- 23 23 split. (a) Outcomes on a 42 × 45 42\times 45 optimizer grid with an inverse-decay fit to the main memorization–grokking boundary. (b) First held-out 80 % 80\% crossing among runs that ultimately grok at the 90 % 90\% criterion, plotted against ( η ​ λ W ) − 1 (\eta\lambda_{W})^{-1} . The dashed segment indicates the scaling s 80 ∝ ( η ​ λ W ) − 1 s_{80}\propto(\eta\lambda_{W})^{-1} .
+
+ Biases, LayerNorm, residual paths, and attention all break the global homogeneity used in Theorems 1 and 2 . However, differentiating K = J ​ J ⊤ K=JJ^{\top} under gradient flow still yields an exact residual-dependent contribution to K ˙ \dot{K} for any differentiable model (Appendix E ). We therefore tested whether the homogeneous predictions also hold in a non-homogeneous case, and trained a (42 × \times 45)-grid of Transformers. In line with the MLP phase diagram, Figure 4 a shows a weak-decay memorization region, an intermediate grokking band, and failure at stronger decay or large learning rate. The fitted curve of the form η = A / λ W \eta=A/\lambda_{W} describes the grokking-memorization boundary well, in line with the homogeneous theory. Additionally, within the grokking networks, Figure 4 b exhibits the same linear scaling of the first held-out 80 % 80\% crossing s 80 s_{80} with ( η ​ λ W ) − 1 (\eta\lambda_{W})^{-1} . We use 80 % 80\% here because early 10 % 10\% accuracy crossings are often reversible in practice. This suggests that the optimizer-level phase and transition-time scaling may extend beyond exact homogeneity.
+
+ 4 Limitations and Outlook
+
+ Our theory holds for homogeneous networks trained with squared loss, coupled weight decay, and full-batch gradient flow. Extending the reduced dynamics to more general objectives and architectures is a natural next step. The Transformer experiments already show that similar macroscopic optimizer-space structure can persist without exact homogeneity, but the corresponding microscopic dynamics remain open. Further, the scalar reduction follows a single decoupled task direction. Although the natural Fourier basis of modular addition motivates this, interactions among task-relevant components are neglected, and more general datasets need not provide an equally natural spectral basis. Future work should therefore extend the dynamics to interacting task directions and identify suitable coordinates beyond cyclic modular arithmetic. In this direction, Marchetti et al. (2026) show that for sequential group-composition tasks, networks learn irreducible representations one at a time, suggesting a route from the present one-mode reduction toward multiple representation-theoretic components. Finally, modular addition and grokking provide explicit task structure and separate fitting from generalization, but parts of our mechanism are more general. The fixed-kernel residual result does not rely on modular arithmetic, and the residual-dependent contribution to NTK evolution persists for differentiable models. This raises the question of whether our framework also applies to broader representation-learning problems. The J-space framework of Gurnee et al. (2026) provides a possible connection, using an activation-to-output Jacobian to identify representations with strong downstream influence. The NTK similarly uses the parameter Jacobian to track task-aligned directions during training. Establishing whether these directions emerge together would connect the optimization dynamics studied here to the broader formation of internal representations used for generalization.
+
+ 5 Conclusions
+
+ We developed a spectral theory of grokking in which coupled weight decay leaves a finite post-fit residual, with target components at smaller NTK eigenvalues retaining a larger residual fraction. We used the neural tangent hierarchy to show that this residual drives task-aligned NTK growth. The resulting slow dynamics determine whether task-aligned NTK strength can grow sufficiently far and sufficiently quickly within the training budget, while training fit and discrete-time stability impose additional constraints. Empirically, a homogeneous MLP on modular addition shows continued Fourier organization of the NTK after training accuracy saturates, an MLP hyperparameter sweep recovers the predicted ( η , λ W ) (\eta,\lambda_{W}) phase geometry and ( η ​ λ W ) − 1 (\eta\lambda_{W})^{-1} transition-time scaling, and a one-block Transformer reproduces the same macroscopic phase structure and transition-time scaling despite lacking exact homogeneity. Together, these results suggest that residual error left after fitting can actively shape how and when neural networks acquire generalizing representations, connecting feature learning, generalization time, and optimizer-space structure within a single mechanistic framework.
+
+ Reproducibility statement
+
+ We provide the proofs and derivations of the homogeneous results in Appendices B.1 – D.4 and the differentiable-model identities in Appendix E.1 . Appendix F.2 records the complete paired intervention, including architectures, seeds, splits, losses, optimizers, kernel normalization, and reporting convention. Appendices G.1 – G.4 give the corresponding details for the spectral diagnostic, MLP and Transformer phase sweeps, boundary calibration, and reduced-mode illustration. The accompanying code 3 3 
+ 3 
+
+ The code will be made publicly available upon publication. centralizes the configurations and provides training and analysis entry points.
+
+ AI use statement
+
+ AI was used to assist with text editing, coding, and with literature research. AI was not involved in research ideation, the development of theoretical results, research methodology, and experimental design. All AI-assisted outputs were reviewed, revised where necessary, and verified by the authors.
+
+ References
+
+ Baratin et al. (2021) 
+ 
+Aristide Baratin, Thomas George, César Laurent, R. Devon Hjelm, Guillaume Lajoie, Pascal Vincent, and Simon Lacoste-Julien.
+
+ Implicit regularization via neural feature alignment.
+
+ In Proceedings of the 24th International Conference on Artificial Intelligence and Statistics , volume 130 of Proceedings of Machine Learning Research , pp. 2269–2277, 2021.
+
+ Beck et al. (2025) 
+ 
+Alon Beck, Noam Itzhak Levi, and Yohai Bar-Sinai.
+
+ Grokking at the edge of linear separability.
+
+ In Proceedings of the 42nd International Conference on Machine Learning , volume 267 of Proceedings of Machine Learning Research , pp. 3307–3334, 2025.
+
+ Bertolotti & Cazzola (2026) 
+ 
+Francesco Bertolotti and Walter Cazzola.
+
+ A survey on grokking.
+
+ ACM Computing Surveys , 58(13):327:1–327:25, 2026.
+
+ doi: 10.1145/3814603 .
+
+ Cohen et al. (2021) 
+ 
+Jeremy Cohen, Simran Kaur, Yuanzhi Li, J Zico Kolter, and Ameet Talwalkar.
+
+ Gradient descent on neural networks typically occurs at the edge of stability.
+
+ In International Conference on Learning Representations , 2021.
+
+ URL https://openreview.net/forum?id=jh-rTtvkGeM .
+
+ Ding et al. (2024) 
+ 
+Xiaoman Delores Ding, Zifan Carl Guo, Eric J. Michaud, Ziming Liu, and Max Tegmark.
+
+ Survival of the fittest representation: A case study with modular addition.
+
+ arXiv preprint arXiv:2405.17420 , 2024.
+
+ Gurnee et al. (2026) 
+ 
+Wes Gurnee, Nicholas Sofroniew, Adam Pearce, Mateusz Piotrowski, Isaac Kauvar, Runjin Chen, Anna Soligo, Paul Bogdan, Euan Ong, Rowan Wang, T. Ben Thompson, David Abrahams, Subhash Kantamneni, Emmanuel Ameisen, Joshua Batson, and Jack Lindsey.
+
+ Verbalizable representations form a global workspace in language models.
+
+ arXiv preprint arXiv:2607.15495 , 2026.
+
+ He et al. (2026) 
+ 
+Jianliang He, Leda Wang, Siyu Chen, and Zhuoran Yang.
+
+ On the mechanism and dynamics of modular addition: Fourier features, lottery ticket, and grokking.
+
+ arXiv preprint arXiv:2602.16849 , 2026.
+
+ Huang & Yau (2020) 
+ 
+Jiaoyang Huang and Horng-Tzer Yau.
+
+ Dynamics of deep neural networks and neural tangent hierarchy.
+
+ In Proceedings of the 37th International Conference on Machine Learning , 2020.
+
+ Jacot et al. (2018) 
+ 
+Arthur Jacot, Franck Gabriel, and Clement Hongler.
+
+ Neural tangent kernel: Convergence and generalization in neural networks.
+
+ In Advances in Neural Information Processing Systems , 2018.
+
+ Jeffares et al. (2024) 
+ 
+Alan Jeffares, Alicia Curth, and Mihaela van der Schaar.
+
+ Deep learning through a telescoping lens: A simple model provides empirical insights on grokking, gradient boosting and beyond.
+
+ In Advances in Neural Information Processing Systems , volume 37, 2024.
+
+ Junior et al. (2025) 
+ 
+Tikeng Notsawo Pascal Junior, Guillaume Dumas, and Guillaume Rabusseau.
+
+ Grokking beyond the euclidean norm of model parameters.
+
+ In Proceedings of the 42nd International Conference on Machine Learning , volume 267 of Proceedings of Machine Learning Research , pp. 28552–28618, 2025.
+
+ Kim (2026) 
+ 
+Taeyoung Kim.
+
+ Grokking on the weight-decay clock: A rate hierarchy from softly broken symmetries.
+
+ arXiv preprint arXiv:2607.23967 , 2026.
+
+ Kumar et al. (2024) 
+ 
+Tanishq Kumar, Blake Bordelon, Samuel J. Gershman, and Cengiz Pehlevan.
+
+ Grokking as the transition from lazy to rich training dynamics.
+
+ In International Conference on Learning Representations , 2024.
+
+ Levi et al. (2024) 
+ 
+Noam Itzhak Levi, Alon Beck, and Yohai Bar-Sinai.
+
+ Grokking in linear estimators: A solvable model that groks without understanding.
+
+ In International Conference on Learning Representations , 2024.
+
+ Lin (2025) 
+ 
+Jennifer Lin.
+
+ Feature identification via the empirical ntk.
+
+ arXiv preprint arXiv:2510.00468 , 2025.
+
+ Liu et al. (2022) 
+ 
+Ziming Liu, Ouail Kitouni, Niklas Nolte, Eric J. Michaud, Max Tegmark, and Mike Williams.
+
+ Towards understanding grokking: An effective theory of representation learning.
+
+ In Advances in Neural Information Processing Systems , 2022.
+
+ Liu et al. (2023a) 
+ 
+Ziming Liu, Eric J. Michaud, and Max Tegmark.
+
+ Omnigrok: Grokking beyond algorithmic data.
+
+ In International Conference on Learning Representations , 2023a.
+
+ Liu et al. (2023b) 
+ 
+Ziming Liu, Ziqian Zhong, and Max Tegmark.
+
+ Grokking as compression: A nonlinear complexity perspective.
+
+ arXiv preprint arXiv:2310.05918 , 2023b.
+
+ Lyu et al. (2024) 
+ 
+Kaifeng Lyu, Jikai Jin, Zhiyuan Li, Simon Shaolei Du, Jason D. Lee, and Wei Hu.
+
+ Dichotomy of early and late phase implicit biases can provably induce grokking.
+
+ In International Conference on Learning Representations , 2024.
+
+ Mallinar et al. (2025) 
+ 
+Neil Rohit Mallinar, Daniel Beaglehole, Libin Zhu, Adityanarayanan Radhakrishnan, Parthe Pandit, and Mikhail Belkin.
+
+ Emergence in non-neural models: Grokking modular arithmetic via average gradient outer product.
+
+ In Proceedings of the 42nd International Conference on Machine Learning , volume 267 of Proceedings of Machine Learning Research , pp. 42834–42856, 2025.
+
+ Marchetti et al. (2026) 
+ 
+Giovanni Luca Marchetti, Daniel Kunin, Adele Myers, Francisco Acosta, and Nina Miolane.
+
+ Sequential group composition: A window into the mechanics of deep learning.
+
+ In Forty-third International Conference on Machine Learning , 2026.
+
+ URL https://openreview.net/forum?id=oFD9pc53pF .
+
+ Merrill et al. (2023) 
+ 
+William Merrill, Nikolaos Tsilivis, and Aman Shukla.
+
+ A tale of two circuits: Grokking as competition of sparse and dense subnetworks.
+
+ ICLR Workshop on Mathematical and Empirical Understanding of Foundation Models , 2023.
+
+ Michaud et al. (2023) 
+ 
+Eric J. Michaud, Ziming Liu, Uzay Girit, and Max Tegmark.
+
+ The quantization model of neural scaling.
+
+ In Advances in Neural Information Processing Systems , volume 36, pp. 28699–28722, 2023.
+
+ Miller et al. (2024) 
+ 
+Jack William Miller, Charles O’Neill, and Thang D. Bui.
+
+ Grokking beyond neural networks: An empirical exploration with model complexity.
+
+ Transactions on Machine Learning Research , 2024.
+
+ Mohamadi et al. (2024) 
+ 
+Mohamad Amin Mohamadi, Zhiyuan Li, Lei Wu, and Danica J. Sutherland.
+
+ Why do you grok? a theoretical analysis on grokking modular addition.
+
+ In Proceedings of the 41st International Conference on Machine Learning , volume 235 of Proceedings of Machine Learning Research , pp. 35934–35967, 2024.
+
+ Naidu et al. (2026) 
+ 
+Prudhviraj Naidu, Zixian Wang, Leon Bergen, and Ramamohan Paturi.
+
+ Quiet feature learning in algorithmic tasks.
+
+ In Proceedings of the AAAI Conference on Artificial Intelligence , volume 40, pp. 37756–37764, 2026.
+
+ Nanda et al. (2023) 
+ 
+Neel Nanda, Lawrence Chan, Tom Lieberum, Jess Smith, and Jacob Steinhardt.
+
+ Progress measures for grokking via mechanistic interpretability.
+
+ In International Conference on Learning Representations , 2023.
+
+ Power et al. (2022) 
+ 
+Alethea Power, Yuri Burda, Harri Edwards, Igor Babuschkin, and Vedant Misra.
+
+ Grokking: Generalization beyond overfitting on small algorithmic datasets.
+
+ arXiv preprint arXiv:2201.02177 , 2022.
+
+ Prieto et al. (2025) 
+ 
+Lucas Prieto, Melih Barsbey, Pedro A. M. Mediano, and Tolga Birdal.
+
+ Grokking at the edge of numerical stability.
+
+ In International Conference on Learning Representations , 2025.
+
+ Rubin et al. (2024) 
+ 
+Noa Rubin, Inbar Seroussi, and Zohar Ringel.
+
+ Grokking as a first order phase transition in two layer networks.
+
+ In International Conference on Learning Representations , 2024.
+
+ Sanguino Bautiste et al. (2024) 
+ 
+Javier Sanguino Bautiste, Gregor Bachmann, Bobby He, Lorenzo Noci, and Thomas Hofmann.
+
+ Feature learning dynamics under grokking in a sparse parity task.
+
+ ICML 2024 Workshop on High-dimensional Learning Dynamics: The Emergence of Structure and Reasoning , 2024.
+
+ Thilak et al. (2022) 
+ 
+Vimal Thilak, Etai Littwin, Shuangfei Zhai, Omid Saremi, Roni Paiss, and Joshua M. Susskind.
+
+ The slingshot mechanism: An empirical study of adaptive optimizers and the grokking phenomenon.
+
+ In Has it Trained Yet? Workshop at NeurIPS , 2022.
+
+ Tian (2026) 
+ 
+Yuandong Tian.
+
+ Provable scaling laws of feature emergence from learning dynamics of grokking.
+
+ In International Conference on Learning Representations , 2026.
+
+ Varma et al. (2024) 
+ 
+Vikrant Varma, Rohin Shah, Zachary Kenton, Janos Kramar, and Ramana Kumar.
+
+ Explaining grokking through circuit efficiency.
+
+ In International Conference on Learning Representations , 2024.
+
+ Xu et al. (2026) 
+ 
+Mingyue Xu, Gal Vardi, and Itay Safran.
+
+ To grok grokking: Provable grokking in ridge regression.
+
+ arXiv preprint arXiv:2601.19791 , 2026.
+
+ Zheng et al. (2024) 
+ 
+Xingyu Zheng, Kyle Daruwalla, Ari S. Benjamin, and David Klindt.
+
+ Delays in generalization match delayed changes in representational geometry.
+
+ In Proceedings of UniReps: the Second Edition of the Workshop on Unifying Representations in Neural Models , volume 285 of Proceedings of Machine Learning Research , pp. 324–334, 2024.
+
+ Appendix A Related mechanisms for delayed generalization
+
+ Grokking has been explained through circuit formation, implicit bias, tangent-feature motion, fixed spectra, and optimizer state. Surveys emphasize that several mechanisms can coexist across losses, architectures, and training regimes ( Bertolotti & Cazzola, 2026 ) . We position our account by asking which dynamical object changes during the plateau and which observations distinguish that change from a slow fixed-feature relaxation.
+
+ A.1 Mechanistic progress and representation competition
+
+ Modular arithmetic provides an interpretable Fourier basis for circuit analysis. Nanda et al. ( Nanda et al., 2023 ) reverse-engineer a trigonometric algorithm in a grokked Transformer and introduce progress measures that reveal gradual circuit formation during the apparent plateau. Varma et al. ( Varma et al., 2024 ) explain delayed generalization through competition between memorizing and generalizing circuits, while Merrill et al. ( Merrill et al., 2023 ) study competition between sparse and dense subnetworks. Ding et al. ( Ding et al., 2024 ) track competing circular Fourier representations with low-dimensional dynamics. He et al. ( He et al., 2026 ) analyze how frequency competition, phase alignment, and weight decay shape Fourier-feature formation in two-layer networks on modular addition. Across a broader set of algorithmic Transformer tasks, Naidu et al. ( Naidu et al., 2026 ) find causally relevant features developing during long plateaus before the output loss improves. Other representation-level studies connect grokking to changes in norms, learned features, and compression ( Liu et al., 2022 ; Liu et al., 2023a ; Liu et al., 2023b ) . We use the same task-defined Fourier basis but study the residual that drives tangent-feature motion within it.
+
+ A.2 Kernel-to-feature transitions and empirical NTK dynamics
+
+ Several theories describe grokking as a transition from an early linearized regime to later feature learning. Kumar et al. ( Kumar et al., 2024 ) use a controllable laziness parameter to induce or remove grokking in polynomial regression, MNIST, and modular addition. Lyu et al. ( Lyu et al., 2024 ) prove a separation between early kernel-like and late implicit biases in homogeneous networks with weight decay. Mohamadi et al. ( Mohamadi et al., 2024 ) show that an early permutation-equivariant kernel regime can be sample inefficient for modular addition, whereas bounded-norm feature-learning solutions generalize from fewer examples. Rubin et al. ( Rubin et al., 2024 ) analyze an adaptive kernel and relate grokking in two-layer networks to a first-order phase transition. Tian ( Tian, 2026 ) derives a sequence of lazy, independent-feature, and interacting-feature stages with scaling laws for feature emergence and generalization.
+
+ Empirical NTKs distinguish departure from the lazy regime from the task content acquired by the kernel. On sparse parity, Sanguino Bautiste et al. ( Sanguino Bautiste et al., 2024 ) observe leading NTK eigenfunctions moving from non-predictive directions toward predictive features as generalization emerges. On image classification, Zheng et al. ( Zheng et al., 2024 ) find substantial empirical-NTK movement before delayed test improvement and closer synchronization between representational geometry and generalization. For modular arithmetic, Lin ( Lin, 2025 ) shows that leading empirical-NTK eigenspaces align with Fourier feature families in trained MLPs and Transformers and that the alignment changes through grokking. These results establish feature motion but do not identify its source. We derive a residual-dependent equation for task-aligned kernel components. Equation ( 8 ) inserts the post-fit residual into K ˙ \dot{K} , and the Fourier projection yields the reduced feedback, slow time, and finite-training boundary. This mechanism is also compatible with dynamic alignment between finite-network tangent features and task directions ( Baratin et al., 2021 ) .
+
+ A.3 Static-feature grokking and the weight-decay transition-time scaling
+
+ Fixed-feature models show that delayed generalization can occur without representation change. Levi et al. ( Levi et al., 2024 ) analyze grokking in linear estimators, Miller et al. ( Miller et al., 2024 ) document related non-neural behavior, and Beck et al. ( Beck et al., 2025 ) study long delays near linear separability. Xu et al. ( Xu et al., 2026 ) prove end-to-end grokking for overparameterized ridge regression trained with gradient descent and weight decay. Their bounds separate early training fit from later population improvement and express the delay in terms of learning rate, decay, sample size, feature dimension, and initialization. Kim ( Kim, 2026 ) derives a complementary late-time relaxation in linear models with weight decay and heavy-ball optimization; the zero-momentum limit again yields 1 / ( η ​ λ ) 1/(\eta\lambda) scaling.
+
+ The transition-time scaling in Eq. ( 13 ) is therefore shared by static-feature and feature-learning mechanisms. Our finite-network account adds the empirical NTK as a state variable and predicts task-aligned motion after training accuracy saturates. The normalized kernel measurement, the residual-dependent hierarchy term, and the directional intervention separate this claim from a fixed-feature delay.
+
+ Feature learning can also arise outside ordinary neural-network gradient descent. Mallinar et al. ( Mallinar et al., 2025 ) demonstrate grokking in recursive feature machines driven by an average gradient outer product; block-circulant task features emerge after training loss has vanished. Jeffares et al. ( Jeffares et al., 2024 ) analyze grokking through a sequence of local linear approximations, providing another time-resolved view of representation change.
+
+ A.4 Jacobian representations and emergent capabilities
+
+ Jacobian geometry can isolate directions with direct behavioral leverage. Gurnee et al. ( Gurnee et al., 2026 ) introduce the Jacobian lens and identify a small “J-space” of verbalizable representations in language models; interventions show that these directions can mediate downstream reasoning and reporting. Their Jacobian transports downstream activations to outputs, whereas our NTK uses the parameter Jacobian, but both approaches focus on directions that couple strongly to behavior. We study how such task-relevant parameter-Jacobian directions form during training.
+
+ The quantization model of neural scaling ( Michaud et al., 2023 ) proposes that knowledge and skills may be acquired in discrete modules even when aggregate loss follows smooth power laws. Grokking offers a small setting in which abrupt behavior can be resolved in time. Equation ( 58 ) gives one route from a smooth internal coordinate to a sharp output transition, so behavioral discontinuity need not imply discontinuous internal learning. At the same time, task-aligned modes provide a concrete object for testing more modular accounts of capability acquisition.
+
+ A.5 Regularization and optimization mechanisms
+
+ Regularization mechanisms extend beyond Euclidean weight decay. Junior et al. ( Junior et al., 2025 ) show that sparsity, low-rank penalties, implicit regularization, and depth can induce grokking-like transitions. Adaptive optimizers can produce late-training instabilities ( Thilak et al., 2022 ) , while cross-entropy training can involve numerical and logit-scaling effects ( Prieto et al., 2025 ) . The relevant slow variable changes with the objective and optimizer. We focus on homogeneous squared-loss training because coupled L 2 L_{2} decay leaves the ridge residual in Theorem 1 and directly contracts the two-homogeneous empirical NTK in Eq. ( 8 ).
+
+ A.6 Relation to fixed-feature and circuit-level accounts
+
+ Our account links the residual left by an early approximately fixed kernel to later tangent-feature motion in a task-defined Fourier direction. The resulting feature strength determines whether held-out margins are reachable and how much optimizer time is required to reach them. Fixed-feature analyses explain how weight decay can create a long transition-time without changing the representation; circuit analyses describe the algorithm implemented after generalization. Residual-dependent neural-tangent-hierarchy dynamics connect the two by specifying how post-fit supervision can reshape the tangent geometry from which a generalizing circuit is built.
+
+ Appendix B Exact homogeneous function-space dynamics
+
+ For reference, the notation used throughout the derivations is summarized below.
+
+ Symbol 
+ Meaning 
+
+ 𝝈 = 𝐟 − 𝐲 \boldsymbol{\sigma}=\mathbf{f}-\mathbf{y} 
+ stacked training residual 
+
+ J = ∇ 𝜽 𝐟 J=\nabla_{\boldsymbol{\theta}}\mathbf{f} 
+ training-set parameter Jacobian 
+
+ K = J ​ J ⊤ K=JJ^{\top} 
+ empirical neural tangent kernel 
+
+ D D 
+ degree of parameter homogeneity 
+
+ 𝒩 \mathcal{N} 
+ global normalization multiplying ‖ 𝝈 ‖ 2 / 2 \left\lVert\boldsymbol{\sigma}\right\rVert^{2}/2 in the implemented loss 
+
+ λ W \lambda_{W} 
+ optimizer coupled L 2 L_{2} weight-decay coefficient 
+
+ λ W norm = λ W / 𝒩 {\lambda_{W}^{\mathrm{norm}}}=\lambda_{W}/\mathcal{N} 
+ normalized decay used in continuous time 
+
+ η \eta 
+ optimizer gradient-descent learning rate 
+
+ t t 
+ normalized gradient-flow time, t = 𝒩 ​ t opt t=\mathcal{N}t_{\rm opt} 
+
+ s s 
+ discrete optimizer update index 
+
+ Λ \Lambda 
+ task-direction NTK strength 𝐮 ⊤ ​ K ​ 𝐮 \mathbf{u}^{\top}K\mathbf{u} 
+
+ a a 
+ projected residual-to-NTK coupling coefficient 
+
+ y y 
+ target coefficient in the selected task direction 
+
+ Λ g \Lambda_{\mathrm{g}} 
+ reduced strength representing a held-out criterion 
+
+ T T 
+ finite optimizer update budget 
+
+ Table 1: Notation used in the main derivations.
+
+ B.1 Proof of Theorem 1 
+
+ We absorb the global data-loss prefactor into the normalized time introduced in Section 2.1 . The data-gradient term then has unit coefficient, and optimizer weight decay appears through λ W norm {\lambda_{W}^{\mathrm{norm}}} ,
+
+ 𝜽 ˙ \displaystyle\dot{\boldsymbol{\theta}} 
+ = − J ⊤ ​ 𝝈 − λ W norm ​ 𝜽 , \displaystyle=-J^{\top}\boldsymbol{\sigma}-{\lambda_{W}^{\mathrm{norm}}}\boldsymbol{\theta}, 
+ 
+ (19) 
+
+ 𝝈 ˙ \displaystyle\dot{\boldsymbol{\sigma}} 
+ = J ​ 𝜽 ˙ = − J ​ J ⊤ ​ 𝝈 − λ W norm ​ J ​ 𝜽 = − K ​ 𝝈 − λ W norm ​ J ​ 𝜽 . \displaystyle=J\dot{\boldsymbol{\theta}}=-JJ^{\top}\boldsymbol{\sigma}-{\lambda_{W}^{\mathrm{norm}}}J\boldsymbol{\theta}=-K\boldsymbol{\sigma}-{\lambda_{W}^{\mathrm{norm}}}J\boldsymbol{\theta}. 
+ 
+ (20) 
+
+ For a D D -homogeneous network, uniform rescaling of all trainable weights rescales the output by degree D D . Differentiating this identity at unit scale gives the Euler relation that closes the parameter-space decay term in function space.
+
+ 𝐟 c ​ 𝜽 \displaystyle\mathbf{f}_{c\boldsymbol{\theta}} 
+ = c D ​ 𝐟 𝜽 , \displaystyle=c^{D}\mathbf{f}_{\boldsymbol{\theta}}, 
+ 
+ (21) 
+
+ d d ​ c ​ 𝐟 c ​ 𝜽 | c = 1 \displaystyle\left.\frac{d}{dc}\mathbf{f}_{c\boldsymbol{\theta}}\right|_{c=1} 
+ = J ​ 𝜽 = D ​ 𝐟 = D ⁡ ( 𝝈 + 𝐲 ) . \displaystyle=J\boldsymbol{\theta}=D\mathbf{f}=D(\boldsymbol{\sigma}+\mathbf{y}). 
+ 
+ (22) 
+
+ Substituting this relation removes the remaining explicit dependence on 𝜽 \boldsymbol{\theta} .
+
+ 𝝈 ˙ = − ( K + D ​ λ W norm ​ I ) ​ 𝝈 − D ​ λ W norm ​ 𝐲 , \dot{\boldsymbol{\sigma}}=-(K+D{\lambda_{W}^{\mathrm{norm}}}I)\boldsymbol{\sigma}-D{\lambda_{W}^{\mathrm{norm}}}\mathbf{y}, 
+ 
+ (23) 
+
+ which is Eq. ( 5 ).
+
+ For fixed K K , the residual equation is affine and linear. The matrix M := K + D ​ λ W norm ​ I M:=K+D{\lambda_{W}^{\mathrm{norm}}}I is positive definite for λ W norm > 0 {\lambda_{W}^{\mathrm{norm}}}>0 , even when K K has null directions, so every residual component relaxes exponentially to a unique fixed point. We set
+
+ M := K + D ​ λ W norm ​ I ≻ 0 , 𝝈 ∗ := − D ​ λ W norm ​ M − 1 ​ 𝐲 , M:=K+D{\lambda_{W}^{\mathrm{norm}}}I\succ 0,\qquad\boldsymbol{\sigma}_{*}:=-D{\lambda_{W}^{\mathrm{norm}}}M^{-1}\mathbf{y}, 
+
+ and the solution can be written as
+
+ 𝝈 ˙ \displaystyle\dot{\boldsymbol{\sigma}} 
+ = − M ⁡ ( 𝝈 − 𝝈 ∗ ) , \displaystyle=-M(\boldsymbol{\sigma}-\boldsymbol{\sigma}_{*}), 
+ 
+ (24) 
+
+ 𝝈 ⁡ ( t ) − 𝝈 ∗ \displaystyle\boldsymbol{\sigma}(t)-\boldsymbol{\sigma}_{*} 
+ = e − M ​ t ​ ( 𝝈 ⁡ ( 0 ) − 𝝈 ∗ ) . \displaystyle=e^{-Mt}\bigl(\boldsymbol{\sigma}(0)-\boldsymbol{\sigma}_{*}\bigr). 
+ 
+ (25) 
+
+ We diagonalize K K to expose the ridge form. Each eigenmode follows an independent scalar relaxation, and the ratio of its equilibrium residual to its target coefficient is determined by Λ j \Lambda_{j} relative to D ​ λ W norm D{\lambda_{W}^{\mathrm{norm}}} . For K ​ 𝐮 j = Λ j ​ 𝐮 j K\mathbf{u}_{j}=\Lambda_{j}\mathbf{u}_{j} ,
+
+ σ ˙ j \displaystyle\dot{\sigma}_{j} 
+ = − ( Λ j + D ​ λ W norm ) ​ σ j − D ​ λ W norm ​ y j , \displaystyle=-(\Lambda_{j}+D{\lambda_{W}^{\mathrm{norm}}})\sigma_{j}-D{\lambda_{W}^{\mathrm{norm}}}y_{j}, 
+ 
+ (26) 
+
+ σ j , ∗ \displaystyle\sigma_{j,*} 
+ = − D ​ λ W norm Λ j + D ​ λ W norm ​ y j . \displaystyle=-\frac{D{\lambda_{W}^{\mathrm{norm}}}}{\Lambda_{j}+D{\lambda_{W}^{\mathrm{norm}}}}\,y_{j}. 
+ 
+ (27) 
+
+ For ReLU networks, these identities hold on every interval on which the activation pattern is fixed. At activation-boundary crossings the network remains continuous and the gradient-flow equation holds almost everywhere, so the same function-space relation extends piecewise across the trajectory.
+
+ This proves Theorem 1 . □ \square 
+
+ Appendix C One-mode neural-tangent-hierarchy closure
+
+ C.1 Assumptions behind the modal closure
+
+ For the normalized Fourier direction 𝐮 \mathbf{u} used in the main text, define
+
+ q 𝜽 := 𝐮 ⊤ ​ 𝐟 𝜽 , Λ := 𝐮 ⊤ ​ K ​ 𝐮 = ‖ ∇ 𝜽 q 𝜽 ‖ 2 , σ := 𝐮 ⊤ ​ 𝝈 . q_{\boldsymbol{\theta}}:=\mathbf{u}^{\top}\mathbf{f}_{\boldsymbol{\theta}},\qquad\Lambda:=\mathbf{u}^{\top}K\mathbf{u}=\left\lVert\nabla_{\boldsymbol{\theta}}q_{\boldsymbol{\theta}}\right\rVert^{2},\qquad\sigma:=\mathbf{u}^{\top}\boldsymbol{\sigma}. 
+ 
+ (28) 
+
+ The reduction follows one task-bearing direction rather than approximating the full kernel. Over the transition interval, we assume that the kernel acts approximately diagonally on this direction and that the residual driving it is dominated by the component along u u :
+
+ 𝝈 ≈ σ ​ 𝐮 , K ​ 𝐮 ≈ Λ ​ 𝐮 . \boldsymbol{\sigma}\approx\sigma\mathbf{u},\qquad K\mathbf{u}\approx\Lambda\mathbf{u}. 
+ 
+ (29) 
+
+ These conditions suppress leading-order mixing with the remaining modes.
+
+ With
+
+ K i ​ j ​ k ( 2 ) = ⟨ ∇ 𝜽 K i ​ j , ∇ 𝜽 f k ⟩ , K^{(2)}_{ijk}=\left\langle\nabla_{\boldsymbol{\theta}}K_{ij},\nabla_{\boldsymbol{\theta}}f_{k}\right\rangle, 
+ 
+ (30) 
+
+ the projected hierarchy term becomes
+
+ 𝐮 ⊤ ​ ( K ( 2 ) ​ 𝝈 ) ​ 𝐮 \displaystyle\mathbf{u}^{\top}(K^{(2)}\boldsymbol{\sigma})\mathbf{u} 
+ ≈ σ ​ ∑ i ​ j ​ k u i ​ u j ​ u k ​ K i ​ j ​ k ( 2 ) , \displaystyle\approx\sigma\sum_{ijk}u_{i}u_{j}u_{k}K^{(2)}_{ijk}, 
+ 
+ (31) 
+
+ a ⁡ ( 𝜽 ) \displaystyle a(\boldsymbol{\theta}) 
+ : = ∑ i ​ j ​ k u i ​ u j ​ u k ​ K i ​ j ​ k ( 2 ) = ⟨ ∇ 𝜽 Λ , ∇ 𝜽 q 𝜽 ⟩ . \displaystyle:=\sum_{ijk}u_{i}u_{j}u_{k}K^{(2)}_{ijk}=\left\langle\nabla_{\boldsymbol{\theta}}\Lambda,\nabla_{\boldsymbol{\theta}}q_{\boldsymbol{\theta}}\right\rangle. 
+ 
+ (32) 
+
+ Thus a ⁡ ( 𝜽 ) a(\boldsymbol{\theta}) is the local proportionality between the residual coefficient σ \sigma and the residual-driven change in the NTK strength Λ \Lambda . When a > 0 a>0 and σ < 0 \sigma<0 for a positive target coefficient, this term increases Λ \Lambda . The sign of a a is a dynamical property; homogeneity does not determine it. The projected kernel equation is therefore
+
+ Λ ˙ = − a ⁡ ( 𝜽 ) ​ σ − 2 ​ λ W norm ​ Λ . \dot{\Lambda}=-a(\boldsymbol{\theta})\sigma-2{\lambda_{W}^{\mathrm{norm}}}\Lambda. 
+ 
+ (33) 
+
+ Whenever σ ≠ 0 \sigma\neq 0 , the same equation can be inverted along a measured trajectory:
+
+ a eff ​ ( t ) = − Λ ˙ ​ ( t ) + 2 ​ λ W norm ​ Λ ​ ( t ) σ ⁡ ( t ) . a_{\rm eff}(t)=-\frac{\dot{\Lambda}(t)+2{\lambda_{W}^{\mathrm{norm}}}\Lambda(t)}{\sigma(t)}. 
+ 
+ (34) 
+
+ The constant- a a approximation is local and does not require a a to remain fixed throughout training. In the two-homogeneous MLP, both Λ \Lambda and a a are degree two under uniform parameter rescaling,
+
+ Λ ⁡ ( c ​ 𝜽 ) = c 2 ​ Λ ​ ( 𝜽 ) , a ⁡ ( c ​ 𝜽 ) = c 2 ​ a ​ ( 𝜽 ) . \Lambda(c\boldsymbol{\theta})=c^{2}\Lambda(\boldsymbol{\theta}),\qquad a(c\boldsymbol{\theta})=c^{2}a(\boldsymbol{\theta}). 
+ 
+ (35) 
+
+ Under the one-mode parameter approximation,
+
+ 𝜽 ˙ \displaystyle\dot{\boldsymbol{\theta}} 
+ ≈ − σ ​ ∇ 𝜽 q 𝜽 − λ W norm ​ 𝜽 , \displaystyle\approx-\sigma\nabla_{\boldsymbol{\theta}}q_{\boldsymbol{\theta}}-{\lambda_{W}^{\mathrm{norm}}}\boldsymbol{\theta}, 
+ 
+ (36) 
+
+ a ˙ \displaystyle\dot{a} 
+ = − b ⁡ ( 𝜽 ) ​ σ − 2 ​ λ W norm ​ a , b ⁡ ( 𝜽 ) := ⟨ ∇ 𝜽 a , ∇ 𝜽 q 𝜽 ⟩ . \displaystyle=-b(\boldsymbol{\theta})\sigma-2{\lambda_{W}^{\mathrm{norm}}}a,\qquad b(\boldsymbol{\theta}):=\left\langle\nabla_{\boldsymbol{\theta}}a,\nabla_{\boldsymbol{\theta}}q_{\boldsymbol{\theta}}\right\rangle. 
+ 
+ (37) 
+
+ After the residual relaxes near its instantaneous ridge value, substitution into Eq. ( 37 ) gives
+
+ a ˙ ≃ 2 ​ λ W norm ​ ( b ⁡ ( 𝜽 ) ​ y Λ + 2 ​ λ W norm − a ) , \dot{a}\simeq 2{\lambda_{W}^{\mathrm{norm}}}\left(\frac{b(\boldsymbol{\theta})y}{\Lambda+2{\lambda_{W}^{\mathrm{norm}}}}-a\right), 
+ 
+ (38) 
+
+ and
+
+ d d ​ t ​ ( a Λ ) = σ Λ 2 ​ ( a 2 − b ​ Λ ) . \frac{d}{dt}\left(\frac{a}{\Lambda}\right)=\frac{\sigma}{\Lambda^{2}}\left(a^{2}-b\Lambda\right). 
+ 
+ (39) 
+
+ Equations ( 37 )–( 38 ) show that weight decay does not introduce an additional fast timescale for a a after residual relaxation. Pure radial decay also leaves a / Λ a/\Lambda unchanged, so any remaining drift of this ratio is residual driven. We therefore use a locally constant coupling subject to four explicit conditions:
+
+ 1. 
+ 
+ the projected residual and kernel satisfy Eq. ( 29 );
+
+ 2. 
+ 
+ a ⁡ ( t ) a(t) remains positive over the interval of interest;
+
+ 3. 
+ 
+ a ⁡ ( t ) a(t) changes slowly relative to residual relaxation; and
+
+ 4. 
+ 
+ coupling to other task modes is weak enough to be absorbed into the local coefficient a a and the effective threshold Λ g \Lambda_{\mathrm{g}} .
+
+ The cyclic symmetry of modular addition and the difference-structured split motivate approximate Fourier decoupling. The remaining conditions are assumptions of the scalar reduction.
+
+ C.2 Proof of Theorem 2 
+
+ With a a fixed locally, we combine the two first-order equations into a second-order equation for Λ \Lambda . This form separates damping from the force that selects the equilibrium. Equation ( 10 ) gives
+
+ Λ ¨ \displaystyle\ddot{\Lambda} 
+ = − a ​ σ ˙ − 2 ​ λ W norm ​ Λ ˙ \displaystyle=-a\dot{\sigma}-2{\lambda_{W}^{\mathrm{norm}}}\dot{\Lambda} 
+ 
+ (40) 
+
+ = a ⁡ ( Λ + 2 ​ λ W norm ) ​ σ + 2 ​ a ​ λ W norm ​ y − 2 ​ λ W norm ​ Λ ˙ , \displaystyle=a(\Lambda+2{\lambda_{W}^{\mathrm{norm}}})\sigma+2a{\lambda_{W}^{\mathrm{norm}}}y-2{\lambda_{W}^{\mathrm{norm}}}\dot{\Lambda}, 
+ 
+ (41) 
+
+ σ \displaystyle\sigma 
+ = − Λ ˙ + 2 ​ λ W norm ​ Λ a , \displaystyle=-\frac{\dot{\Lambda}+2{\lambda_{W}^{\mathrm{norm}}}\Lambda}{a}, 
+ 
+ (42) 
+
+ hence
+
+ Λ ¨ + ( Λ + 4 ​ λ W norm ) ​ Λ ˙ + 2 ​ λ W norm ​ Λ ​ ( Λ + 2 ​ λ W norm ) − 2 ​ a ​ λ W norm ​ y = 0 . \ddot{\Lambda}+(\Lambda+4{\lambda_{W}^{\mathrm{norm}}})\dot{\Lambda}+2{\lambda_{W}^{\mathrm{norm}}}\Lambda(\Lambda+2{\lambda_{W}^{\mathrm{norm}}})-2a{\lambda_{W}^{\mathrm{norm}}}y=0. 
+ 
+ (43) 
+
+ Equation ( 43 ) describes one-dimensional damped motion with state-dependent coefficient Λ + 4 ​ λ W norm \Lambda+4{\lambda_{W}^{\mathrm{norm}}} . We collect the remaining terms into the cubic potential
+
+ V ⁡ ( Λ ) \displaystyle V(\Lambda) 
+ = 2 ​ λ W norm 3 ​ Λ 3 + 2 ​ λ W norm 2 ​ Λ 2 − 2 ​ a ​ λ W norm ​ y ​ Λ , \displaystyle=\frac{2{\lambda_{W}^{\mathrm{norm}}}}{3}\Lambda^{3}+2{\lambda_{W}^{\mathrm{norm}}}^{2}\Lambda^{2}-2a{\lambda_{W}^{\mathrm{norm}}}y\Lambda, 
+ 
+ (44) 
+
+ ℋ \displaystyle\mathcal{H} 
+ = 1 2 ​ Λ ˙ 2 + V ⁡ ( Λ ) − V ⁡ ( Λ ∗ ) . \displaystyle=\frac{1}{2}\dot{\Lambda}^{2}+V(\Lambda)-V(\Lambda_{*}). 
+ 
+ (45) 
+
+ On the branch Λ ≥ 0 \Lambda\geq 0 , positive decay makes the potential strictly convex. The shifted energy ℋ \mathcal{H} combines displacement from its unique minimum with the kinetic term, and
+
+ V ′ ​ ( Λ ) \displaystyle V^{\prime}(\Lambda) 
+ = 2 ​ λ W norm ​ Λ ​ ( Λ + 2 ​ λ W norm ) − 2 ​ a ​ λ W norm ​ y , \displaystyle=2{\lambda_{W}^{\mathrm{norm}}}\Lambda(\Lambda+2{\lambda_{W}^{\mathrm{norm}}})-2a{\lambda_{W}^{\mathrm{norm}}}y, 
+ 
+ (46) 
+
+ V ′′ ​ ( Λ ) \displaystyle V^{\prime\prime}(\Lambda) 
+ = 4 ​ λ W norm ​ ( Λ + λ W norm ) > 0 , \displaystyle=4{\lambda_{W}^{\mathrm{norm}}}(\Lambda+{\lambda_{W}^{\mathrm{norm}}})>0, 
+ 
+ (47) 
+
+ ℋ ˙ \displaystyle\dot{\mathcal{H}} 
+ = − ( Λ + 4 ​ λ W norm ) ​ Λ ˙ 2 ≤ 0 . \displaystyle=-(\Lambda+4{\lambda_{W}^{\mathrm{norm}}})\dot{\Lambda}^{2}\leq 0. 
+ 
+ (48) 
+
+ The stationary points of the first-order system coincide with the extrema of this potential. We solve the equilibrium conditions to obtain
+
+ σ ∗ \displaystyle\sigma_{*} 
+ = − 2 ​ λ W norm a ​ Λ ∗ , \displaystyle=-\frac{2{\lambda_{W}^{\mathrm{norm}}}}{a}\Lambda_{*}, 
+ 
+ (49) 
+
+ Λ ∗ ​ ( Λ ∗ + 2 ​ λ W norm ) \displaystyle\Lambda_{*}(\Lambda_{*}+2{\lambda_{W}^{\mathrm{norm}}}) 
+ = a ​ y , \displaystyle=ay, 
+ 
+ (50) 
+
+ Λ ± \displaystyle\Lambda_{\pm} 
+ = − λ W norm ± λ W norm 2 + a ​ y . \displaystyle=-{\lambda_{W}^{\mathrm{norm}}}\pm\sqrt{{\lambda_{W}^{\mathrm{norm}}}^{2}+ay}. 
+ 
+ (51) 
+
+ For y = 0 y=0 , the only nonnegative root is zero. For y > 0 y>0 , Λ + > 0 \Lambda_{+}>0 and Λ − < 0 \Lambda_{-}<0 , giving one positive target-bearing equilibrium. The Lyapunov calculation establishes dissipative motion toward the potential minimum; we use the Jacobian to verify the local asymptotic stability in Theorem 2 . At the positive equilibrium,
+
+ A = ( − ( Λ ∗ + 2 ​ λ W norm ) − σ ∗ − a − 2 ​ λ W norm ) , A=\begin{pmatrix}-(\Lambda_{*}+2{\lambda_{W}^{\mathrm{norm}}})&-\sigma_{*}\\
+-a&-2{\lambda_{W}^{\mathrm{norm}}}\end{pmatrix}, 
+ 
+ (52) 
+
+ with
+
+ tr ⁡ A \displaystyle\operatorname{tr}A 
+ = − ( Λ ∗ + 4 ​ λ W norm ) < 0 , \displaystyle=-(\Lambda_{*}+4{\lambda_{W}^{\mathrm{norm}}})<0, 
+ 
+ (53) 
+
+ det A \displaystyle\det A 
+ = 2 ​ λ W norm ​ ( Λ ∗ + 2 ​ λ W norm ) − a ​ σ ∗ \displaystyle=2{\lambda_{W}^{\mathrm{norm}}}(\Lambda_{*}+2{\lambda_{W}^{\mathrm{norm}}})-a\sigma_{*} 
+ 
+ (54) 
+
+ = 4 ​ λ W norm ​ ( Λ ∗ + λ W norm ) > 0 . \displaystyle=4{\lambda_{W}^{\mathrm{norm}}}(\Lambda_{*}+{\lambda_{W}^{\mathrm{norm}}})>0. 
+ 
+ (55) 
+
+ The negative trace and positive determinant place both eigenvalues in the open left half-plane, so the positive equilibrium is locally asymptotically stable on the nonnegative branch. □ \square 
+
+ Figure 5: Reduced potential and adiabatic trajectories. (a) With illustrative values λ W norm = 0.15 \lambda_{W}^{\mathrm{norm}}=0.15 and a = 1 a=1 , the task-aligned mode ( y = 1 y=1 ) has its potential minimum at positive Λ \Lambda , whereas the unsupported mode ( y = 0 y=0 ) is minimized at Λ = 0 \Lambda=0 . (b) Starting from the same initial strength, the two adiabatic trajectories move toward their respective minima. These dimensionless values illustrate the reduced dynamics and are not fitted to an empirical run.
+
+ Appendix D Adiabatic reduction and finite-training boundary
+
+ D.1 From smooth mode growth to an accuracy transition
+
+ The reduced dynamics produce a smooth trajectory Λ ⁡ ( t ) \Lambda(t) , whereas held-out accuracy changes only when individual predictions change class. For held-out example μ \mu with correct class c μ c_{\mu} , define its correct-class margin along the training trajectory by
+
+ m μ ​ ( t ) = f c μ ​ ( 𝐱 μ , t ) − max c ≠ c μ ⁡ f c ​ ( 𝐱 μ , t ) . m_{\mu}(t)=f_{c_{\mu}}(\mathbf{x}_{\mu};t)-\max_{c\neq c_{\mu}}f_{c}(\mathbf{x}_{\mu};t). 
+ 
+ (56) 
+
+ When Λ ⁡ ( t ) \Lambda(t) is monotone over the transition, the trajectory can be reparameterized by Λ \Lambda , so that m ~ μ ​ ( Λ ) := m μ ​ ( t ⁡ ( Λ ) ) \widetilde{m}_{\mu}(\Lambda):=m_{\mu}(t(\Lambda)) . If each relevant m ~ μ ​ ( Λ ) \widetilde{m}_{\mu}(\Lambda) changes monotonically through its classification transition, then each example has a mode strength at which its predicted class changes. Denote this threshold by
+
+ m ~ μ ​ ( Λ μ , g ) = 0 . \widetilde{m}_{\mu}(\Lambda_{\mu,\mathrm{g}})=0. 
+ 
+ (57) 
+
+ In this case, held-out accuracy at a given Λ \Lambda is the empirical cumulative distribution of the example-specific thresholds,
+
+ Acc ( Λ ) = 1 M ∑ μ = 1 M 𝟏 { Λ > Λ μ , g } = F ^ g ( Λ ) . \operatorname{Acc}(\Lambda)=\frac{1}{M}\sum_{\mu=1}^{M}\mathbf{1}\{\Lambda>\Lambda_{\mu,\mathrm{g}}\}=\widehat{F}_{\mathrm{g}}(\Lambda). 
+ 
+ (58) 
+
+ A narrow distribution of Λ μ , g \Lambda_{\mu,\mathrm{g}} therefore produces a sharp accuracy rise even when Λ ⁡ ( t ) \Lambda(t) changes smoothly. No discontinuity in the optimization dynamics is required. As an illustration, a logistic threshold distribution with location μ g \mu_{g} and scale b g b_{g} gives
+
+ Acc ⁡ ( Λ ) ≈ 1 1 + exp [ − ( Λ − μ g ) / b g ] . \operatorname{Acc}(\Lambda)\approx\frac{1}{1+\exp[-(\Lambda-\mu_{g})/b_{g}]}. 
+ 
+ (59) 
+
+ This logistic form is only an example of the readout, the one-mode dynamics do not depend on it.
+
+ D.2 Adiabatic slow equation
+
+ The residual relaxes at rate Λ + 2 ​ λ W norm \Lambda+2{\lambda_{W}^{\mathrm{norm}}} , while the NTK mode moves on the slower decay-controlled scale once the residual is close to its ridge value. Under this separation of timescales, we set σ ˙ ≃ 0 \dot{\sigma}\simeq 0 at the current Λ \Lambda and define the resulting adiabatic residual σ ad ​ ( Λ ) \sigma_{\rm ad}(\Lambda) . Equation ( 10 ) gives
+
+ 0 \displaystyle 0 
+ = − ( Λ + 2 ​ λ W norm ) ​ σ − 2 ​ λ W norm ​ y , \displaystyle=-(\Lambda+2{\lambda_{W}^{\mathrm{norm}}})\sigma-2{\lambda_{W}^{\mathrm{norm}}}y, 
+ 
+ (60) 
+
+ σ ad ​ ( Λ ) \displaystyle\sigma_{\rm ad}(\Lambda) 
+ = − 2 ​ λ W norm ​ y Λ + 2 ​ λ W norm , \displaystyle=-\frac{2{\lambda_{W}^{\mathrm{norm}}}y}{\Lambda+2{\lambda_{W}^{\mathrm{norm}}}}, 
+ 
+ (61) 
+
+ Λ ˙ \displaystyle\dot{\Lambda} 
+ = − a ​ σ ad ​ ( Λ ) − 2 ​ λ W norm ​ Λ \displaystyle=-a\sigma_{\rm ad}(\Lambda)-2{\lambda_{W}^{\mathrm{norm}}}\Lambda 
+ 
+ (62) 
+
+ = 2 ​ λ W norm ​ a ​ y − Λ 2 − 2 ​ λ W norm ​ Λ Λ + 2 ​ λ W norm . \displaystyle=2{\lambda_{W}^{\mathrm{norm}}}\frac{ay-\Lambda^{2}-2{\lambda_{W}^{\mathrm{norm}}}\Lambda}{\Lambda+2{\lambda_{W}^{\mathrm{norm}}}}. 
+ 
+ (63) 
+
+ The numerator in Eq. ( 63 ) determines the sign of the mode growth. It is positive below the stable fixed point and vanishes at that fixed point, so the upward motion slows as Λ \Lambda approaches equilibrium. Separating variables gives
+
+ d ​ t = 1 2 ​ λ W norm ​ Λ + 2 ​ λ W norm a ​ y − Λ 2 − 2 ​ λ W norm ​ Λ ​ d ​ Λ . dt=\frac{1}{2{\lambda_{W}^{\mathrm{norm}}}}\frac{\Lambda+2{\lambda_{W}^{\mathrm{norm}}}}{ay-\Lambda^{2}-2{\lambda_{W}^{\mathrm{norm}}}\Lambda}\,d\Lambda. 
+ 
+ (64) 
+
+ Integrating from Λ 0 \Lambda_{0} to Λ g \Lambda_{\mathrm{g}} gives the normalized gradient-flow time required to reach the held-out threshold. After T T optimizer updates,
+
+ t \displaystyle t 
+ ≃ 𝒩 ​ η ​ T , \displaystyle\simeq\mathcal{N}\eta T, 
+ 
+ (65) 
+
+ 𝒩 ​ λ W norm \displaystyle\mathcal{N}{\lambda_{W}^{\mathrm{norm}}} 
+ = λ W . \displaystyle=\lambda_{W}. 
+ 
+ (66) 
+
+ Equating the available normalized time to the crossing time gives Eq. ( 15 ). The conversion from updates contributes 𝒩 \mathcal{N} , while 𝒩 ​ λ W norm = λ W \mathcal{N}{\lambda_{W}^{\mathrm{norm}}}=\lambda_{W} , leaving optimizer decay in the prefactor and normalized decay inside the integrand.
+
+ D.3 Closed form, critical slowing, and the fitting cutoff
+
+ We factor the denominator of the crossing-time integrand at the two fixed points of the slow equation. Define
+
+ q := a ​ y , Λ ± := − λ W norm ± λ W norm 2 + q . q:=ay,\qquad\Lambda_{\pm}:=-{\lambda_{W}^{\mathrm{norm}}}\pm\sqrt{{\lambda_{W}^{\mathrm{norm}}}^{2}+q}. 
+ 
+ (67) 
+
+ Then
+
+ q − Λ 2 − 2 ​ λ W norm ​ Λ \displaystyle q-\Lambda^{2}-2{\lambda_{W}^{\mathrm{norm}}}\Lambda 
+ = − ( Λ − Λ + ) ​ ( Λ − Λ − ) , \displaystyle=-(\Lambda-\Lambda_{+})(\Lambda-\Lambda_{-}), 
+ 
+ (68) 
+
+ C − \displaystyle C_{-} 
+ : = 2 ​ λ W norm + Λ + Λ + − Λ − , \displaystyle:=\frac{2{\lambda_{W}^{\mathrm{norm}}}+\Lambda_{+}}{\Lambda_{+}-\Lambda_{-}}, 
+ 
+ (69) 
+
+ C + \displaystyle C_{+} 
+ : = 2 ​ λ W norm + Λ − Λ − − Λ + . \displaystyle:=\frac{2{\lambda_{W}^{\mathrm{norm}}}+\Lambda_{-}}{\Lambda_{-}-\Lambda_{+}}. 
+ 
+ (70) 
+
+ The integrand becomes
+
+ Λ + 2 ​ λ W norm q − Λ 2 − 2 ​ λ W norm ​ Λ = − C − Λ − Λ + − C + Λ − Λ − . \frac{\Lambda+2{\lambda_{W}^{\mathrm{norm}}}}{q-\Lambda^{2}-2{\lambda_{W}^{\mathrm{norm}}}\Lambda}=-\frac{C_{-}}{\Lambda-\Lambda_{+}}-\frac{C_{+}}{\Lambda-\Lambda_{-}}. 
+ 
+ (71) 
+
+ Integrating between Λ 0 \Lambda_{0} and Λ g \Lambda_{\mathrm{g}} gives
+
+ η ∗ ( λ W ) = 1 2 ​ λ W ​ T [ \displaystyle\eta_{*}(\lambda_{W})=\frac{1}{2\lambda_{W}T}\Bigg[ 
+ C − log | Λ 0 − Λ + Λ g − Λ + | + C + log | Λ 0 − Λ − Λ g − Λ − | ] . \displaystyle C_{-}\log\left|\frac{\Lambda_{0}-\Lambda_{+}}{\Lambda_{\mathrm{g}}-\Lambda_{+}}\right|+C_{+}\log\left|\frac{\Lambda_{0}-\Lambda_{-}}{\Lambda_{\mathrm{g}}-\Lambda_{-}}\right|\Bigg]. 
+ 
+ (72) 
+
+ As the requested threshold approaches the stable fixed point Λ + \Lambda_{+} , the pole at Λ + \Lambda_{+} reaches the upper integration limit while the Λ − \Lambda_{-} contribution remains finite. Hence, for Λ g ↑ Λ + \Lambda_{\mathrm{g}}\uparrow\Lambda_{+} ,
+
+ η ∗ ​ ( λ W ) \displaystyle\eta_{*}(\lambda_{W}) 
+ ∼ C − 2 ​ λ W ​ T ​ log ⁡ 1 Λ + − Λ g , \displaystyle\sim\frac{C_{-}}{2\lambda_{W}T}\log\frac{1}{\Lambda_{+}-\Lambda_{\mathrm{g}}}, 
+ 
+ (73) 
+
+ Λ + − Λ g \displaystyle\Lambda_{+}-\Lambda_{\mathrm{g}} 
+ = Θ ⁡ ( λ W mode − λ W ) . \displaystyle=\Theta\!\left(\lambda_{W}^{\mathrm{mode}}-\lambda_{W}\right)\,. 
+ 
+ (74) 
+
+ The logarithm arises because the growth rate of Λ \Lambda vanishes at the reachability boundary. Away from this cutoff, the logarithm remains finite and the explicit prefactor gives the leading 1 / ( λ W ​ T ) 1/(\lambda_{W}T) dependence.
+
+ The training-fit cutoff in Eq. ( 17 ) follows from the same adiabatic gain. For a representative training mode, the expressed fraction of its target component is
+
+ g ⁡ ( Λ fit ) = Λ fit Λ fit + 2 ​ λ W norm . g(\Lambda_{\rm fit})=\frac{\Lambda_{\rm fit}}{\Lambda_{\rm fit}+2{\lambda_{W}^{\mathrm{norm}}}}. 
+ 
+ (75) 
+
+ Requiring g ⁡ ( Λ fit ) ≥ g min g(\Lambda_{\rm fit})\geq g_{\min} gives
+
+ Λ fit Λ fit + 2 ​ λ W norm \displaystyle\frac{\Lambda_{\rm fit}}{\Lambda_{\rm fit}+2{\lambda_{W}^{\mathrm{norm}}}} 
+ ≥ g min , \displaystyle\geq g_{\min}, 
+ 
+ (76) 
+
+ λ W norm \displaystyle{\lambda_{W}^{\mathrm{norm}}} 
+ ≤ Λ fit ​ ( 1 − g min ) 2 ​ g min , \displaystyle\leq\frac{\Lambda_{\rm fit}(1-g_{\min})}{2g_{\min}}, 
+ 
+ (77) 
+
+ λ W \displaystyle\lambda_{W} 
+ ≤ 𝒩 ​ Λ fit ​ ( 1 − g min ) 2 ​ g min , \displaystyle\leq\mathcal{N}\frac{\Lambda_{\rm fit}(1-g_{\min})}{2g_{\min}}, 
+ 
+ (78) 
+
+ which is Eq. ( 17 ). The approximately vertical boundary used in the phase diagram further assumes that the representative training-mode strength Λ fit \Lambda_{\rm fit} varies weakly with η \eta over the range of interest.
+
+ D.4 Discrete-time stability of the frozen-kernel dynamics
+
+ Our continuous-time reduction does not describe the large-step edge of the optimizer plane. We hold the kernel fixed to isolate the Euler stability condition for the fast residual dynamics and set
+
+ h := 𝒩 ​ η . h:=\mathcal{N}\eta. 
+
+ For fixed K K ,
+
+ 𝝈 s + 1 \displaystyle\boldsymbol{\sigma}_{s+1} 
+ = 𝝈 s − h ⁡ [ ( K + 2 ​ λ W norm ​ I ) ​ 𝝈 s + 2 ​ λ W norm ​ 𝐲 ] , \displaystyle=\boldsymbol{\sigma}_{s}-h\left[(K+2{\lambda_{W}^{\mathrm{norm}}}I)\boldsymbol{\sigma}_{s}+2{\lambda_{W}^{\mathrm{norm}}}\mathbf{y}\right], 
+ 
+ (79) 
+
+ 𝝈 ∗ \displaystyle\boldsymbol{\sigma}_{*} 
+ = − 2 ​ λ W norm ​ ( K + 2 ​ λ W norm ​ I ) − 1 ​ 𝐲 , \displaystyle=-2{\lambda_{W}^{\mathrm{norm}}}(K+2{\lambda_{W}^{\mathrm{norm}}}I)^{-1}\mathbf{y}, 
+ 
+ (80) 
+
+ 𝜹 s \displaystyle\boldsymbol{\delta}_{s} 
+ : = 𝝈 s − 𝝈 ∗ , \displaystyle:=\boldsymbol{\sigma}_{s}-\boldsymbol{\sigma}_{*}, 
+ 
+ (81) 
+
+ 𝜹 s + 1 \displaystyle\boldsymbol{\delta}_{s+1} 
+ = [ I − h ⁡ ( K + 2 ​ λ W norm ​ I ) ] ​ 𝜹 s . \displaystyle=\left[I-h(K+2{\lambda_{W}^{\mathrm{norm}}}I)\right]\boldsymbol{\delta}_{s}. 
+ 
+ (82) 
+
+ After we subtract the fixed point, each kernel eigendirection evolves independently. For K ​ 𝐮 j = Λ j ​ 𝐮 j K\mathbf{u}_{j}=\Lambda_{j}\mathbf{u}_{j} ,
+
+ δ j , s + 1 = [ 1 − h ⁡ ( Λ j + 2 ​ λ W norm ) ] ​ δ j , s . \delta_{j,s+1}=\left[1-h(\Lambda_{j}+2{\lambda_{W}^{\mathrm{norm}}})\right]\delta_{j,s}. 
+ 
+ (83) 
+
+ Therefore
+
+ | 1 − h ⁡ ( Λ j + 2 ​ λ W norm ) | \displaystyle\left|1-h(\Lambda_{j}+2{\lambda_{W}^{\mathrm{norm}}})\right| 
+ < 1 , \displaystyle<1, 
+ 
+ (84) 
+
+ 𝒩 ​ η \displaystyle\mathcal{N}\eta 
+ < 2 Λ max ​ ( K ) + 2 ​ λ W norm , \displaystyle<\frac{2}{\Lambda_{\max}(K)+2{\lambda_{W}^{\mathrm{norm}}}}, 
+ 
+ (85) 
+
+ η \displaystyle\eta 
+ < 2 𝒩 ​ Λ max ​ ( K ) + 2 ​ λ W , \displaystyle<\frac{2}{\mathcal{N}\Lambda_{\max}(K)+2\lambda_{W}}, 
+ 
+ (86) 
+
+ which recovers Eq. ( 18 ). The most restrictive eigenvalue is Λ max ​ ( K ) \Lambda_{\max}(K) . Feature learning changes this spectrum, so we use the bound only as a local stability condition for the frozen-kernel approximation, not as a global guarantee for nonlinear training.
+
+ Appendix E Jacobian-mediated feature dynamics beyond homogeneity
+
+ For any differentiable model trained with squared loss and coupled L 2 L_{2} decay, the chain rule separates the residual-dependent contribution to tangent-kernel evolution from the contribution of radial parameter decay. Homogeneity is only needed to convert the latter into fixed multiples of the output and NTK. Without homogeneity, the residual-dependent term remains exact, while the radial contractions become architecture dependent.
+
+ E.1 Exact differentiable-model identities
+
+ Proposition 1 (Exact Jacobian-mediated dynamics for differentiable models) . 
+
+ Let 
+
+ ℒ ~ ​ ( 𝜽 ) = 1 2 ​ ‖ 𝐟 𝜽 − 𝐲 ‖ 2 + λ W norm 2 ​ ‖ 𝜽 ‖ 2 , \widetilde{\mathcal{L}}(\boldsymbol{\theta})=\frac{1}{2}\left\lVert\mathbf{f}_{\boldsymbol{\theta}}-\mathbf{y}\right\rVert^{2}+\frac{{\lambda_{W}^{\mathrm{norm}}}}{2}\left\lVert\boldsymbol{\theta}\right\rVert^{2}, 
+ 
+ (87) 
+
+ with 𝛔 = 𝐟 − 𝐲 \boldsymbol{\sigma}=\mathbf{f}-\mathbf{y} , J = ∇ 𝛉 𝐟 J=\nabla_{\boldsymbol{\theta}}\mathbf{f} , and K = J ​ J ⊤ K=JJ^{\top} . Then 
+
+ 𝝈 ˙ \displaystyle\dot{\boldsymbol{\sigma}} 
+ = − K ​ 𝝈 − λ W norm ​ J ​ 𝜽 , \displaystyle=-K\boldsymbol{\sigma}-{\lambda_{W}^{\mathrm{norm}}}J\boldsymbol{\theta}, 
+ 
+ (88) 
+
+ K ˙ i ​ j \displaystyle\dot{K}_{ij} 
+ = − ∑ k K ( 2 ) i ​ j ​ k σ k − λ W norm R i ​ j , \displaystyle=-\sum_{k}K^{(2)}_{ijk}\sigma_{k}-{\lambda_{W}^{\mathrm{norm}}}R_{ij}, 
+ 
+ (89) 
+
+ where 
+
+ K i ​ j ​ k ( 2 ) = ⟨ ∇ 𝜽 K i ​ j , ∇ 𝜽 f k ⟩ , R i ​ j = ⟨ ∇ 𝜽 K i ​ j , 𝜽 ⟩ . K^{(2)}_{ijk}=\left\langle\nabla_{\boldsymbol{\theta}}K_{ij},\nabla_{\boldsymbol{\theta}}f_{k}\right\rangle,\qquad R_{ij}=\left\langle\nabla_{\boldsymbol{\theta}}K_{ij},\boldsymbol{\theta}\right\rangle. 
+ 
+ (90) 
+
+ Along the same flow, the loss is monotone because 
+
+ d d ​ t ​ ℒ ~ ​ ( 𝜽 ⁡ ( t ) ) = − ‖ J ⊤ ​ 𝝈 + λ W norm ​ 𝜽 ‖ 2 ≤ 0 . \frac{d}{dt}\widetilde{\mathcal{L}}(\boldsymbol{\theta}(t))=-\left\lVert J^{\top}\boldsymbol{\sigma}+{\lambda_{W}^{\mathrm{norm}}}\boldsymbol{\theta}\right\rVert^{2}\leq 0. 
+ 
+ (91) 
+
+ Proof.
+
+ We differentiate the model output along parameter gradient flow to obtain the residual identity. Applying the same derivative to each entry of K K produces one contraction with the data gradient and one with the radial weight-decay direction.
+
+ 𝜽 ˙ \displaystyle\dot{\boldsymbol{\theta}} 
+ = − J ⊤ ​ 𝝈 − λ W norm ​ 𝜽 , \displaystyle=-J^{\top}\boldsymbol{\sigma}-{\lambda_{W}^{\mathrm{norm}}}\boldsymbol{\theta}, 
+ 
+ (92) 
+
+ 𝝈 ˙ \displaystyle\dot{\boldsymbol{\sigma}} 
+ = J ​ 𝜽 ˙ = − K ​ 𝝈 − λ W norm ​ J ​ 𝜽 , \displaystyle=J\dot{\boldsymbol{\theta}}=-K\boldsymbol{\sigma}-{\lambda_{W}^{\mathrm{norm}}}J\boldsymbol{\theta}, 
+ 
+ (93) 
+
+ K ˙ i ​ j \displaystyle\dot{K}_{ij} 
+ = ⟨ ∇ 𝜽 K i ​ j , 𝜽 ˙ ⟩ \displaystyle=\left\langle\nabla_{\boldsymbol{\theta}}K_{ij},\dot{\boldsymbol{\theta}}\right\rangle 
+ 
+ (94) 
+
+ = − ∑ k ⟨ ∇ 𝜽 K i ​ j , ∇ 𝜽 f k ⟩ σ k − λ W norm ⟨ ∇ 𝜽 K i ​ j , 𝜽 ⟩ , \displaystyle=-\sum_{k}\left\langle\nabla_{\boldsymbol{\theta}}K_{ij},\nabla_{\boldsymbol{\theta}}f_{k}\right\rangle\sigma_{k}-{\lambda_{W}^{\mathrm{norm}}}\left\langle\nabla_{\boldsymbol{\theta}}K_{ij},\boldsymbol{\theta}\right\rangle, 
+ 
+ (95) 
+
+ d d ​ t ​ ℒ ~ \displaystyle\frac{d}{dt}\widetilde{\mathcal{L}} 
+ = ⟨ ∇ 𝜽 ℒ ~ , 𝜽 ˙ ⟩ = − ‖ ∇ 𝜽 ℒ ~ ‖ 2 . \displaystyle=\left\langle\nabla_{\boldsymbol{\theta}}\widetilde{\mathcal{L}},\dot{\boldsymbol{\theta}}\right\rangle=-\left\lVert\nabla_{\boldsymbol{\theta}}\widetilde{\mathcal{L}}\right\rVert^{2}. 
+ 
+ (96) 
+
+ □ \square 
+
+ Equation ( 89 ) isolates the extension needed beyond homogeneous networks. Whenever the K ( 2 ) K^{(2)} contraction is nonzero, the residual that controls prediction error also changes the tangent kernel. The contraction may vanish at individual states; homogeneity is needed only to replace the remaining radial term by fixed coefficients.
+
+ E.2 Local projected dynamics
+
+ For a task direction 𝐮 \mathbf{u} , we suppose over a training interval that
+
+ K ​ 𝐮 ≈ Λ ​ 𝐮 , 𝝈 ≈ σ ​ 𝐮 , 𝐮 ⊤ ​ J ​ 𝜽 ≈ β ⁡ ( σ + y ) , 𝐮 ⊤ ​ R ​ 𝐮 ≈ ρ ​ Λ , 𝐮 ⊤ ​ ( K ( 2 ) ​ 𝝈 ) ​ 𝐮 ≈ a ​ σ , K\mathbf{u}\approx\Lambda\mathbf{u},\quad\boldsymbol{\sigma}\approx\sigma\mathbf{u},\quad\mathbf{u}^{\top}J\boldsymbol{\theta}\approx\beta(\sigma+y),\quad\mathbf{u}^{\top}R\mathbf{u}\approx\rho\Lambda,\quad\mathbf{u}^{\top}(K^{(2)}\boldsymbol{\sigma})\mathbf{u}\approx a\sigma, 
+ 
+ (97) 
+
+ with slowly varying β , ρ , a \beta,\rho,a . The coefficients β \beta and ρ \rho summarize radial parameter decay after projection onto the local task direction, while a a retains its residual-to-kernel role. Projecting gives
+
+ σ ˙ ≈ − ( Λ + β ​ λ W norm ) ​ σ − β ​ λ W norm ​ y , Λ ˙ ≈ − a ​ σ − ρ ​ λ W norm ​ Λ . \dot{\sigma}\approx-(\Lambda+\beta{\lambda_{W}^{\mathrm{norm}}})\sigma-\beta{\lambda_{W}^{\mathrm{norm}}}y,\qquad\dot{\Lambda}\approx-a\sigma-\rho{\lambda_{W}^{\mathrm{norm}}}\Lambda. 
+ 
+ (98) 
+
+ For a two-homogeneous model, Euler identities set β = ρ = 2 \beta=\rho=2 and recover Eq. ( 10 ). In a non-homogeneous model, we must measure these local contractions; they need not equal the homogeneous coefficients. If they remain order one and vary slowly through the transition, both decay terms retain the factor λ W norm {\lambda_{W}^{\mathrm{norm}}} , leaving 1 / λ W norm 1/{\lambda_{W}^{\mathrm{norm}}} as the natural normalized-time scale and ( η ​ λ W ) − 1 (\eta\lambda_{W})^{-1} as the corresponding update scale.
+
+ For the Transformer in Appendix G.3 , we let 𝐟 𝜽 \mathbf{f}_{\boldsymbol{\theta}} denote the softmax probabilities entering the mean-squared-error loss. Proposition 1 then applies despite attention, LayerNorm, residual paths, and biases.
+
+ Appendix F Directional NTK-alignment intervention
+
+ F.1 Earlier task alignment shortens the predicted delay
+
+ Starting closer to the held-out threshold removes a positive part of the crossing-time integral without invoking the global kinetic calibration. Equation ( 15 ) gives
+
+ s g = 1 2 ​ η ​ λ W ​ ∫ Λ 0 Λ g Λ + 2 ​ λ W norm a ​ y − Λ 2 − 2 ​ λ W norm ​ Λ ​ 𝑑 Λ , s_{\mathrm{g}}=\frac{1}{2\eta\lambda_{W}}\int_{\Lambda_{0}}^{\Lambda_{\mathrm{g}}}\frac{\Lambda+2{\lambda_{W}^{\mathrm{norm}}}}{ay-\Lambda^{2}-2{\lambda_{W}^{\mathrm{norm}}}\Lambda}\,d\Lambda, 
+ 
+ (99) 
+
+ and differentiation with respect to the initial strength gives
+
+ ∂ s g ∂ Λ 0 = − 1 2 ​ η ​ λ W ​ Λ 0 + 2 ​ λ W norm a ​ y − Λ 0 2 − 2 ​ λ W norm ​ Λ 0 < 0 \frac{\partial s_{\mathrm{g}}}{\partial\Lambda_{0}}=-\frac{1}{2\eta\lambda_{W}}\frac{\Lambda_{0}+2{\lambda_{W}^{\mathrm{norm}}}}{ay-\Lambda_{0}^{2}-2{\lambda_{W}^{\mathrm{norm}}}\Lambda_{0}}<0 
+ 
+ (100) 
+
+ throughout the reachable branch, where the denominator is the positive spectral drive. The sign predicts that improving early alignment with a reachable task direction should advance the later held-out transition even if the auxiliary intervention is removed before generalization begins.
+
+ F.2 A temporary NTK intervention advances held-out generalization
+
+ We change early task-indexed tangent geometry while keeping the later objective identical, which tests the sign in Eq. ( 100 ). We use addition modulo 97 97 on the 4,753 4{,}753 unordered input pairs. We train a bias-free → → → → 97 194\!\to\!128\!\to\!128\!\to\!128\!\to\!97 ReLU teacher with He-normal initialization. Its 50 / 50 50/50 split uses NumPy seed 0 0 and contains 2,376 2{,}376 training and 2,377 2{,}377 held-out examples. We run 30,000 30{,}000 full-batch SGD updates without momentum, using learning rate 180 180 , coupled weight decay 10 − 5 10^{-5} , ordinary PyTorch MSE between logits and one-hot targets averaged over samples and outputs, and model seed 0 0 .
+
+ For examples 𝐱 μ , 𝐱 ν \mathbf{x}_{\mu},\mathbf{x}_{\nu} with labels c μ , c ν c_{\mu},c_{\nu} , we project the empirical NTK through the corresponding true-label logits,
+
+ K μ ​ ν TL = ⟨ ∇ 𝜽 f c μ ​ ( 𝐱 μ ) , ∇ 𝜽 f c ν ​ ( 𝐱 ν ) ⟩ . K^{\rm TL}_{\mu\nu}=\left\langle\nabla_{\boldsymbol{\theta}}f_{c_{\mu}}(\mathbf{x}_{\mu}),\nabla_{\boldsymbol{\theta}}f_{c_{\nu}}(\mathbf{x}_{\nu})\right\rangle. 
+ 
+ (101) 
+
+ The intervention uses a normalization order different from the diagnostic in Appendix G.1 . We first cosine-normalize the sample kernel,
+
+ K ^ μ ​ ν TL = K μ ​ ν TL K μ ​ μ TL ​ K ν ​ ν TL , \widehat{K}^{\rm TL}_{\mu\nu}=\frac{K^{\rm TL}_{\mu\nu}}{\sqrt{K^{\rm TL}_{\mu\mu}K^{\rm TL}_{\nu\nu}}}, 
+ 
+ (102) 
+
+ and then average between label groups,
+
+ K ¯ c ​ c ′ = 1 n c ​ n c ′ ∑ μ : c μ = c ∑ ν : c ν = c ′ K ^ TL μ ​ ν . \bar{K}_{cc^{\prime}}=\frac{1}{n_{c}n_{c^{\prime}}}\sum_{\mu:c_{\mu}=c}\sum_{\nu:c_{\nu}=c^{\prime}}\widehat{K}^{\rm TL}_{\mu\nu}. 
+ 
+ (103) 
+
+ We compute the fixed symmetric 97 × 97 97\times 97 target matrix from the teacher’s training split and the differentiable student matrix from each student’s training split.
+
+ We train 40 40 paired bias-free → → 97 194\!\to\!256\!\to\!97 ReLU students with He-normal initialization. Pair q ∈ { 0 , … , 39 } q\in\{0,\ldots,39\} uses model seed q q and an independently generated 50 / 50 50/50 split with NumPy seed 10,000 + q 10{,}000+q ; every split has 2,376 2{,}376 training and 2,377 2{,}377 held-out examples, and both members of the pair share the same initialization and data. Every student uses 30,000 30{,}000 full-batch SGD updates without momentum, learning rate 35 35 , coupled weight decay 3 × 10 − 6 3\times 10^{-6} , and ordinary PyTorch MSE between logits and one-hot targets averaged over samples and outputs. During updates 0 0 through 2,999 2{,}999 , the intervention member minimizes
+
+ ℒ int = ℒ student + λ NTK ​ ‖ K ¯ 𝜽 − K ¯ teacher ‖ F , λ NTK = 0.10 . \mathcal{L}_{\rm int}=\mathcal{L}_{\rm student}+\lambda_{\rm NTK}\left\|\bar{K}_{\boldsymbol{\theta}}-\bar{K}_{\rm teacher}\right\|_{F},\qquad\lambda_{\rm NTK}=0.10. 
+ 
+ (104) 
+
+ We remove the auxiliary term at update 3,000 3{,}000 ; the baseline never receives it. We record training and held-out accuracy and MSE every 100 100 updates.
+
+ Figure 6: Temporary early NTK alignment advances held-out generalization. (a) Mean held-out accuracy for the paired baseline and intervention students. The shaded vertical region marks the first 3,000 3{,}000 updates, when the NTK penalty is active; bands show one sample standard deviation across 40 40 paired seeds. (b) Mean held-out MSE for the same runs. The mean first 50 % 50\% held-out crossing moves from 20,200 20{,}200 updates for the baseline to 13,527.5 13{,}527.5 for the intervention, a ratio of 1.493 1.493 .
+
+ The paired mean speedup is 1.498 1.498 , and the median paired speedup is 1.489 1.489 . The intervention students also maintain lower held-out MSE after the penalty has been removed. Because the two members of each pair share their data and initialization and use the same objective after update 3,000 3{,}000 , the shift is consistent with the predicted negative derivative in Eq. ( 100 ). Matching the full 97 × 97 97\times 97 label kernel changes several Fourier components and may alter other parts of the trajectory, so the experiment tests the direction of the initial-alignment effect rather than the scalar one-mode closure in isolation.
+
+ Appendix G Experimental configurations and analysis conventions
+
+ The accompanying experiment package centralizes the configurations below in the model, training, and analysis code. We report optimizer weight decay in the convention passed directly to PyTorch SGD. The anonymous artifact URL remains to be inserted in the reproducibility statement.
+
+ G.1 Spectral diagnostics on addition modulo 97
+
+ For Figure 2 , we use the 97 ⋅ 98 / 2 = 4,753 97\cdot 98/2=4{,}753 unordered input pairs allowed by commutativity. A NumPy generator with seed 0 0 permutes the pairs; the first 2,376 2{,}376 are used for training and the remaining 2,377 2{,}377 are held out. Each input concatenates two 97 97 -dimensional one-hot vectors, and the target is the 97 97 -dimensional one-hot encoding of the modular sum.
+
+ The model is a bias-free → → 97 194\!\to\!256\!\to\!97 one-hidden-layer ReLU MLP with He-normal initialization and model seed 0 0 . We train for 20,000 20{,}000 full-batch SGD updates with learning rate 40 40 , coupled weight decay 2.5 × 10 − 5 2.5\times 10^{-5} , and no momentum. The loss is ordinary PyTorch MSE averaged over samples and all 97 97 output coordinates, so 𝒩 = 2 / ( 2376 ⋅ 97 ) = 1 / 115,236 \mathcal{N}=2/(2376\cdot 97)=1/115{,}236 and λ W norm = 2.8809 {\lambda_{W}^{\mathrm{norm}}}=2.8809 . Accuracy is recorded every 100 100 updates.
+
+ For training examples 𝐱 μ , 𝐱 ν \mathbf{x}_{\mu},\mathbf{x}_{\nu} with labels c μ , c ν c_{\mu},c_{\nu} , the true-label-projected sample NTK is
+
+ K μ ​ ν TL = ⟨ ∇ 𝜽 f c μ ​ ( 𝐱 μ ) , ∇ 𝜽 f c ν ​ ( 𝐱 ν ) ⟩ . K^{\rm TL}_{\mu\nu}=\left\langle\nabla_{\boldsymbol{\theta}}f_{c_{\mu}}(\mathbf{x}_{\mu}),\nabla_{\boldsymbol{\theta}}f_{c_{\nu}}(\mathbf{x}_{\nu})\right\rangle. 
+ 
+ (105) 
+
+ We first average these entries between groups of examples with the same output labels, producing a 97 × 97 97\times 97 matrix K ~ \widetilde{K} . We then diagonal-normalize and symmetrize the label kernel,
+
+ K ¯ c ​ c ′ = K ~ c ​ c ′ K ~ c ​ c ​ K ~ c ′ ​ c ′ . \bar{K}_{cc^{\prime}}=\frac{\widetilde{K}_{cc^{\prime}}}{\sqrt{\widetilde{K}_{cc}\widetilde{K}_{c^{\prime}c^{\prime}}}}. 
+ 
+ (106) 
+
+ Panel (a) uses updates 0 0 , 3,000 3{,}000 , 8,000 8{,}000 , and 20,000 20{,}000 . Eigensystems are computed at updates 0 0 , 100 100 , 500 500 , 1,000 1{,}000 , 3,000 3{,}000 , 6,000 6{,}000 , 8,000 8{,}000 , 10,000 10{,}000 , and 20,000 20{,}000 . Eigenvectors are matched backward through these checkpoints by maximum absolute overlap, with signs chosen continuously. Panel (c) displays four tracked leading eigenvectors at updates 0 0 , 1,000 1{,}000 , 6,000 6{,}000 , and 20,000 20{,}000 .
+
+ G.2 High-resolution MLP phase sweep on addition modulo 23
+
+ We use all 23 2 = 529 23^{2}=529 ordered input pairs. Each input concatenates two 23 23 -dimensional one-hot vectors, and the target is a 23 23 -dimensional one-hot encoding of the modular sum. NumPy seed 2027 2027 selects the training differences
+
+ 𝒟 = { 0 , 1 , 2 , 3 , 4 , 5 , 6 , 7 , 12 , 13 , 14 , 16 , 17 , 19 , 20 , 22 } , \mathcal{D}=\{0,1,2,3,4,5,6,7,12,13,14,16,17,19,20,22\}, 
+ 
+ (107) 
+
+ and we define
+
+ 𝒯 𝒟 = { ( a , b ) : a − b mod 23 ∈ 𝒟 } . \mathcal{T}_{\mathcal{D}}=\{(a,b):a-b\bmod 23\in\mathcal{D}\}. 
+ 
+ (108) 
+
+ The split contains 368 368 training and 161 161 held-out pairs and is invariant under simultaneous shifts ( a , b ) ↦ ( a + r , b + r ) (a,b)\mapsto(a+r,b+r) .
+
+ At every grid point we initialize the same bias-free → → 23 46\!\to\!256\!\to\!23 one-hidden-layer ReLU MLP with He-normal initialization and model seed 0 0 . Training uses ordinary PyTorch MSE averaged over the 368 × 23 368\times 23 residual coordinates, full-batch SGD, coupled L 2 L_{2} weight decay, and no momentum. Thus 𝒩 = 2 / ( 368 ⋅ 23 ) = 1 / 4232 \mathcal{N}=2/(368\cdot 23)=1/4232 . Each run lasts 24,000 24{,}000 updates and is evaluated every 100 100 updates. The grid contains 84 84 logarithmically spaced learning rates from 0.1 0.1 to 100 100 and 90 90 logarithmically spaced weight decays from 5 × 10 − 6 5\times 10^{-6} to 2 × 10 − 3 2\times 10^{-3} , for 7,560 7{,}560 runs.
+
+ We classify runs using a 90 % 90\% accuracy threshold. Grokking requires final training and held-out accuracy above 90 % 90\% ; memorization requires final training accuracy above 90 % 90\% but held-out accuracy below it; forgetting means that training accuracy crossed 90 % 90\% earlier but ends below it; all remaining runs are no fitting . For Figure 3 b, we retain only runs that ultimately grok and record the first update at which held-out accuracy reaches 10 % 10\% . This lower threshold marks the beginning of the final MLP generalization rise and does not affect the phase labels.
+
+ The representative runs in Figure 7 are fixed cells from the same dense sweep. Their ( η , λ W ) (\eta,\lambda_{W}) values are ( 0.87048 , 3.2930 × 10 − 5 ) (0.87048,3.2930\times 10^{-5}) for memorization, ( 2.36316 , 1.18329 × 10 − 4 ) (2.36316,1.18329\times 10^{-4}) for grokking, ( 1.43426 , 1.24846 × 10 − 3 ) (1.43426,1.24846\times 10^{-3}) for forgetting, and ( 28.6967 , 1.89561 × 10 − 4 ) (28.6967,1.89561\times 10^{-4}) for no fitting. The grokking example first reaches 90 % 90\% held-out accuracy at update 8,300 8{,}300 . The forgetting example reaches peak training accuracy 0.948 0.948 and ends at 0.204 0.204 .
+
+ Figure 7: Representative trajectories for the four MLP phase outcomes. We show training and held-out accuracy for fixed cells from the modulo- 23 23 sweep. The dotted horizontal line is the 90 % 90\% threshold used to classify the phase map.
+
+ G.2.1 Boundary extraction and calibration
+
+ For each usable weight-decay column, we define the memorization–grokking boundary as the geometric midpoint between the last memorizing learning rate and the first grokking learning rate. We exclude the detached high-step island. The finite-time boundary uses 53 53 midpoints over 2 × 10 − 5 ≤ λ W ≤ 7 × 10 − 4 2\times 10^{-5}\leq\lambda_{W}\leq 7\times 10^{-4} with equal weight in log learning rate.
+
+ To evaluate Eq. ( 15 ), define the scaled coordinates
+
+ Λ ^ = 𝒩 ​ Λ , q ^ = 𝒩 2 ​ a ​ y . \widehat{\Lambda}=\mathcal{N}\Lambda,\qquad\widehat{q}=\mathcal{N}^{2}ay. 
+ 
+ (109) 
+
+ This removes 𝒩 \mathcal{N} from the integrand while leaving the optimizer prefactor 1 / ( 2 ​ λ W ​ T ) 1/(2\lambda_{W}T) unchanged. The calibrated finite-time curve is
+
+ η fit ​ ( λ W ) = C η 2 ​ λ W ​ T ​ ∫ Λ ^ 0 Λ ^ g Λ ^ + 2 ​ λ W q ^ − Λ ^ 2 − 2 ​ λ W ​ Λ ^ ​ 𝑑 Λ ^ \boxed{\eta_{\rm fit}(\lambda_{W})=\frac{C_{\eta}}{2\lambda_{W}T}\int_{\widehat{\Lambda}_{0}}^{\widehat{\Lambda}_{g}}\frac{\widehat{\Lambda}+2\lambda_{W}}{\widehat{q}-\widehat{\Lambda}^{2}-2\lambda_{W}\widehat{\Lambda}}\,d\widehat{\Lambda}} 
+ 
+ (110) 
+
+ with one global kinetic factor C η C_{\eta} . If omitted modes and slow variation in the projected coupling rescale the scalar velocity as d ​ Λ ^ / d ​ t ≃ κ ​ F ​ ( Λ ^ ) d\widehat{\Lambda}/dt\simeq\kappa F(\widehat{\Lambda}) , then crossing times are multiplied by 1 / κ 1/\kappa and C η = 1 / κ C_{\eta}=1/\kappa . The MSE normalization 𝒩 \mathcal{N} is known exactly and is not part of this calibration. The quantities Λ ^ 0 \widehat{\Lambda}_{0} , Λ ^ g \widehat{\Lambda}_{g} , and q ^ \widehat{q} are inferred jointly from the optimizer-plane boundary rather than measured from NTK trajectories. We therefore treat them as effective coordinates of the scalar boundary model: the fit tests the predicted dependence of the crossing time on learning rate and weight decay, but does not determine the absolute magnitude of post-fit NTK growth.
+
+ Panel (a) of Table 2 collects the values used for every overlay in Figure 3 a. The mode-reachability cutoff is derived from the fitted reduced coordinates rather than fitted independently. The training-fit and stability overlays use the functional forms of Eqs. ( 17 ) and ( 18 ), with their locations calibrated separately to the observed boundaries. In particular, the stability calibration is summarized by an effective scale Λ ^ stab \widehat{\Lambda}_{\rm stab} and is not obtained from a direct measurement of 𝒩 ​ Λ max ​ ( K ) \mathcal{N}\Lambda_{\max}(K) .
+
+ Over the small-decay interval used for the inverse-decay comparison, the empirical boundary has log–log slope − 1.1681 -1.1681 , while the calibrated finite-time curve has slope − 0.9043 -0.9043 . These slopes are diagnostics of the boundary shape and are not additional fit parameters.
+
+ G.3 Transformer phase sweep on addition modulo 23
+
+ We use the same task, difference split, split seed, training size, and held-out size as in Appendix G.2 , but present each input as a sequence of two 23 23 -dimensional one-hot tokens. A learned affine encoder maps each token to d model = 32 d_{\rm model}=32 . The model contains one pre-norm Transformer block with four attention heads, a ReLU feed-forward width of 64 64 , residual connections, learned embeddings for the two positions, a final LayerNorm, and an affine → 23 64\!\to\!23 decoder. We use model seed 0 0 at every grid point.
+
+ Training uses full-batch SGD with coupled L 2 L_{2} weight decay and no momentum. The loss is PyTorch MSE between softmax probabilities and one-hot targets, averaged over samples and output coordinates, so 𝒩 = 1 / 4232 \mathcal{N}=1/4232 . Each run lasts 60,000 60{,}000 updates and is evaluated every 250 250 updates. The phase file contains 42 42 uniformly logarithmically spaced learning rates from 5 × 10 − 3 5\times 10^{-3} to 10 3 10^{3} and 45 45 uniformly logarithmically spaced weight decays from 10 − 7 10^{-7} to 10 − 3 10^{-3} , for 1,890 1{,}890 independently trained networks. We use the same 90 % 90\% phase definitions as for the MLP.
+
+ For every usable weight-decay column, we extract the geometric midpoint between the last memorizing and first grokking learning rate. We fit the inverse-decay form η = A / λ W \eta=A/\lambda_{W} over 10 − 5 ≤ λ W ≤ 3 × 10 − 4 10^{-5}\leq\lambda_{W}\leq 3\times 10^{-4} . The current phase grid yields the values in panel (b) of Table 2 .
+
+ Curve 
+
+ Relation 
+
+ Calibration values 
+
+ Fit range / quality 
+
+ (a) MLP 
+
+ Finite-time boundary 
+
+ Eq. ( 110 ) 
+
+ C η = 24.840743 C_{\eta}=24.840743 , Λ ^ 0 = 0.9281806 \widehat{\Lambda}_{0}=0.9281806 , Λ ^ g = 0.9284920 \widehat{\Lambda}_{g}=0.9284920 , q ^ = 0.8633973 \widehat{q}=0.8633973 ; κ = C η − 1 = 0.0402564 \kappa=C_{\eta}^{-1}=0.0402564 
+
+ 53 53 midpoints, 2 × 10 − 5 ≤ λ W ≤ 7 × 10 − 4 2\times 10^{-5}\leq\lambda_{W}\leq 7\times 10^{-4} ; log-MSE 0.026800 0.026800 ; log-RMSE 0.163706 0.163706 
+
+ Inverse-decay asymptote 
+
+ η = A / λ W \eta=A/\lambda_{W} 
+
+ A = 1.0916395 × 10 − 4 A=1.0916395\times 10^{-4} 
+
+ 34 34 midpoints, 2 × 10 − 5 ≤ λ W ≤ 2 × 10 − 4 2\times 10^{-5}\leq\lambda_{W}\leq 2\times 10^{-4} ; log-RMSE 0.119902 0.119902 
+
+ Mode reachability 
+
+ Eq. ( 16 ) 
+
+ λ W mode = 7.0000 × 10 − 4 \lambda_{W}^{\rm mode}=7.0000\times 10^{-4} , derived from q ^ \widehat{q} and Λ ^ g \widehat{\Lambda}_{g} 
+
+ no independent fit 
+
+ Training fit 
+
+ Eq. ( 17 ) 
+
+ λ W fit = 8.3821151 × 10 − 4 \lambda_{W}^{\rm fit}=8.3821151\times 10^{-4} 
+
+ location minimizes final-training-accuracy misclassification 
+
+ Frozen-kernel stability 
+
+ Eq. ( 18 ) 
+
+ effective Λ ^ stab = 0.1056011 \widehat{\Lambda}_{\rm stab}=0.1056011 ; low-decay cutoff η ≃ 18.9282 \eta\simeq 18.9282 
+
+ location calibrated to observed instability boundary 
+
+ (b) Transformer 
+
+ Inverse-decay boundary 
+
+ η = A / λ W \eta=A/\lambda_{W} 
+
+ A = 1.6875621 × 10 − 5 A=1.6875621\times 10^{-5} 
+
+ 16 16 boundary points, 10 − 5 ≤ λ W ≤ 3 × 10 − 4 10^{-5}\leq\lambda_{W}\leq 3\times 10^{-4} ; log-RMSE 0.107016 0.107016 
+
+ Table 2: Boundary calibrations for the optimizer-plane experiments. Panel (a) lists the MLP phase-diagram overlays; panel (b) gives the inverse-decay fit for the Transformer memorization–grokking boundary. The theory specifies the functional forms of the MLP curves, while their locations are determined either by the reduced finite-time fit or by separate effective calibrations to the observed boundaries.
+
+ For the transition-time scaling panel, we retain runs that ultimately grok and record the first held-out 80 % 80\% crossing. The 80 % 80\% threshold is chosen to lie in the final generalization rise rather than near chance accuracy, 1 / 23 ≈ 4.35 % 1/23\approx 4.35\% . On the current 1,890 1{,}890 -run grid, the grokking cohort has median η ​ λ W ​ s 80 = 0.920 \eta\lambda_{W}s_{80}=0.920 .
+
+ G.4 Reduced-mode potential illustration
+
+ For Figure 5 , we integrate Eq. ( 12 ) with dimensionless normalized decay λ W norm = 0.15 {\lambda_{W}^{\mathrm{norm}}}=0.15 , coupling a = 1 a=1 , initial strength Λ ⁡ ( 0 ) = 0.25 \Lambda(0)=0.25 , fourth-order Runge–Kutta step 0.002 0.002 , and final time 18 18 . The task-aligned trajectory uses y = 1 y=1 , while the unsupported control uses y = 0 y=0 . These values are chosen only to display the qualitative reduced dynamics and are not fitted to an empirical run.

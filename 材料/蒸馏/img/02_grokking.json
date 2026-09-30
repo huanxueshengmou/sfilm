@@ -1,0 +1,146 @@
+[
+ {
+  "file": "02_grokking_01.png",
+  "w": 9065,
+  "h": 3616,
+  "bytes": 579944,
+  "src": "https://arxiv.org/html/2301.05217v1/figs/1-layer_transformer.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "02_grokking_02.png",
+  "w": 700,
+  "h": 391,
+  "bytes": 49874,
+  "src": "https://arxiv.org/html/2301.05217v1/figs/opaque_1l_accuracy.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "02_grokking_03.png",
+  "w": 700,
+  "h": 370,
+  "bytes": 55230,
+  "src": "https://arxiv.org/html/2301.05217v1/figs/opaque_1l_loss.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "02_grokking_04.png",
+  "w": 626,
+  "h": 626,
+  "bytes": 206600,
+  "src": "https://arxiv.org/html/2301.05217v1/att_score_pos_0.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "02_grokking_05.png",
+  "w": 626,
+  "h": 626,
+  "bytes": 174086,
+  "src": "https://arxiv.org/html/2301.05217v1/act_mlp_neuron_0.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "02_grokking_06.png",
+  "w": 626,
+  "h": 626,
+  "bytes": 57623,
+  "src": "https://arxiv.org/html/2301.05217v1/norm_fourier_logits.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "02_grokking_07.png",
+  "w": 814,
+  "h": 526,
+  "bytes": 52546,
+  "src": "https://arxiv.org/html/2301.05217v1/w_logit_fourier_basis_freq14.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "02_grokking_08.png",
+  "w": 1000,
+  "h": 500,
+  "bytes": 95290,
+  "src": "https://arxiv.org/html/2301.05217v1/figs/cos_inter.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "02_grokking_09.png",
+  "w": 1250,
+  "h": 500,
+  "bytes": 577812,
+  "src": "https://arxiv.org/html/2301.05217v1/attn_pattern_all_heads.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "02_grokking_10.png",
+  "w": 1250,
+  "h": 500,
+  "bytes": 417829,
+  "src": "https://arxiv.org/html/2301.05217v1/neuron_acts_more_samples.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "02_grokking_11.png",
+  "w": 700,
+  "h": 450,
+  "bytes": 133237,
+  "src": "https://arxiv.org/html/2301.05217v1/figs/average_2l_loss.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "02_grokking_12.png",
+  "w": 1177,
+  "h": 525,
+  "bytes": 85584,
+  "src": "https://arxiv.org/html/2301.05217v1/figs/2l_excluded_loss_full.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "02_grokking_13.png",
+  "w": 700,
+  "h": 450,
+  "bytes": 55458,
+  "src": "https://arxiv.org/html/2301.05217v1/figs/weight_decay_5_small_prime_modulus.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "02_grokking_14.png",
+  "w": 700,
+  "h": 450,
+  "bytes": 34775,
+  "src": "https://arxiv.org/html/2301.05217v1/figs/second_large_prime_loss_graph.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "02_grokking_15.png",
+  "w": 1478,
+  "h": 525,
+  "bytes": 62420,
+  "src": "https://arxiv.org/html/2301.05217v1/figs/withouth-weight-decay-loss-full.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "02_grokking_16.png",
+  "w": 1000,
+  "h": 626,
+  "bytes": 47654,
+  "src": "https://arxiv.org/html/2301.05217v1/5_digit_add_infinite_linear.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "02_grokking_17.png",
+  "w": 1000,
+  "h": 626,
+  "bytes": 34342,
+  "src": "https://arxiv.org/html/2301.05217v1/skip_trigram_infinite_linear.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "02_grokking_18.png",
+  "w": 1500,
+  "h": 375,
+  "bytes": 33443,
+  "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+  "alt": "Simons Foundation International"
+ }
+]

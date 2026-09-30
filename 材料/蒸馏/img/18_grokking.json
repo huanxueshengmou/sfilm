@@ -1,0 +1,90 @@
+[
+ {
+  "file": "18_grokking_01.png",
+  "w": 3204,
+  "h": 1629,
+  "bytes": 357917,
+  "src": "https://arxiv.org/html/2606.00230v1/result_plots/grokking_curves/combined_grokking_curves.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "18_grokking_02.png",
+  "w": 1967,
+  "h": 1048,
+  "bytes": 144407,
+  "src": "https://arxiv.org/html/2606.00230v1/result_plots/concept_vector_auc/concept_pref_auroc_dot.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "18_grokking_03.png",
+  "w": 1974,
+  "h": 1048,
+  "bytes": 187988,
+  "src": "https://arxiv.org/html/2606.00230v1/result_plots/spectral_rank_concepts/eff_rank_last_layer.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "18_grokking_04.png",
+  "w": 2998,
+  "h": 1385,
+  "bytes": 602580,
+  "src": "https://arxiv.org/html/2606.00230v1/result_plots/attention_plots/paper_attn_to_context_by_layer.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "18_grokking_05.png",
+  "w": 3272,
+  "h": 1611,
+  "bytes": 256239,
+  "src": "https://arxiv.org/html/2606.00230v1/result_plots/grokking_curves/35m_grokking.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "18_grokking_06.png",
+  "w": 3272,
+  "h": 1611,
+  "bytes": 196675,
+  "src": "https://arxiv.org/html/2606.00230v1/result_plots/grokking_curves/130m_grokking.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "18_grokking_07.png",
+  "w": 1967,
+  "h": 1048,
+  "bytes": 280593,
+  "src": "https://arxiv.org/html/2606.00230v1/result_plots/concept_vector_auc/concept_pref_auroc_dot_all_layers.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "18_grokking_08.png",
+  "w": 1974,
+  "h": 1048,
+  "bytes": 366452,
+  "src": "https://arxiv.org/html/2606.00230v1/result_plots/spectral_rank_concepts/eff_rank_all_layers.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "18_grokking_09.png",
+  "w": 2982,
+  "h": 1385,
+  "bytes": 554820,
+  "src": "https://arxiv.org/html/2606.00230v1/result_plots/attention_plots/paper_entropy_by_layer.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "18_grokking_10.png",
+  "w": 1297,
+  "h": 2033,
+  "bytes": 178918,
+  "src": "https://arxiv.org/html/2606.00230v1/combined_attention_heatmaps.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "18_grokking_11.png",
+  "w": 1500,
+  "h": 375,
+  "bytes": 33443,
+  "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+  "alt": "Simons Foundation International"
+ }
+]

@@ -1,0 +1,650 @@
+    <!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <link rel="canonical" href="https://blog.csdn.net/gitblog_00601/article/details/163664694"/>
+    <link rel="alternate" type="application/rss+xml" title="尹田凌Luke" href="https://blog.csdn.net/gitblog_00601/rss/map">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="renderer" content="webkit"/>
+    <meta name="force-rendering" content="webkit"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+      <meta name="report" content='{"pid": "blog", "spm":"1001.2101"}'>
+    <meta name="referrer" content="always">
+    <meta http-equiv="Cache-Control" content="no-siteapp" /><link rel="alternate" media="handheld" href="#" />
+    <meta name="shenma-site-verification" content="5a59773ab8077d4a62bf469ab966a63b_1497598848">
+    <meta name="applicable-device" content="pc">
+    <link  href="https://g.csdnimg.cn/static/logo/favicon32.ico"  rel="shortcut icon" type="image/x-icon" />
+    <title>Axolotl 中的 Grokfast 集成：用慢梯度放大加速 Grokking 现象收敛-CSDN博客</title>
+    <meta property="og:locale" content="zh_CN">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Axolotl 中的 Grokfast 集成：用慢梯度放大加速 Grokking 现象收敛-CSDN博客">
+    <meta property="og:description" content="文章浏览阅读153次，点赞4次，收藏2次。Grokfast（Grokking 加速器）是一种通过放大历史梯度中的&quot;慢分量&quot;来显著缩短模型从过拟合到泛化突变（grokking 阶段）等待时间的优化器技术。本文以 Axolotl 官方集成 [src/axolotl/integrations/grokfast/README.md](https://link.gitcode.com/i/00e48f855">
+    <meta property="og:url" content="https://blog.csdn.net/gitblog_00601/article/details/163664694">
+    <meta property="og:site_name" content="CSDN博客">
+    <meta property="og:image" content="https://img-bss.csdnimg.cn/202112131616291007.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Axolotl 中的 Grokfast 集成：用慢梯度放大加速 Grokking 现象收敛">
+    <meta property="article:published_time" content="2026-09-14T20:07:34+08:00">
+    <meta property="article:modified_time" content="2026-09-14T20:07:40+08:00">
+    <meta property="bytedance:published_time" content="2026-08-11T12:58:16+08:00">
+    <meta property="bytedance:lrDate_time" content="2026-09-14T20:07:34+08:00">
+    <meta property="bytedance:updated_time" content="2026-09-14T20:07:34+08:00">
+    <meta property="article:author" content="尹田凌Luke">
+    <meta property="article:section" content="Axolotl 中的 Grokfast 集成：用慢梯度放大加速 Grokking 现象收敛">
+    <meta property="article:tag" content="Axolotl 中的 Grokfast 集成：用慢梯度放大加速 Grokking 现象收敛">
+    <meta name="geo:keywords" content="Axolotl 中的 Grokfast 集成：用慢梯度放大加速 Grokking 现象收敛">
+    <meta name="geo:summary" content="Grokfast（Grokking 加速器）是一种通过放大历史梯度中的&quot;慢分量&quot;来显著缩短模型从过拟合到泛化突变（grokking 阶段）等待时间的优化器技术。本文以 Axolotl 官方集成 [src/axolotl/integrations/grokfast/README.md](https://link.gitcode.com/i/00e48f855b5e81f7b74817e8b323fc">
+    <meta name="geo:entity_type" content="Article">
+    <meta name="geo:subject" content="Axolotl 中的 Grokfast 集成：用慢梯度放大加速 Grokking 现象收敛">
+    <meta name="geo:key_points" content="Axolotl 中的 Grokfast 集成：用慢梯度放大加速 Grokking 现象收敛">
+    <meta name="geo:citation_ready" content="true">
+    <meta name="description:direct_answer" content="Grokfast（Grokking 加速器）是一种通过放大历史梯度中的&quot;慢分量&quot;来显著缩短模型从过拟合到泛化突变（grokking 阶段）等待时间的优化器技术。本文以 Axolotl 官方集成 [src/axolotl/integrations/grokfast/README.md](https:/">
+    <meta name="author:credentials" content="尹田凌Luke">
+    <meta name="author:affiliation" content="csdn">
+    <meta name="geo:source_type" content="original">
+    <meta name="geo:fact_checked" content="true">
+    <meta name="geo:editorial_policy" content="https://passport.csdn.net/service">
+    <meta name="geo:update_frequency" content="daily">
+    <meta name="geo:maintenance_status" content="active">
+        <script type="application/ld+json">
+          {"image":"https://img-bss.csdnimg.cn/202112131616291007.png","keywords":"Axolotl 中的 Grokfast 集成：用慢梯度放大加速 Grokking 现象收敛","@type":"Article","author":[{"@type":"Person","name":"尹田凌Luke","url":"https://blog.csdn.net/gitblog_00601"}],"inLanguage":"zh-CN","description":"文章浏览阅读153次，点赞4次，收藏2次。Grokfast（Grokking 加速器）是一种通过放大历史梯度中的\"慢分量\"来显著缩短模型从过拟合到泛化突变（grokking 阶段）等待时间的优化器技术。本文以 Axolotl 官方集成 [src/axolotl/integrations/grokfast/README.md](https://link.gitcode.com/i/00e48f855","dateModified":"2026-09-14T20:07:40+08:00","@context":"https://schema.org","url":"https://blog.csdn.net/gitblog_00601/article/details/163664694","datePublished":"2026-09-14T20:07:34+08:00","publisher":{"@type":"Organization","name":"CSDN","logo":{"@type":"ImageObject","url":"https://g.csdnimg.cn/static/logo/favicon32.ico"}},"geoSummary":{"heading":"内容摘要","items":{"主题":"Axolotl 中的 Grokfast 集成：用慢梯度放大加速 Grokking 现象收敛","类型":"article","适用场景":"Grokfast（Grokking 加速器）是一种通过放大历史梯度中的\"慢分量\"来显著缩短模型从过拟合到泛化突变（grokking 阶段）等待时间的优化器技术。本文以 Axolotl 官方集成 [src/axolotl/integrations/grokfast/README.md](https://link.gitcode.com/i/00e48f855b5e81f7b74817e8b323fc","核心功能":"Axolotl 中的 Grokfast 集成：用慢梯度放大加速 Grokking 现象收敛","更新日期":"2026-09-14T20:07:40+08:00"},"keyPoints":["Axolotl 中的 Grokfast 集成：用慢梯度放大加速 Grokking 现象收敛"],"citationContext":{"authoritySource":"尹田凌Luke","factChecked":true,"lastVerified":"2026-09-14T20:07:40+08:00"}},"headline":"Axolotl 中的 Grokfast 集成：用慢梯度放大加速 Grokking 现象收敛","articleSection":"Axolotl 中的 Grokfast 集成：用慢梯度放大加速 Grokking 现象收敛"}
+        </script>
+    <script>
+    (function(){
+    var el = document.createElement("script");
+    el.src = "https://lf1-cdn-tos.bytegoofy.com/goofy/ttzz/push.js?1abfa13dfe74d72d41d83c86d240de42fa345e1877a4861fa55a00b4f9f2644d3d72cd14f8a76432df3935ab77ec54f830517b3cb210f7fd334f50ccb772134a";
+    el.id = "ttzz";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(el, s);
+    })(window)
+    </script>
+        <meta name="keywords" content="Axolotl 中的 Grokfast 集成：用慢梯度放大加速 Grokking 现象收敛">
+    <meta name="description" content="文章浏览阅读153次，点赞4次，收藏2次。Grokfast（Grokking 加速器）是一种通过放大历史梯度中的&quot;慢分量&quot;来显著缩短模型从过拟合到泛化突变（grokking 阶段）等待时间的优化器技术。本文以 Axolotl 官方集成 [src/axolotl/integrations/grokfast/README.md](https://link.gitcode.com/i/00e48f855b5e81f7b74817e8b323fc">
+              <link rel="stylesheet" type="text/css" href="https://csdnimg.cn/release/blogv2/dist/pc/css/gitcode_detail_enter-9ffcda9241.min.css">
+    <style>
+        #content_views pre{
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none; 
+            user-select: none; 
+        }
+        #content_views pre code{
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none; 
+            user-select: none; 
+        }
+    </style>
+    <script type="application/ld+json">{"@context":"https://ziyuan.baidu.com/contexts/cambrian.jsonld","@id":"https://blog.csdn.net/gitblog_00601/article/details/163664694","appid":"1638831770136827","pubDate":"2026-08-11T12:58:16","title":"Axolotl 中的 Grokfast 集成：用慢梯度放大加速 Grokking 现象收敛-CSDN博客","upDate":"2026-09-14T20:07:34"}</script>
+    <script src="https://g.csdnimg.cn/lib/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>
+    <script src="https://g.csdnimg.cn/lib/jquery-migrate/1.4.1/jquery-migrate.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        var isCorporate = false;
+        var username =  "gitblog_00601";
+        var skinImg = "white";
+
+        var blog_address = "https://blog.csdn.net/gitblog_00601";
+        var currentUserName = "";
+        var isOwner = false;
+        var loginUrl = "http://passport.csdn.net/account/login?from=https://blog.csdn.net/gitblog_00601/article/details/163664694";
+        var blogUrl = "https://blog.csdn.net/";
+        var starMapUrl = "https://ai.csdn.net";
+        var paymentBalanceUrl = "https://csdnimg.cn/release/vip-business-components/vipPaymentBalance.js?v=2025122501";
+        var avatar = "https://profile-avatar.csdnimg.cn/default.jpg!1";
+        var isCJBlog = false;
+        var isStarMap = false;
+        var articleTitle = "Axolotl 中的 Grokfast 集成：用慢梯度放大加速 Grokking 现象收敛";
+        var articleDesc = "文章浏览阅读153次，点赞4次，收藏2次。Grokfast（Grokking 加速器）是一种通过放大历史梯度中的\&quot;慢分量\&quot;来显著缩短模型从过拟合到泛化突变（grokking 阶段）等待时间的优化器技术。本文以 Axolotl 官方集成 [src/axolotl/integrations/grokfast/README.md](https://link.gitcode.com/i/00e48f855b5e81f7b74817e8b323fc";
+        var articleTitles = "Axolotl 中的 Grokfast 集成：用慢梯度放大加速 Grokking 现象收敛-CSDN博客";
+        var nickName = "尹田凌Luke";
+        var articleDetailUrl = "https://blog.csdn.net/gitblog_00601/article/details/163664694";
+        var vipUrlV = "https://mall.csdn.net/vip?vipSource=learningVip";
+        if(window.location.host.split('.').length == 3) {
+            blog_address = blogUrl + username;
+        }
+        var skinStatus = "White";
+        var isVipSkin = false;
+        var blogStaticHost = "https://csdnimg.cn/release/blogv2/"
+          var payColumn = false
+    </script>
+        <meta name="toolbar" content='{"type":"0","fixModel":"1"}'>
+      <script ript src="https://g.csdnimg.cn/??fixed-sidebar/1.1.7/fixed-sidebar.js" type="text/javascript"></script>
+    <script src='//g.csdnimg.cn/common/csdn-report/report.js' type='text/javascript'></script>
+    <link rel="stylesheet" type="text/css" href="https://csdnimg.cn/public/sandalstrap/1.4/css/sandalstrap.min.css">
+    <style>
+        .MathJax_Message, .MathJax_Preview{
+            display: none !important;
+        }
+    </style>
+    <script src="https://dup.baidustatic.com/js/ds.js"></script>
+      <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "lgtpix6r85");
+      </script>
+    <script src="/cdn_cgi_bs_bot/static/crypto.min.js"></script>
+    <script src="/cdn_cgi_bs_bot/static/bot-score-v1.js"></script>
+
+    <script src="/cdn_cgi_bs_captcha/static/js/waf_captcha_embedded_bs_v6.3.0805.js"></script>
+</head>
+  <body class="nodata twocolumn-container " style="">
+    <div id="toolbarBox" style="min-height: 48px;"></div>
+        <script>
+            var toolbarSearchExt = '{\"id\":163664694,\"landingWord\":[],\"queryWord\":\"\",\"tag\":[],\"title\":\"Axolotl 中的 Grokfast 集成：用慢梯度放大加速 Grokking 现象收敛\"}';
+        </script>
+        <link rel="stylesheet" type="text/css" href='https://cdn-static-cache.gitcode.com/gitcode-quick-app-components-fe/gitcode-repo.pro.css'>
+        <script src="https://g.csdnimg.cn/common/csdn-toolbar-gitcode/csdn-toolbar-gitcode.js" type="text/javascript"></script>
+        <script>
+        window.toolbarReady = false;
+        $(document).on('toolbarReady', function (e) {
+          window.toolbarReady = true;
+          if(window.csdn.configuration_tool_parameterv){
+              window.csdn.configuration_tool_parameterv({
+                  'need_first_suspend': true,//第一栏悬浮
+                  'need_little_suspend': false,//第二栏悬浮
+                  'little_tool_id': '' ,//第二栏id
+                  'little_need_insert_type': '' //第二栏需要模块类型
+              })
+          }
+        })
+        </script>
+    <script>
+    (function(){
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        }
+        else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+    </script>
+
+    <link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/pc/css/blog_code-01256533b5.min.css">
+    <link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/chart-3456820cac.css" />
+    <link rel="stylesheet" href="https://g.csdnimg.cn/lib/swiper/6.0.4/css/swiper.css" />
+    <script src="https://g.csdnimg.cn/lib/swiper/6.0.4/js/swiper.js" async></script>
+    <script>
+      var articleId = 163664694;
+        var privateEduData = [];
+        var privateData = [];
+      var crytojs = "https://csdnimg.cn/release/blogv2/dist/components/js/crytojs-ca5b8bf6ae.min.js";
+      var commentscount = 0;
+      var commentAuth = 1;
+      var curentUrl = "https://blog.csdn.net/gitblog_00601/article/details/163664694";
+      var myUrl = "https://my.csdn.net/";
+      var isGitCodeBlog = true;
+var vipActivityIcon = "https://i-operation.csdnimg.cn/images/99a45e75b3604261bbe47a0982437719.png";
+var vipActivityIconV2 = {
+  icon: "https://i-operation.csdnimg.cn/images/99a45e75b3604261bbe47a0982437719.png",
+  url: "https://i.csdn.net/#/geek-star-fun-pack?utm_source=260901_vip_blogleftbanner"
+};
+      var isOpenSourceBlog = false;
+      var isVipArticle = false;
+        var highlight = ["grokking","grokfast","axolotl","加速","放大","集成","收敛","梯度","中的","现象","慢",":"];//高亮数组
+        var isRecommendModule = true;
+          var isBaiduPre = true;
+          var baiduCount = 2;
+          var setBaiduJsCount = 10;
+        var viewCountFormat = 153;
+      var share_card_url = "https://app-blog.csdn.net/share?article_id=163664694&username=gitblog_00601"
+      var mallVipUrl = "https://mall.csdn.net/vip?vipSource=article"
+      var vipArticleAbStyle = "t_1"
+      var vipArticleCpStyle = "t_1"
+      var detailheaderAbCommunity = "exp1"
+      var codeAiAbStyle = "control"
+      var runProjectDeepBlogAB = "t_1"
+      var gitcodeHighlightWordAB = "exp1"
+
+      var deepblogUrl = ""
+        deepblogUrl = "https://deepblog.net?utm_source=blog_onekey_run";
+      var codeAiAbObjStyle = ""
+        codeAiAbObjStyle = "{\"control\":{\"title\":\"AI写代码\",\"destUrl\":\"https://trae.com.cn?utm_source=community&utm_medium=csdn&utm_campaign=daima\",\"imgUrl\":\"https://i-operation.csdnimg.cn/images/a5fff6f6c9f0464c9a46b130c972952b.png\"},\"exp4\":{\"title\":\"Lobster AI\",\"destUrl\":\"https://lobsterai.youdao.com/#/index?keyfrom=csdn3\",\"imgUrl\":\"https://i-operation.csdnimg.cn/images/2c9d3b91a8ad4956bca5af92918b9e75.png\"},\"exp5\":{\"title\":\"用码道免费领 1 个月 Token\",\"destUrl\":\"https://developer.huaweicloud.com/codeartsco.html?source=dmzntgwltcsdn1&sourcead=dmzntgwltcsdnzn11\",\"imgUrl\":\"https://i-operation.csdnimg.cn/images/7c0190c005ab41659100f583c0791aee.png\"},\"exp6\":{\"title\":\"AI代码解释\",\"destUrl\":\"https://developer.huaweicloud.com/codeartsco.html?source=dmzntgwltcsdn1&sourcead=dmzntgwltcsdncommunity8\",\"imgUrl\":\"https://i-operation.csdnimg.cn/images/7c0190c005ab41659100f583c0791aee.png\"},\"exp7\":{\"title\":\"看看AI怎么写\",\"destUrl\":\"https://developer.huaweicloud.com/codeartsco.html?source=dmzntgwltcsdn1&sourcead=dmzntgwltcsdncommunity9\",\"imgUrl\":\"https://i-operation.csdnimg.cn/images/7c0190c005ab41659100f583c0791aee.png\"},\"exp8\":{\"title\":\"点击领取万元奖金\",\"destUrl\":\"https://builderx.csdn.net/activity-site/madao-activity-page/madao?source=community7\",\"imgUrl\":\"https://i-operation.csdnimg.cn/images/7c0190c005ab41659100f583c0791aee.png\"},\"exp9\":{\"title\":\"复制一句话领 10 元\",\"destUrl\":\"https://builderx.csdn.net/activity-site/madao-activity-page/index?source=community1\",\"imgUrl\":\"https://i-operation.csdnimg.cn/images/7c0190c005ab41659100f583c0791aee.png\"}}";
+      var articleType = 1;
+      var baiduKey = "";
+      var copyPopSwitch = true;
+      var needInsertBaidu = true;
+      var recommendRegularDomainArr = ["blog.csdn.net/.+/article/details/","download.csdn.net/download/","edu.csdn.net/course/detail/","ask.csdn.net/questions/","bbs.csdn.net/topics/","www.csdn.net/gather_.+/"]
+      var codeStyle = "";
+      var baiduSearchType = "";
+      var sharData = "{\"hot\":[{\"id\":1,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/a5f4260710904e538002a6ab337939b3.png\"},{\"id\":2,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/188b37199a2c4b74b1d9ffc39e0d52de.png\"},{\"id\":3,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/14ded358b631444581edd98a256bc5af.png\"},{\"id\":4,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/1470f23a770444d986ad551b9c33c5be.png\"},{\"id\":5,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/c329f5181dc74f6c9bd28c982bb9f91d.png\"},{\"id\":6,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/ccd8a3305e81460f9c505c95b432a65f.png\"},{\"id\":7,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/bc89d8283389440d97fc4d30e30f45e1.png\"},{\"id\":8,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/452d485b4a654f5592390550d2445edf.png\"},{\"id\":9,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/f8b9939db2ed474a8f43a643015fc8b7.png\"},{\"id\":10,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/6de8864187ab4ed3b1db0856369c36ff.png\"},{\"id\":11,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/673cc3470ff74072acba958dc0c46e2d.png\"},{\"id\":12,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/930c119760ac4491804db80f9c6d4e3f.png\"},{\"id\":13,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/15e6befb05a24233bc2b65e96aa8d972.png\"},{\"id\":14,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/2075fd6822184b95a41e214de4daec13.png\"},{\"id\":15,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/859b1552db244eb6891a809263a5c657.png\"},{\"id\":16,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/0be2f920f1f74290a98921974a9613fd.png\"},{\"id\":17,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/2e97e00b43f14afab494ea55ef3f4a6e.png\"},{\"id\":18,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/ff4ab252f46e444686f5135d6ebbfec0.png\"},{\"id\":19,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/ae029bbe99564e79911657912d36524f.png\"},{\"id\":20,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/b3ece39963de440388728e9e7b9bf427.png\"},{\"id\":21,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/6f14651a99ba486e926d63b6fa692997.png\"},{\"id\":22,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/83ceddf050084875a341e32dcceca721.png\"},{\"id\":23,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/b90368b8fd5d4c6c8c79a707d877cf7c.png\"},{\"id\":24,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/aeffae14ecf14e079b2616528c9a393b.png\"},{\"id\":25,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/c5a06b5a13d44d16bed868fc3384897a.png\"},{\"id\":26,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/08b697658b844b318cea3b119e9541ef.png\"},{\"id\":27,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/68ccb0b8d09346ac961d2b5c1a8c77bf.png\"},{\"id\":28,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/a2227a247e37418cbe0ea972ba6a859b.png\"},{\"id\":29,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/3a42825fede748f9993e5bb844ad350d.png\"},{\"id\":30,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/8882abc1dd484224b636966ea38555c3.png\"},{\"id\":31,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/4f6a5f636a3e444d83cf8cc06d87a159.png\"},{\"id\":32,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/1953ef79c56b4407b78d7181bdff11c3.png\"},{\"id\":33,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/c04a2a4f772948ed85b5b0380ed36287.png\"},{\"id\":34,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/5b4fecd05091405ea04d8c0f53e9f2c7.png\"},{\"id\":35,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/b89f576d700344e280d6ceb2a66c2420.png\"},{\"id\":36,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/1c65780e11804bbd9971ebadb3d78bcf.png\"},{\"id\":37,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/d590db2055f345db9706eb68a7ec151a.png\"},{\"id\":38,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/fe602f80700b4f6fb3c4a9e4c135510e.png\"},{\"id\":39,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/39ff2fcd31e04feba301a071976a0ba7.png\"},{\"id\":40,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/f9b61b3d113f436b828631837f89fb39.png\"},{\"id\":41,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/df1aca5f610c4ad48cd16da88c9c8499.png\"},{\"id\":42,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/d7acf73a1e6b41399a77a85040e10961.png\"},{\"id\":43,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/b7f1b63542524b97962ff649ab4e7e23.png\"}],\"vip\":[{\"id\":1,\"vipUrl\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220920101150.png\",\"url\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220920101154.png\"},{\"id\":2,\"vipUrl\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220920101204.png\",\"url\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220920101208.png\"},{\"id\":3,\"vipUrl\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220920101211.png\",\"url\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220920101215.png\"},{\"id\":4,\"vipUrl\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220920101218.png\",\"url\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220920101220.png\"},{\"id\":5,\"vipUrl\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220920101223.png\",\"url\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220920101226.png\"},{\"id\":6,\"vipUrl\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220922100635.png\",\"url\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220922100639.png\"},{\"id\":7,\"vipUrl\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220922100642.png\",\"url\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220922100644.png\"},{\"id\":8,\"vipUrl\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220922100647.png\",\"url\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220922100649.png\"},{\"id\":9,\"vipUrl\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220922100652.png\",\"url\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220922100655.png\"},{\"id\":10,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/55de67481fde4b04b97ad78f11fe369a.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/bb2418fb537e4d78b10d8765ccd810c5.png\"},{\"id\":11,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/579c713394584d128104ef1044023954.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/f420d9fbcf5548079d31b5e809b6d6cd.png\"},{\"id\":12,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/75b7f3155ba642f5a4cc16b7baf44122.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/a9030f5877be401f8b340b80b0d91e64.png\"},{\"id\":13,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/0903d33cafa54934be3780aa54ae958d.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/2cd8c8929f5a42fca5da2a0aeb456203.png\"},{\"id\":14,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/949fd7c22884439fbfc3c0e9c3b8dee7.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/dafbea9bd9eb4f3b962b48dc41657f89.png\"},{\"id\":15,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/4119cfddd71d4e6a8a27a18dbb74d90e.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/c56310c8b6384d9e85388e4e342ce508.png\"},{\"id\":16,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/121575274da142bcbbbbc2e8243dd411.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/5013993de06542f881018bb9abe2edf7.png\"},{\"id\":17,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/4d97aa6dd4fe4f09a6bef5bdf8a6abcd.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/76f23877b6ad4066ad45ce8e31b4b977.png\"},{\"id\":18,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/fdb619daf21b4c829de63b9ebc78859d.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/a1abe5d27a5441f599adfe662f510243.png\"},{\"id\":19,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/676b7707bb11410f8f56bc0ed2b2345c.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/7ac5b467fbf24e1d8c2de3f3332c4f54.png\"},{\"id\":20,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/0becb8cc227e4723b765bdd69a20fd4a.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/fdec85b26091486b9a89d0b8d45c3749.png\"},{\"id\":21,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/1a6c06235ad44941b38c54cbc25a370c.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/410a06cda2d44b0c84578f88275caf70.png\"}],\"map\":{\"hot\":\"热门\",\"vip\":\"VIP\"}}";
+        var commentListModule = ''
+      var canRead = true;
+      var blogMoveHomeArticle = true;
+      var showSearchText = "";
+      var articleSource = 2;
+      var articleReport = '{"pid": "blog", "spm":"1001.2101"}';
+        var baiduSearchChannel = 'pc_relevant'
+        var baiduSearchIdentification = '.235^v43^pc_blog_bottom_relevance_base6'
+        var distRequestId = 'silkroad_1790680596240'
+        var initRewardObject = {
+          giver: currentUserName,
+          anchor: username,
+          articleId: articleId,
+          sign: ''
+        }
+        var isLikeStatus = false;
+        var isUnLikeStatus = false;
+        var studyLearnWord = "";
+        var unUseCount = 0;
+        var codeMaxSize = 0;
+        var overCost = true;
+        var isCurrentUserVip = false;
+        var contentViewsHeight = 0;
+        var contentViewsCount = 0;
+        var contentViewsCountLimit = 5;
+        var isShowConcision = false;
+        var lastTime = 0
+        var postTime = "2026-09-14 20:07:34"
+      var isCookieConcision = false
+      var isHasDirectoryModel = false
+      var isShowSideModel = false
+      var isShowDirectoryModel = true
+      function getCookieConcision(sName){
+        var allCookie = document.cookie.split("; ");
+        for (var i=0; i < allCookie.length; i++){
+          var aCrumb = allCookie[i].split("=");
+          if (sName == aCrumb[0])
+            return aCrumb[1];
+        }
+        return null;
+      }
+      if (getCookieConcision('blog_details_concision') && getCookieConcision('blog_details_concision') == 0){
+        isCookieConcision = true
+        isShowSideModel = true
+        isShowDirectoryModel = false
+      }
+    </script>
+        <div class="main_father clearfix d-flex" style="height:100%;">
+          <div class="container clearfix" id="mainBox">
+          <main>
+<script type="text/javascript">
+    var resourceId =  "";
+   
+    function getQueryString(name) {   
+      var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象  
+      var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+      if( r != null ) return decodeURIComponent( r[2] ); return '';   
+    }
+    function stripscript(s){ 
+      var pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？%]") 
+      var rs = ""; 
+      for (var i = 0; i < s.length; i++) { 
+        rs = rs+s.substr(i, 1).replace(pattern, ''); 
+      } 
+      return rs;
+    }
+    var blogHotWords = stripscript(getQueryString('utm_term')).length > 1 ? stripscript(getQueryString('utm_term')) : ''
+</script>
+<div class="blog-content-box">
+  <div class="article-header-box" id="article-header-box">
+    <div class="article-header">
+      <div class="article-title-box">
+          <h1 class="title-article" id="articleContentId">Axolotl 中的 Grokfast 集成：用慢梯度放大加速 Grokking 现象收敛</h1>
+      </div>
+      <div class="article-info-box">
+          <div class="article-bar-top">
+              <div class="bar-content active">
+              <span class="article-type-text original">原创</span>
+                  <span class="time">于&nbsp;2026-09-14 20:07:34&nbsp;发布</span>
+                <span class="border-dian">·</span>
+                <span class="read-count">153 阅读</span>
+                  <span class="border-dian">·</span>
+                  <div class="href-article-edit-new">
+                    <span class="href-article-edit-click">CC 4.0 BY-SA版权</span>
+                    <div class="slide-content-box-new">
+                                版权声明：本文为博主原创文章，遵循<a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"> CC 4.0 BY-SA </a>版权协议，转载请附上原文出处链接和本声明。
+                    </div>
+                  </div>
+              </div>
+              <div class="operating active">
+              </div>
+          </div>
+          <div class="blog-tags-box article-header-tags-v2">
+
+<div class="article-header-categories-wrap">
+  <div class="article-header-collect-row">
+    <div class="article-header-category-segment article-header-collect-segment" id="article-header-collect-group" data-column-count="0" style="display:none">
+      <span class="article-header-row-dot" style="display:none">·</span>
+      <div class="article-header-category-group article-header-collect-group">
+        <span class="article-header-label">收录于</span>
+        <div class="article-header-pill-list article-header-collect-list" id="article-header-collect-list">
+          <span class="article-header-community-slot community-name" id="community-name"></span>
+<div class="tag-more-btn collect-more-btn column-collect-more-btn" style="display:none" id="article-header-collect-more-btn" data-report-click='{"spm":"1001.2101.3001.4224"}'>
+  <svg class="more-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+    <circle cx="6" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="18" cy="12" r="2"/>
+  </svg>
+  <div class="column-more-dropdown">
+    <p class="dropdown-title">当前文章被以下社区和专栏收录：</p>
+    <div class="column-more-list" id="article-header-collect-more-list">
+      <div class="dropdown-divider column-more-item-divider"></div>
+    </div>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+          </div>
+       
+          
+       
+      </div>
+    </div>
+  </div>
+    <div id="blogHuaweiyunAdvert" class=""></div>
+    <div id="gitcodeCardTopBox"></div>
+    <article class="baidu_pl">
+        <div id="article_content" class="article_content clearfix">
+        <link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/kdoc_html_views-1a98987dfd.css">
+        <link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/ck_htmledit_views-a50b13a894.css">
+                <div id="content_views" class="htmledit_views atom-one-dark">
+                    <h2>Axolotl 中的 Grokfast 集成&#xff1a;用慢梯度放大加速 Grokking 现象收敛</h2> 
+<p> <a class="has-card" href="https://gitcode.com/GitHub_Trending/ax/axolotl/?utm_source&#61;gitcode_aigc_v1_t0&amp;index&#61;top&amp;type&#61;card&amp;" title="【免费下载链接】axolotl"> <span class="link-card-box" contenteditable="false"> <span class="link-title">【免费下载链接】axolotl</span> <span class="link-desc">Go ahead and axolotl questions</span> <span class="link-link"> <img alt="【免费下载链接】axolotl" class="link-link-icon" src="https://cdn-static.gitcode.com/Group427321440.svg" /> 项目地址: https://gitcode.com/GitHub_Trending/ax/axolotl </span> </span> </a> </p> 
+<p>Grokfast&#xff08;Grokking 加速器&#xff09;是一种通过放大历史梯度中的&#34;慢分量&#34;来显著缩短模型从过拟合到泛化突变&#xff08;grokking 阶段&#xff09;等待时间的优化器技术。本文以 Axolotl 官方集成 <a href="https://link.gitcode.com/i/00e48f855b5e81f7b74817e8b323fc5d" rel="nofollow">src/axolotl/integrations/grokfast/README.md</a> 为核心骨架&#xff0c;结合 <a href="https://link.gitcode.com/i/5c75b1ed021fca6445875a9b03842014" rel="nofollow">optimizer.py</a>、<a href="https://link.gitcode.com/i/b268e4150896132e1477dc50b456b703" rel="nofollow">args.py</a> 与插件机制源码&#xff0c;讲解该插件的工作原理、YAML 配置方式、参数默认值与调节建议&#xff0c;帮助你在一份训练配置中直接启用&#34;grokking 加速&#34;&#xff0c;而无需改动任何训练代码。</p> 
+<h3>Grokfast 是什么&#xff1a;从 Grokking 到慢梯度放大</h3> 
+<p>在深度学习中&#xff0c;<code>grokking</code> 描述一种奇特现象&#xff1a;模型在训练集上先快速达到 100% 准确率&#xff08;完美过拟合&#xff09;&#xff0c;但在验证集上长时间保持随机水平&#xff0c;经过大量额外训练步后&#xff0c;泛化能力才突然&#34;顿悟&#34;式跃升。这种&#34;过拟合—突变泛化&#34;的延迟会浪费大量算力&#xff0c;尤其在小模型、算法任务&#xff08;如模加法、算术推理&#xff09;的预训练与微调中尤为明显。</p> 
+<p>Grokfast 论文&#xff08;Lee 等人&#xff0c;2024&#xff0c;arXiv:2405.20233&#xff0c;见 <a href="https://link.gitcode.com/i/00e48f855b5e81f7b74817e8b323fc5d#L17-L23" rel="nofollow">README.md 中的 BibTeX 引用</a>&#xff09;提出&#xff1a;在梯度下降的更新过程中&#xff0c;当前梯度由两部分组成——变化快的高频分量与沿同一方向持续累积的&#34;慢梯度&#34;分量。grokking 所需的泛化能力恰好与这些缓慢积累的梯度分量相关。因此&#xff0c;与其修改网络结构或损失函数&#xff0c;不如在优化器更新前对梯度做一次<strong>滤波</strong>&#xff1a;提取并放大慢梯度&#xff0c;再叠加回当前梯度&#xff0c;从而加速泛化跃迁的到来。</p> 
+<p>Axolotl 将其封装为官方插件&#xff08;对应支持矩阵中的 <code>grokfast</code> 条目&#xff0c;见 <a href="https://link.gitcode.com/i/80b17a3560cde6700afbe1aa2516f4af" rel="nofollow">docs/support-matrix.qmd</a> 的 &#34;grokking-accelerated optimizer&#34; 描述&#xff09;&#xff0c;使你在不写任何 PyTorch 代码的情况下即可在训练中启用该技术。</p> 
+<h3>插件机制&#xff1a;回调而非独立优化器</h3> 
+<p>Grokfast 在 Axolotl 中并不是一个独立的 torch 优化器&#xff0c;而是一个 <strong>TrainerCallback</strong>。它通过 Axolotl 的插件&#xff08;Plugin&#xff09;体系挂载到训练循环中&#xff0c;在每次优化器 step 之前改写参数的 <code>.grad</code>。</p> 
+<p>关键源码位于 <a href="https://link.gitcode.com/i/951903a9af8be33a38e256c2fb3c4db1" rel="nofollow">src/axolotl/integrations/grokfast/<strong>init</strong>.py</a>&#xff1a;</p> 
+<ul><li><code>GrokfastCallbackHandler(TrainerCallback)</code> 继承自 <code>transformers.trainer_callback.TrainerCallback</code>&#xff1b;</li><li><code>on_train_begin</code> 将内部保存的历史梯度 <code>self.grads</code> 重置为 <code>None</code>&#xff0c;保证每次训练从头累积&#xff1b;</li><li><code>on_pre_optimizer_step</code> 在优化器真正执行 step 前被调用&#xff0c;取出模型并调用 <code>gradfilter_ema(model, self.grads, alpha&#61;self.alpha, lamb&#61;self.lamb)</code> 对梯度进行滤波放大&#xff0c;随后返回 <code>control</code>&#xff1b;</li><li><code>GrokfastPlugin(BasePlugin)</code> 通过 <code>add_callbacks_post_trainer</code> 将回调注册进 trainer&#xff0c;并打印 <code>&#34;Adding Grokfast callback to the trainer&#34;</code> 日志便于确认插件已生效。</li></ul> 
+<p>插件自身通过 <code>get_input_args()</code> 返回 <code>&#34;axolotl.integrations.grokfast.GrokfastArgs&#34;</code>&#xff0c;把配置项并入全局 schema&#xff1b;Axolotl 的 <code>PluginManager</code> 会在训练启动前加载 <code>plugins:</code> 列表中声明的插件&#xff0c;并在 <a href="https://link.gitcode.com/i/0c4403a7ac5be9f74e57d738e6664751" rel="nofollow">core/builders/base.py</a> 等处统一收集所有插件返回的 post-trainer 回调。因此你无需感知回调的注册细节——只要在配置中声明插件与参数即可。</p> 
+<h3>核心算法&#xff1a;EMA 慢梯度滤波器</h3> 
+<p>与原始 Grokfast 论文提供的 <code>gradfilter_ma</code>&#xff08;滑动窗口均值/求和滤波&#xff09;不同&#xff0c;Axolotl 插件默认并仅启用 <code>gradfilter_ema</code>&#xff08;指数移动平均&#xff09;实现&#xff0c;位于 <a href="https://link.gitcode.com/i/5c75b1ed021fca6445875a9b03842014" rel="nofollow">src/axolotl/integrations/grokfast/optimizer.py</a>。</p> 
+<p>其算法步骤&#xff08;以伪代码还原&#xff09;&#xff1a;</p> 
+<pre><code># 首次调用&#xff1a;为每个可训练参数保存当前梯度快照
+grads[n] &#61; p.grad.detach()                     # 对每个 requires_grad 且 grad 非空的参数 n
+
+# 每次 on_pre_optimizer_step&#xff1a;
+grads[n] &#61; grads[n] * alpha &#43; p.grad.detach() * (1 - alpha)   # EMA 更新慢梯度
+p.grad   &#61; p.grad &#43; grads[n] * lamb                            # 放大后叠加回当前梯度
+</code></pre> 
+<p>逐行解读&#xff1a;</p> 
+<ol><li><strong>初始化快照</strong>&#xff1a;首次进入 <code>on_pre_optimizer_step</code> 时&#xff0c;<code>grads</code> 为 <code>None</code>&#xff0c;代码以 <code>p.grad.data.detach()</code> 为每个参数建立 EMA 初值&#xff0c;之后 <code>on_train_begin</code> 的重置保证了跨训练重启时不会污染状态&#xff1b;</li><li><strong>EMA 更新</strong>&#xff1a;每个参数维护一个标量/张量状态 <code>grads[n]</code>&#xff0c;以 <code>alpha</code> 为衰减系数对历史梯度做指数移动平均。<code>alpha</code> 越大&#xff0c;历史信息衰减越慢&#xff0c;慢梯度越&#34;平滑&#34;&#xff1b;</li><li><strong>梯度叠加</strong>&#xff1a;将放大系数 <code>lamb</code> 与慢梯度相乘后加到当前 <code>p.grad</code> 上。这一步完全发生在优化器 step 之前&#xff0c;因此后续的 AdamW / Adam 等优化器只会看到&#34;增强后的梯度&#34;&#xff0c;无需替换优化器本身&#xff0c;也不需要修改学习率调度器。</li></ol> 
+<p>值得注意的是&#xff0c;<code>optimizer.py</code> 中同时保留了 <code>gradfilter_ma</code>&#xff08;滑动窗口实现&#xff0c;含 <code>mean</code>/<code>sum</code> 两种聚合方式与 <code>warmup</code>、<code>trigger</code> 消融参数&#xff09;&#xff0c;但 Axolotl 插件只暴露 EMA 路径。窗口滤波需要为每个参数维护一个 <code>deque(maxlen&#61;window_size)</code> 的历史缓冲&#xff0c;内存开销与显式窗口长度成正比&#xff1b;而 EMA 只需每个参数一个与梯度同形的张量&#xff0c;实现更轻量、更易于在任意规模模型上扩展&#xff0c;这也是 Axolotl 选择 EMA 作为默认实现的合理原因&#xff08;从源码结构可以推断&#xff09;。</p> 
+<h3>配置指南&#xff1a;YAML 三行开启 Grokfast</h3> 
+<p>原文档给出了最简启用配置&#xff08;<a href="https://link.gitcode.com/i/00e48f855b5e81f7b74817e8b323fc5d#L7-L13" rel="nofollow">README.md</a>&#xff09;&#xff0c;完整写法如下&#xff1a;</p> 
+<pre><code class="language-yaml">plugins:
+  - axolotl.integrations.grokfast.GrokfastPlugin
+
+grokfast_alpha: 2.0
+grokfast_lamb: 0.98
+</code></pre> 
+<p>要点说明&#xff1a;</p> 
+<ul><li><code>plugins</code> 列表是 Axolotl 插件体系的统一入口&#xff0c;插件类名必须写全限定名 <code>axolotl.integrations.grokfast.GrokfastPlugin</code>&#xff0c;与 <code>load_plugin</code> 的 <code>&#34;module_name.class_name&#34;</code> 拆分逻辑&#xff08;见 <a href="https://link.gitcode.com/i/b9dc25f5d79eb7360eb3fae5a7c23c3f" rel="nofollow">integrations/base.py</a>&#xff09;一致&#xff1b;若拼写错误或包未以 editable 模式安装&#xff0c;插件将无法加载&#xff08;详见 <a href="https://link.gitcode.com/i/0cf28c27cb412d5c2e54f19c2d28de78" rel="nofollow">docs/custom_integrations.qmd</a> 中的警告提示&#xff09;&#xff1b;</li><li>插件生效后训练日志会出现 <code>Adding Grokfast callback to the trainer</code>&#xff0c;可用它作为启用成功的判定依据。</li></ul> 
+<p>需要特别强调<strong>参数取值顺序</strong>&#xff1a;README 示例中 <code>grokfast_alpha: 2.0</code>、<code>grokfast_lamb: 0.98</code> 沿用了论文实验中的超参&#xff1b;而源码默认值&#xff08;<a href="https://link.gitcode.com/i/b268e4150896132e1477dc50b456b703#L15-L16" rel="nofollow">args.py</a>&#xff09;为 <code>grokfast_alpha &#61; 0.98</code>、<code>grokfast_lamb &#61; 2.0</code>。二者含义相同&#xff0c;仅书写顺序与数值对应关系不同&#xff1a;</p> 
+<ul><li><code>grokfast_alpha</code>&#xff1a;EMA 衰减系数&#xff0c;取值范围 (0, 1)&#xff0c;越接近 1 保留越多历史梯度信息。默认 <code>0.98</code>&#xff1b;</li><li><code>grokfast_lamb</code>&#xff1a;慢梯度放大倍数&#xff0c;一般 ≥ 0。论文建议取值约 <code>2.0</code> 可获得较好的加速效果。</li></ul> 
+<p>因此建议按源码默认语义书写&#xff1a;</p> 
+<pre><code class="language-yaml">plugins:
+  - axolotl.integrations.grokfast.GrokfastPlugin
+
+grokfast_alpha: 0.98   # EMA 衰减系数&#xff0c;越接近 1 历史梯度保留越多
+grokfast_lamb: 2.0     # 慢梯度放大系数&#xff0c;论文推荐约 2.0
+</code></pre> 
+<h3>参数含义与调节建议</h3> 
+<table><thead><tr><th>配置项</th><th>默认值&#xff08;源码&#xff09;</th><th>论文示例</th><th>含义</th><th>调节方向</th></tr></thead><tbody><tr><td><code>grokfast_alpha</code></td><td><code>0.98</code></td><td><code>2.0</code>&#xff08;见 README 示例&#xff09;</td><td>EMA 慢梯度的衰减系数&#xff0c;控制历史梯度的影响范围</td><td>过拟合阶段较长可适当增大&#xff1b;数值必须处于 (0,1) 区间才构成有效 EMA</td></tr><tr><td><code>grokfast_lamb</code></td><td><code>2.0</code></td><td><code>0.98</code>&#xff08;见 README 示例&#xff09;</td><td>慢梯度叠加回当前梯度的放大倍数</td><td>泛化跃迁不明显时尝试增大&#xff1b;过大会引入训练不稳定</td></tr></tbody></table> 
+<p>实践要点&#xff1a;</p> 
+<ul><li><strong>EMA 有效性前提</strong>&#xff1a;<code>alpha</code> 严格处于 (0,1) 时公式 <code>grads &#61; grads*alpha &#43; grad*(1-alpha)</code> 才是标准指数移动平均&#xff1b;若把 <code>grokfast_alpha</code> 设为 2.0&#xff08;README 示例的字面值&#xff09;&#xff0c;EMA 将退化为对历史梯度放大的递归累加&#xff0c;行为偏离论文设计&#xff0c;配置时请结合上表判断意图&#xff1b;</li><li><strong>与优化器正交</strong>&#xff1a;Grokfast 只改写梯度&#xff0c;不替换优化器&#xff0c;因此可与 AdamW、Adam、Adafactor 及 Axolotl 支持的其他优化器自由组合&#xff0c;也不影响 LoRA / QLoRA 等参数高效微调流程&#xff1b;</li><li><strong>适用范围</strong>&#xff1a;该插件对出现 grokking 延迟的任务&#xff08;如算法推理、小模型长训练&#xff09;收益明显&#xff1b;对于常规大规模 SFT&#xff0c;慢梯度分量影响有限&#xff0c;收益可能不明显&#xff0c;属于按需启用类插件。</li></ul> 
+<h3>与 Axolotl 插件体系的衔接</h3> 
+<p>Grokfast 插件严格遵循 Axolotl 的 <code>BasePlugin</code> 接口&#xff08;<a href="https://link.gitcode.com/i/2243305859fc0e2de1e8c51b9652c162" rel="nofollow">src/axolotl/integrations/base.py</a>&#xff09;&#xff1a;它仅覆写 <code>get_input_args</code> 与 <code>add_callbacks_post_trainer</code> 两个钩子&#xff0c;通过 <code>PluginManager.add_callbacks_post_trainer</code>&#xff08;<a href="https://link.gitcode.com/i/2243305859fc0e2de1e8c51b9652c162#L693-L710" rel="nofollow">base.py</a>&#xff09;在 trainer 创建完成后把回调注入训练循环。从 <code>_quarto.yml</code> 的导航配置&#xff08;<a href="https://link.gitcode.com/i/237d614407e66f0aab84b68a6c486d34" rel="nofollow">src/axolotl/integrations/args.py</a> 相关条目见 <a href="https://link.gitcode.com/i/59820740646e3c4702c211204c5e6ebb" rel="nofollow">_quarto.yml</a>&#xff09;可见&#xff0c;<code>integrations.grokfast.args</code> 与 <code>integrations.grokfast.optimizer</code> 均已纳入项目文档索引&#xff1b;<code>docs/custom_integrations.qmd</code> 的集成清单中也显式列出 Grokfast&#xff0c;说明该插件是 Axolotl 官方支持矩阵中的一等公民。</p> 
+<p>这种&#34;插件声明 &#43; 回调注入&#34;的设计意味着&#xff1a;<strong>启用 Grokfast 零代码侵入</strong>——既不需要继承 Trainer&#xff0c;也不需要手写梯度钩子&#xff0c;只需在 YAML 的 <code>plugins</code> 中加入一行并给出两个超参。</p> 
+<h3>结语</h3> 
+<p>Grokfast 集成让 Axolotl 用户能以三行 YAML 配置获得&#34;慢梯度放大&#34;带来的 grokking 加速能力。理解 <code>gradfilter_ema</code> 中 <code>alpha</code> 与 <code>lamb</code> 的物理含义、认清 README 示例与源码默认值的对应关系&#xff0c;是正确调参的关键。该插件与优化器、调度器完全正交&#xff0c;可无缝嵌入现有微调与预训练流程&#xff0c;是探索小模型算法能力训练时值得优先尝试的官方集成之一。</p> 
+<p> <a class="has-card" href="https://gitcode.com/GitHub_Trending/ax/axolotl/?utm_source&#61;gitcode_aigc_v1_t1&amp;index&#61;bottom&amp;type&#61;card&amp;" title="【免费下载链接】axolotl"> <span class="link-card-box" contenteditable="false"> <span class="link-title">【免费下载链接】axolotl</span> <span class="link-desc">Go ahead and axolotl questions</span> <span class="link-link"> <img alt="【免费下载链接】axolotl" class="link-link-icon" src="https://cdn-static.gitcode.com/Group427321440.svg" /> 项目地址: https://gitcode.com/GitHub_Trending/ax/axolotl </span> </span> </a> </p>
+                </div>
+        </div>
+        <div id="gitcodeCardBottomBox"></div>
+        <div class="aigc-blog-detail">
+          <p>创作声明：本文部分内容由AI辅助生成（AIGC），仅供参考</p>
+        </div>
+    </article>
+  <script>
+    $(function() {
+      setTimeout(function () {
+        var mathcodeList = document.querySelectorAll('.htmledit_views img.mathcode');
+        if (mathcodeList.length > 0) {
+          for (let i = 0; i < mathcodeList.length; i++) {
+            if (mathcodeList[i].complete) {
+              if (mathcodeList[i].naturalWidth === 0 || mathcodeList[i].naturalHeight === 0) {
+                var alt = mathcodeList[i].alt;
+                alt = '\\(' + alt + '\\)';
+                var curSpan = $('<span class="img-codecogs"></span>');
+                curSpan.text(alt);
+                $(mathcodeList[i]).before(curSpan);
+                $(mathcodeList[i]).remove();
+              }
+            } else {
+              mathcodeList[i].onerror = function() {
+                var alt = mathcodeList[i].alt;
+                alt = '\\(' + alt + '\\)';
+                var curSpan = $('<span class="img-codecogs"></span>');
+                curSpan.text(alt);
+                $(mathcodeList[i]).before(curSpan);
+                $(mathcodeList[i]).remove();
+              };
+            }
+          }
+          MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+        }
+      }, 500)
+    });
+  </script>
+
+</div>
+<div class="directory-boxshadow-dialog" style="display:none;">
+  <div class="directory-boxshadow-dialog-box">
+  </div>
+   <div class="vip-limited-time-offer-box-new" id="vip-limited-time-offer-box-new">
+      <img class="limited-img limited-img-new" src="https://csdnimg.cn/release/blogv2/dist/pc/img/vip-limited-close-newWhite.png">
+      <div class="vip-limited-time-top">
+        确定要放弃本次机会？
+      </div>
+      <span class="vip-limited-time-text">福利倒计时</span>
+      <div class="limited-time-box-new">
+        <span class="time-hour"></span>
+        <i>:</i>
+        <span class="time-minite"></span>
+        <i>:</i>
+        <span class="time-second"></span>
+      </div>
+      <div class="limited-time-vip-box">
+        <p>
+          <img class="coupon-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/vip-limited-close-roup.png">
+          <span class="def">立减 ¥</span>
+          <span class="active limited-num"></span>
+        </p>
+        <span class="">普通VIP年卡可用</span>
+      </div>
+      <a class="limited-time-btn-new" href="https://mall.csdn.net/vip" data-report-click='{"spm":"1001.2101.3001.9621"}' data-report-query='spm=1001.2101.3001.9621'>立即使用</a>
+  </div>
+</div>
+            <script src="https://csdnimg.cn/release/blogv2/dist/components/js/pc_wap_commontools-0813aab227.min.js" type="text/javascript" async></script>
+<div class="blog-footer-bottom" style="margin-top:10px;"></div>
+<script src="https://g.csdnimg.cn/common/csdn-footer/csdn-footer.js" data-isfootertrack="false" type="text/javascript"></script>
+<script type="text/javascript">
+    window.csdn.csdnFooter.options = {
+        el: '.blog-footer-bottom',
+        type: 2
+    }
+</script>          </main>
+        </div>
+<div class="recommend-right align-items-stretch clearfix" id="rightAside" style="position: relative;" data-type="recommend">
+    <aside class="recommend-right_aside">
+      <div id="recommend-right">
+      </div>
+    </aside>
+  <main style="width:100%;position: absolute;top: 0;bottom: 0;background-color: #fff;">
+    <div class="skelecton-container">
+      <div class="skelecton-item" style="width: 30%;"></div>
+      <div class="skelecton-item" style="width: 90%;"></div>
+    </div>
+    <div class="skelecton-container">
+      <div class="skelecton-item" style="width: 200px;"></div>
+      <div class="skelecton-item" style="height: 80px;"></div>
+    </div>
+    <div class="skelecton-container">
+      <div class="skelecton-flex" style="margin-bottom: 18px;">
+        <div class="skelecton-item" style="width: 30%;"></div>
+        <div class="skelecton-item" style="width: 80px;"></div>
+      </div>
+
+      <div class="skelecton-item" style="width: 60%;"></div>
+      <div class="skelecton-item"></div>
+      <div class="skelecton-item" style="width: 40%;margin-bottom: 18px;"></div>
+
+      <div class="skelecton-item" style="width: 60%;"></div>
+      <div class="skelecton-item"></div>
+      <div class="skelecton-item" style="width: 40%;margin-bottom: 18px;"></div>
+
+      <div class="skelecton-item" style="width: 60%;"></div>
+      <div class="skelecton-item"></div>
+      <div class="skelecton-item" style="width: 40%;margin-bottom: 18px;"></div>
+
+      <div class="skelecton-item" style="width: 60%;"></div>
+      <div class="skelecton-item"></div>
+      <div class="skelecton-item" style="width: 40%;"></div>
+    </div>
+  </main>
+</div>
+
+      </div>
+      <div class="mask-dark"></div>
+      <div class="skin-boxshadow"></div>
+      <div class="directory-boxshadow"></div>
+      
+      <div class="pay-code">
+      <div class="pay-money">实付<span class="pay-money-span" data-nowprice='' data-oldprice=''>元</span></div>
+      <div class="content-blance"><a class="blance-bt" href="javascript:;">使用余额支付</a></div>
+      <div class="content-code">
+        <div id="payCode" data-id="">
+          <div class="renovate">
+            <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/pay-time-out.png">
+            <span>点击重新获取</span>
+          </div>
+        </div>
+        <div class="pay-style"><span><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/weixin.png"></span><span><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/zhifubao.png"></span><span><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/jingdong.png"></span><span class="text">扫码支付</span></div>
+      </div>
+      <div class="bt-close">
+        <svg t="1567152543821" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="10924" xmlns:xlink="http://www.w3.org/1999/xlink" width="12" height="12">
+          <defs>
+            <style type="text/css"></style>
+          </defs>
+          <path d="M512 438.378667L806.506667 143.893333a52.032 52.032 0 1 1 73.6 73.621334L585.621333 512l294.485334 294.485333a52.074667 52.074667 0 0 1-73.6 73.642667L512 585.621333 217.514667 880.128a52.053333 52.053333 0 1 1-73.621334-73.642667L438.378667 512 143.893333 217.514667a52.053333 52.053333 0 1 1 73.621334-73.621334L512 438.378667z" fill="" p-id="10925"></path>
+        </svg>
+      </div>
+      <div class="pay-balance">
+        <input type="radio" class="pay-code-radio" data-type="details">
+        <span class="span">钱包余额</span>
+          <span class="balance" style="color:#FC5531;font-size:14px;">0</span>
+          <div class="pay-code-tile">
+            <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/pay-help.png" alt="">
+            <div class="pay-code-content">
+              <div class="span">
+                <p class="title">抵扣说明：</p>
+                <p> 1.余额是钱包充值的虚拟货币，按照1:1的比例进行支付金额的抵扣。<br> 2.余额无法直接购买下载，可以购买VIP、付费专栏及课程。</p>
+              </div>
+            </div>
+          </div>
+      </div>
+      <a class="pay-balance-con" href="https://i.csdn.net/#/wallet/balance/recharge" target="_blank"><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/recharge.png" alt=""><span>余额充值</span></a>
+    </div>
+    <div style="display:none;">
+      <img src="" onerror='setTimeout(function(){if(!/(csdn.net|iteye.com|baiducontent.com|googleusercontent.com|360webcache.com|sogoucdn.com|bingj.com|baidu.com)$/.test(window.location.hostname)){window.location.href="\x68\x74\x74\x70\x73\x3a\x2f\x2f\x77\x77\x77\x2e\x63\x73\x64\x6e\x2e\x6e\x65\x74"}},3000);'>
+    </div>
+    <div class="keyword-dec-box" id="keywordDecBox"></div>
+  </body>
+        <script src='https://cdn-static-cache.gitcode.com/gitcode-quick-app-components-fe/gitcode-repo.pro.umd.js' type="text/javascript"></script>
+    <!-- 富文本柱状图  -->
+    <link rel="stylesheet" href="https://csdnimg.cn/release/blog_editor_html/release1.6.12/ckeditor/plugins/chart/chart.css" />
+    <script type="text/javascript" src="https://csdnimg.cn/release/blog_editor_html/release1.6.12/ckeditor/plugins/chart/lib/chart.min.js"></script>
+    <script type="text/javascript" src="https://csdnimg.cn/release/blog_editor_html/release1.6.12/ckeditor/plugins/chart/widget2chart.js"></script>
+  <script src="https://csdnimg.cn/release/blogv2/dist/components/js/axios-83fa28cedf.min.js" type="text/javascript"></script>
+  <script src="https://csdnimg.cn/release/blogv2/dist/components/js/pc_wap_highlight-8defd55d6e.min.js" type="text/javascript"></script>
+  <script src="https://csdnimg.cn/release/blogv2/dist/components/js/pc_wap_common-3c7b273c43.min.js" type="text/javascript"></script>
+  <script src="https://csdnimg.cn/release/blogv2/dist/components/js/edit_copy_code-43c2d050a0.min.js" type="text/javascript"></script>
+  <script src="https://g.csdnimg.cn/lib/cboxEditor/1.1.6/embed-editor.min.js" type="text/javascript"></script>
+  <link rel="stylesheet" href="https://g.csdnimg.cn/lib/cboxEditor/1.1.6/embed-editor.min.css">
+  <link rel="stylesheet" href="https://csdnimg.cn/release/blog_editor_html/release1.6.12/ckeditor/plugins/codesnippet/lib/highlight/styles/atom-one-dark.css">
+  <script src="https://g.csdnimg.cn/user-accusation/1.0.6/user-accusation.js" type="text/javascript"></script>
+    <script src="https://g.csdnimg.cn/baidu-search/1.0.12/baidu-search.js" type="text/javascript"></script>
+  <script src="https://csdnimg.cn/release/download/old_static/js/qrcode.js"></script>
+  <script src="https://g.csdnimg.cn/lib/qrcode/1.0.0/qrcode.min.js"></script>
+  <script src="https://g.csdnimg.cn/user-ordercart/3.0.1/user-ordercart.js" type="text/javascript"></script>
+  <script src="https://g.csdnimg.cn/user-ordertip/5.0.3/user-ordertip.js" type="text/javascript"></script>
+  <script src="https://g.csdnimg.cn/order-payment/4.0.5/order-payment.js" type="text/javascript"></script>
+  <script src="https://g.csdnimg.cn/order-payment/3.1.1-download-e-isolated/order-payment.js" type="text/javascript"></script>
+  <script src="https://csdnimg.cn/release/blogv2/dist/pc/js/common-65075e27a8.min.js" type="text/javascript"></script>
+  <script src="https://csdnimg.cn/release/blogv2/dist/pc/js/detail-ced070e6a1.min.js" type="text/javascript"></script>
+  <script src="https://g.csdnimg.cn/copyright/1.0.4/copyright.js" type="text/javascript"></script>
+  <script>
+    $(".MathJax").remove();
+    if ($('div.markdown_views pre.prettyprint code.hljs').length > 0) {
+      $('div.markdown_views')[0].className = 'markdown_views';
+    }
+  </script>
+ 
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true,
+        processClass: "mathjax",
+        ignoreClass: "title-article|no-mathjax",
+        preview: "none"
+      },
+      
+      // 优先使用 HTML-CSS 而非 NativeMML
+      "HTML-CSS": {
+        preferredFont: "STIX",        // 使用 STIX 字体
+        availableFonts: ["STIX", "TeX"],
+        webFont: "STIX-Web",
+        scale: 100,                   // 放大 20%
+        minScaleAdjust: 100,
+        linebreaks: { 
+          automatic: true, 
+          width: "90% container" 
+        },
+        matchFontHeight: true,
+        styles: {
+          ".MathJax": {
+            "font-weight": "500 !important"  // 加粗
+          }
+        }
+      },
+      
+      // 禁用 NativeMML（浏览器原生渲染质量不好）
+      NativeMML: {
+        scale: 100
+      },
+      
+      // 设置优先级：HTML-CSS > SVG > NativeMML
+      menuSettings: {
+        renderer: "HTML-CSS"
+      },
+      
+      messageStyle: "none"
+    });
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+  </script>
+  <script src="https://g.csdnimg.cn/static/mathjax-2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script>
+window.csdnQualityGuideFreeArticle = true;
+</script>
+<link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/pc/css/quality_article_guide_enter-0f0dc239a9.min.css">
+<script type="text/javascript" crossorigin src="https://g.csdnimg.cn/common/csdn-login-box/csdn-login-box.js"></script></html>

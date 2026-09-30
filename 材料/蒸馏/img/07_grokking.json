@@ -1,0 +1,90 @@
+[
+ {
+  "file": "07_grokking_01.png",
+  "w": 737,
+  "h": 164,
+  "bytes": 48278,
+  "src": "https://arxiv.org/html/2309.02390v1/figure_1_mem_efficiency.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "07_grokking_02.png",
+  "w": 737,
+  "h": 164,
+  "bytes": 48278,
+  "src": "https://arxiv.org/html/2309.02390v1/x1.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "07_grokking_03.png",
+  "w": 737,
+  "h": 164,
+  "bytes": 48771,
+  "src": "https://arxiv.org/html/2309.02390v1/figure_1_trig_efficiency.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "07_grokking_04.png",
+  "w": 737,
+  "h": 164,
+  "bytes": 48771,
+  "src": "https://arxiv.org/html/2309.02390v1/x2.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "07_grokking_05.png",
+  "w": 372,
+  "h": 187,
+  "bytes": 17853,
+  "src": "https://arxiv.org/html/2309.02390v1/figure_8_ungrokking_wd_addition.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "07_grokking_06.png",
+  "w": 365,
+  "h": 161,
+  "bytes": 24091,
+  "src": "https://arxiv.org/html/2309.02390v1/figure_9_semi_grokking_more_seeds.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "07_grokking_07.png",
+  "w": 726,
+  "h": 256,
+  "bytes": 70856,
+  "src": "https://arxiv.org/html/2309.02390v1/figure_11_ungrokking_more_seeds.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "07_grokking_08.png",
+  "w": 710,
+  "h": 575,
+  "bytes": 125894,
+  "src": "https://arxiv.org/html/2309.02390v1/figure_8_ungrokking_all.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "07_grokking_09.png",
+  "w": 214,
+  "h": 255,
+  "bytes": 6174,
+  "src": "https://arxiv.org/html/2309.02390v1/figure_3_ttm_colorbar.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "07_grokking_10.png",
+  "w": 9065,
+  "h": 3616,
+  "bytes": 579944,
+  "src": "https://arxiv.org/html/2309.02390v1/nanda-figure.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "07_grokking_11.png",
+  "w": 1500,
+  "h": 375,
+  "bytes": 33443,
+  "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+  "alt": "Simons Foundation International"
+ }
+]

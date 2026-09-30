@@ -1,0 +1,258 @@
+[
+ {
+  "file": "38_grokking_01.png",
+  "w": 2270,
+  "h": 1046,
+  "bytes": 935603,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/car-circuit.png",
+  "alt": "Hooke’s Micrographia revealed a rich microscopic world as seen\n through a microscope, including the initial discovery of cells.\n \nImages from the National Library of Wales."
+ },
+ {
+  "file": "38_grokking_02.jpg",
+  "w": 1776,
+  "h": 784,
+  "bytes": 600786,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/micrographia2.jpg",
+  "alt": "Over the last few years, we’ve seen many incredible visualizations and analyses hinting at a rich world of internal features in modern\n neural networks. Above, we see a DeepDream image, which sparked a great deal of excitement in this space."
+ },
+ {
+  "file": "38_grokking_03.jpg",
+  "w": 1624,
+  "h": 540,
+  "bytes": 363214,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/deepdream.jpg",
+  "alt": ""
+ },
+ {
+  "file": "38_grokking_04.jpg",
+  "w": 478,
+  "h": 720,
+  "bytes": 86058,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/schwann-book.jpg",
+  "alt": ""
+ },
+ {
+  "file": "38_grokking_05.png",
+  "w": 558,
+  "h": 828,
+  "bytes": 809118,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/atlas-book-crop.png",
+  "alt": ""
+ },
+ {
+  "file": "38_grokking_06.png",
+  "w": 2530,
+  "h": 802,
+  "bytes": 1944569,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/curves.png",
+  "alt": "4e:55 is a polysemantic neuron which responds to cat faces, fronts of cars, and cat legs. It was discussed in more depth in Feature Visualization ."
+ },
+ {
+  "file": "38_grokking_07.png",
+  "w": 207,
+  "h": 208,
+  "bytes": 73446,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/arg-fv.png",
+  "alt": ""
+ },
+ {
+  "file": "38_grokking_08.png",
+  "w": 660,
+  "h": 656,
+  "bytes": 335727,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/arg-data.png",
+  "alt": "The raw weights between the early curve detector and late curve detector in the same orientation are a curve of positive weights surrounded by small negative or zero weights."
+ },
+ {
+  "file": "38_grokking_09.png",
+  "w": 312,
+  "h": 312,
+  "bytes": 6718,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/arg-synthetic.png",
+  "alt": "This can be interpreted as looking for “tangent curves”\nat each point along the curve."
+ },
+ {
+  "file": "38_grokking_10.png",
+  "w": 272,
+  "h": 284,
+  "bytes": 31775,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/arg-tune.png",
+  "alt": ""
+ },
+ {
+  "file": "38_grokking_11.png",
+  "w": 280,
+  "h": 276,
+  "bytes": 143075,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/arg-use.png",
+  "alt": ""
+ },
+ {
+  "file": "38_grokking_12.png",
+  "w": 370,
+  "h": 370,
+  "bytes": 96986,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/arg-hand.png",
+  "alt": ""
+ },
+ {
+  "file": "38_grokking_13.png",
+  "w": 1952,
+  "h": 438,
+  "bytes": 779377,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/high-low.png",
+  "alt": ""
+ },
+ {
+  "file": "38_grokking_14.png",
+  "w": 1242,
+  "h": 376,
+  "bytes": 484455,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/dog-pose.png",
+  "alt": ""
+ },
+ {
+  "file": "38_grokking_15.png",
+  "w": 1886,
+  "h": 604,
+  "bytes": 1357859,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/polysemantic.png",
+  "alt": ""
+ },
+ {
+  "file": "38_grokking_16.png",
+  "w": 3134,
+  "h": 1012,
+  "bytes": 1945081,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/curve-circuit.png",
+  "alt": "Curve detectors"
+ },
+ {
+  "file": "38_grokking_17.png",
+  "w": 1302,
+  "h": 580,
+  "bytes": 173248,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/curve-weights-a.png",
+  "alt": "High-Low Frequency detectors"
+ },
+ {
+  "file": "38_grokking_18.png",
+  "w": 970,
+  "h": 440,
+  "bytes": 278201,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/curve-weights-b.png",
+  "alt": ""
+ },
+ {
+  "file": "38_grokking_19.png",
+  "w": 920,
+  "h": 1160,
+  "bytes": 504145,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/curve-orientations-a.png",
+  "alt": ""
+ },
+ {
+  "file": "38_grokking_20.png",
+  "w": 798,
+  "h": 1016,
+  "bytes": 397325,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/curve-orientations-b.png",
+  "alt": ""
+ },
+ {
+  "file": "38_grokking_21.png",
+  "w": 3030,
+  "h": 1860,
+  "bytes": 2806095,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/dog-circuit-2.png",
+  "alt": ""
+ },
+ {
+  "file": "38_grokking_22.png",
+  "w": 1676,
+  "h": 1058,
+  "bytes": 1071880,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/oriented-dog-heads.png",
+  "alt": ""
+ },
+ {
+  "file": "38_grokking_23.png",
+  "w": 1296,
+  "h": 1202,
+  "bytes": 666890,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/dog-merge.png",
+  "alt": ""
+ },
+ {
+  "file": "38_grokking_24.png",
+  "w": 2194,
+  "h": 1136,
+  "bytes": 916227,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/superposition.png",
+  "alt": ""
+ },
+ {
+  "file": "38_grokking_25.png",
+  "w": 227,
+  "h": 227,
+  "bytes": 86087,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/universality/curves/AlexNet/unit-0.png",
+  "alt": ""
+ },
+ {
+  "file": "38_grokking_26.png",
+  "w": 227,
+  "h": 227,
+  "bytes": 86431,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/universality/curves/AlexNet/unit-1.png",
+  "alt": ""
+ },
+ {
+  "file": "38_grokking_27.png",
+  "w": 227,
+  "h": 227,
+  "bytes": 87661,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/universality/curves/AlexNet/unit-2.png",
+  "alt": ""
+ },
+ {
+  "file": "38_grokking_28.png",
+  "w": 227,
+  "h": 227,
+  "bytes": 85867,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/universality/curves/AlexNet/unit-3.png",
+  "alt": ""
+ },
+ {
+  "file": "38_grokking_29.png",
+  "w": 224,
+  "h": 224,
+  "bytes": 87499,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/universality/curves/GoogLeNet/unit-0.png",
+  "alt": ""
+ },
+ {
+  "file": "38_grokking_30.png",
+  "w": 224,
+  "h": 224,
+  "bytes": 87709,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/universality/curves/GoogLeNet/unit-1.png",
+  "alt": ""
+ },
+ {
+  "file": "38_grokking_31.png",
+  "w": 224,
+  "h": 224,
+  "bytes": 95904,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/universality/curves/GoogLeNet/unit-2.png",
+  "alt": ""
+ },
+ {
+  "file": "38_grokking_32.png",
+  "w": 224,
+  "h": 224,
+  "bytes": 93064,
+  "src": "https://distill.pub/2020/circuits/zoom-in/images/universality/curves/GoogLeNet/unit-3.png",
+  "alt": ""
+ }
+]

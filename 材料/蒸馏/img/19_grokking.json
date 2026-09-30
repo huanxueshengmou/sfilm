@@ -1,0 +1,26 @@
+[
+ {
+  "file": "19_grokking_01.png",
+  "w": 1075,
+  "h": 524,
+  "bytes": 83855,
+  "src": "https://arxiv.org/html/2606.18465v1/fig_mediation.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "19_grokking_02.png",
+  "w": 1089,
+  "h": 524,
+  "bytes": 73287,
+  "src": "https://arxiv.org/html/2606.18465v1/fig_collapse.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "19_grokking_03.png",
+  "w": 1500,
+  "h": 375,
+  "bytes": 33443,
+  "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+  "alt": "Simons Foundation International"
+ }
+]

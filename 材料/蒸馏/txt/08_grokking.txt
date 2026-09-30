@@ -1,0 +1,446 @@
+# Unifying Grokking and Double Descent
+# id: 08 | lang: en | category: 与双下降统一
+# source: https://arxiv.org/html/2303.06173v1
+# extracted_via: article | chars: 27502 | figures: 3
+==============================================================================
+
+Unifying Grokking and Double Descent
+
+ Xander Davies
+ † † thanks: Equal contribution. Correspondence to alexander_davies@college.harvard.edu . 
+ Affiliation: Harvard University
+
+ Lauro Langosco 1 1 footnotemark: 
+ 1 
+
+ Affiliation: University of Cambridge
+
+ David Krueger
+ 
+ Affiliation: University of Cambridge
+
+ Abstract
+
+ A principled understanding of generalization in deep learning may require unifying disparate observations under a single conceptual framework.
+Previous work has studied grokking , a training dynamic in which a sustained period of near-perfect training performance and near-chance test performance is eventually followed by generalization, as well as the superficially similar double descent . These topics have so far been studied in isolation. We hypothesize that grokking and double descent can be understood as instances of the same learning dynamics within a framework of pattern learning speeds. We propose that this framework also applies when varying model capacity instead of optimization steps, and provide the first demonstration of model-wise grokking.
+
+ 1 Introduction
+
+ (a) Typical grokking on a modular division task.
+
+ (b) Plotting log accuracy reveals a small double descent.
+
+ (c) The double descent is more pronounced in loss.
+
+ Figure 1: 
+Three views of the same training run, replicated from Power et al. (2022) .
+
+ On some datasets, neural networks exhibit surprising training dynamics termed grokking by Power et al. (2022) . In grokking, the model initially overfits, achieving perfect performance on the training set while remaining at near-chance performance on the test set. Later in training, test performance improves and the model eventually achieves perfect test accuracy.
+Grokking is reminiscent of the double descent phenomenon ( Belkin et al., 2018 ; Nakkiran et al., 2021 ) , in which test performance initially improves, then worsens as the model overfits, and then eventually improves again as model capacity increases.
+
+ We argue that double descent and grokking are best viewed as two instances of the same phenomenon,
+in which inductive biases prefer better-generalizing but slower to learn patterns, leading to a transition from poorly-generalizing to well-generalizing patterns. This transition happens both epoch-wise as a function of training time (Figure 1 ) and model-wise as a function of model size (Figure 4 ).
+
+ Contributions.
+
+ We provide a conceptual framework (Claim 1 , Claim 2 ) which unifies the learning dynamics of grokking and double descent. We propose a simple model (Section 2.2 ) to support Claim 1 , and provide evidence for Claim 2 by showing that grokking can occur as a function of model size (Section 3 ).
+
+ Figure 2: 
+ A simple model of pattern learning. Left to right, (1) development of pattern predictiveness during double descent, with well-performing Type 1 (heuristics) patterns and somewhat-predictive Type 3 (slow & well generalizing) patterns ; (2) resulting train and test accuracy curves for double descent; (3) pattern predictiveness during grokking, with poorly-performing Type 1 patterns and perfectly-predictive Type 3 patterns; (4) resulting train and test curves for grokking. In both cases, Type 2 (medium & poorly-generalizing) patterns quickly achieve perfect predictiveness.
+
+ 2 Pattern Learning
+
+ We propose an abstract model of neural network training as pattern learning. Our model aims to capture the intuitive notion that a network uses distinct kinds of mechanisms to classify different inputs; for example, it might memorize some examples while applying heuristics to classify others.
+We build on this notion of pattern to formulate our Claims 1 and 2 , and describe our model in more detail in Section 2.2 .
+
+ 2.1 Core Claims
+
+ We first claim that epoch-wise double descent and grokking share the same underlying dynamics, and then claim that these dynamics also transfer to the model-wise setting.
+
+ Claim 1 (Pattern learning dynamics) . 
+
+ Grokking, like epoch-wise double descent, occurs when slow patterns generalize well and are ultimately favored by the training regime, but are preceded by faster patterns which generalize poorly. 
+
+ We formalize Claim 1 in Section 2.2 , where we propose a simple model of pattern learning to explain neural network training dynamics. As shown in Figure 2 , our model can produce the dynamics from grokking as well as double descent.
+
+ Claim 2 (Duality between model size and scaling time) . 
+
+ Patterns can be viewed as a function of model size as well as a function of training time, and learning dynamics are similar between these two cases. 1 1 
+ 1 
+
+ It is reasonable to speak of pattern learning as a function of effective capacity ( Arpit et al., 2017 ) or effective model complexity ( Nakkiran et al., 2021 ) , though we avoid doing so in this work so as to stay agnostic about the precise metric. 
+
+ If Claim 2 is correct, then grokking, like double descent, should happen model-wise as well as epoch-wise. We confirm this hypothesis empirically in Section 3.1 .
+
+ 2.2 A Model of Learning Dynamics
+
+ In our model, a neural network consists of a set of n n patterns that develop over time during training.
+For any training point, the probability that pattern i i classifies it correctly at time-step t t is p i ​ ( t ) p_{i}(t) .We model p i p_{i} as a sigmoid
+
+ p i ​ ( t ) = γ i 1 + e − α i ​ ( t − b i ) , p_{i}(t)=\frac{\gamma_{i}}{1+e^{-\alpha_{i}(t-b_{i})}}, 
+
+ parameterized by a maximum predictiveness 0 ≤ γ i ≤ 1 0\leq\gamma_{i}\leq 1 , inflection point b i ≥ 0 b_{i}\geq 0 , and learning speed α i ≥ 0 \alpha_{i}\geq 0 .
+The probability that the overall model classifies the training point correctly is then given by the probability that any of the patterns does so.
+Since each data-point is classified independently, the probability of classifying a single training point correctly is equal to the overall training accuracy,
+
+ acc train ​ ( t ) = 1 − ∏ i = 1 n ( 1 − p i ​ ( t ) ) . \displaystyle\text{acc}_{\text{train}}(t)=1-\prod_{i=1}^{n}\left(1-p_{i}(t)\right). 
+ 
+ (1) 
+
+ To calculate test accuracy of our model we assign additional generalization parameters g 1 , … , g n ∈ [ 0 , 1 ] g_{1},\dots,g_{n}\in[0,1] to represent the idea that some patterns generalize better than others. 2 2 
+ 2 
+
+ In this model whether the network classifies a given input correctly depends on whether it is in the training set or the test set, which does not make sense in the case of i.i.d. data: in the real world, whether a given example ( x , y ) (x,y) is classified correctly or not is purely a fact about the value of ( x , y ) (x,y) and the parameters of the model, and doesn’t depend on whether its in the training or test set.
+However, we include such a dependence to model neural networks that overfit the training set and thus are better able to classify training examples.
+Intuitively, every pattern corresponds to a ‘generalization set’ of inputs that are classified using that pattern even if they did not occur during training. The generalization parameter can then be viewed as the fraction of the generalization set that is classified correctly.
+ 
+We assume that patterns that are more frequently successful during training are more used at test time. For any subset A A of { 1 , … , n } \{1,\dots,n\} , we define the probability P A ​ ( t ) = ∏ i ∈ A p i ​ ( t ) ​ ∏ j ∉ A ( 1 − p j ​ ( t ) ) P_{A}(t)=\prod_{i\in A}p_{i}(t)\prod_{j\notin A}(1-p_{j}(t)) that only the patterns in A A are successful, as well as the average generalization ability G ( A ) = 1 / | A | ∑ i ∈ A g i G(A)=1/{|A|}\sum_{i\in A}g_{i} of the patterns in A A . Overall test accuracy at time t t is then given by the average generalization ability weighted the probability of success at train time,
+
+ acc test ​ ( t ) = ∑ A ⊆ { 1 , … , n } P A ​ ( t ) ​ G ​ ( A ) . \text{acc}_{\text{test}}(t)=\sum_{A\subseteq\{1,\dots,n\}}P_{A}(t)G(A). 
+ 
+ (2) 
+
+ We additionally introduce the notion of a preferred pattern , which we use to model the effect of inductive biases on pattern development.
+When pattern k k is preferred, g k g_{k} is weighted more highly in Equation 2 by setting G ⁡ ( A ) = g k G(A)=g_{k} if k ∈ A k\in A and otherwise G ( A ) = 1 / | A | ∑ i ∈ A g i G(A)=1/|A|\sum_{i\in A}g_{i} as usual.
+
+ Figure 3: 
+ Two pattern model. 
+Full square represents the data set. Left to right, (1) blue shows training samples correctly classified by p 1 ​ ( t ) p_{1}(t) , red shows training samples correctly classified by p 2 ​ ( t ) p_{2}(t) , dashed green shows samples correctly classified by both; (2) accuracy is the union of patterns 1 and 2; (3) test accuracy is the sum of correct classifications weighted by generalization parameters, and by their average generalization in the case both correctly classifying; (4) test accuracy given pattern 1 is preferred , causing all examples correctly classified by pattern 1 to generalize according to g 1 g_{1} .
+
+ 2.3 Double Descent & Grokking with Pattern Types
+
+ We model learning in double descent and grokking as interactions between three patterns learned at different speeds during training:
+a heuristic pattern that is fast and generalizes well; an overfitting pattern that is fast, though slower than the heuristic, and generalizes poorly; and a slow-generalizing pattern that is slow and generalizes well. This last pattern is ultimately preferred by the inductive biases of the model.
+
+ As shown in Figure 2 , this simple model can produce grokking as well as double descent; the two can be interpolated between by solely modulating the maximum predictiveness ( γ \gamma ) of the heuristic and the slow-generalizing patterns. 3 3 
+ 3 
+
+ Code replicating our results is available at github.com/xanderdavies/unifying-grok-dd , including an interactive notebook to explore the pattern learning model and interpolate between grokking and double descent. 
+
+ 3 Experiments
+
+ Figure 4: 
+ Model-Wise Grokking. Darker color indicates lower loss, dotted line represents 90% training accuracy.
+ Left: Test loss as function of training steps and model size. Right: Training loss. Epoch-Wise Grokking: Moving vertically from zero training steps, test loss initially falls, then rises dramatically (beginning near perfect fitting of the training set), and then falls again. Model-Wise Grokking: Moving horizontally along training step counts which will eventually lead to low loss, we see the same pattern of initial test loss decrease, followed by rapid increase around training-set fitting, and then eventual decrease. See Figure 5 for a horizontal cross-section.
+
+ 3.1 Model-Wise Grokking
+
+ Following the original grokking setting of Power et al. (2022) , we train decoder-only transformers ( Vaswani et al., 2017 ) with causal attention masking on the binary operation of division mod 97 (details in Appendix B ). We explore the effects of regulating effective model complexity by varying parameter-count.
+
+ Figure 4 shows train and test loss with respect to optimization steps and embedding dimension. For a range of values, delayed generalization occurs both when moving vertically (epoch-wise grokking), as well as when moving horizontally (model-wise grokking). Figure 6 shows the corresponding accuracy heatmaps, with clear double descent behavior both epoch-wise and model-wise. Figure 5 shows model-wise grokking with models trained for 400k epochs.
+
+ 3.2 A Type 1 Pattern in the Grokking Setting
+
+ In the modular division setting of Power et al. (2022) the test accuracy is non-monotonic (Figure 1 ). Early in training, the model learns that for all b b , 0 / b = 0 mod n 0/b=0\mod n . This pattern generalizes well and is learned quickly, corresponding to a Type 1 pattern in our model. As predicted by our model, this leads to an initial spike above chance in test accuracy. Interestingly, the development of poorly-generalizing Type 2 features then leads to worse-than-chance performance on the rest of the data, likely due to anti-correlation between train and test set values for every dividend and divisor in modular division, causing a descent in test performance. This small bump is noticeable in Power et al. (2022) , but not noted by the authors. We validate this hypothesis experimentally (Figure 7 ).
+
+ 4 Related Work
+
+ Pattern Learning at Different Speeds.
+
+ Heckel & Yilmaz (2020) find different parts of networks learning at different speeds can cause two bias-variance trade-off curves with different minima, leading to double descent in test error; they show that adjusting step-sizes of different layers can align the learning curves and eliminate double descent behavior. They argue that epoch-wise double descent occurs due to this difference in learning speed, as opposed to due to regulating model complexity. Pezeshki et al. (2021) use a linear teacher-student model to demonstrate that epoch-wise double descent can be explained by different patterns being learned at different speeds. Stephenson & Lee (2021) experimentally demonstrate double descent can be avoided by removing or accelerating slow-to-learn features. In this work, we extend this pattern learning framework to interpret grokking behavior as well as double descent behavior, and propose a mathematical model uniting both phenomena. Our framework uses the concept of distinct patterns with individual strengths ( Heckel & Yilmaz, 2020 ; Pezeshki et al., 2021 ) , but is distinct in allowing for specific per-pattern generalization parameters and separating maximum predictiveness from learning speed, as well as introducing the notion of a “preferred” pattern.
+
+ Double Descent.
+
+ The double descent phenomenon describes a phenomenon in which model test performance initially improves, then worsens as the model overfits, and then eventually improves again as we increase the capacity of our training procedure ( Belkin et al., 2018 ) . This capacity measure was originally demonstrated with model size (model-wise); Nakkiran et al. (2021) generalize the capacity notion in effective model complexity , and show double descent can occur when varying the number of optimization steps (epoch-wise) and other forms of capacity modulation.
+
+ Figure 5: 
+Model-wise grokking, with each point a transformer of the corresponding embedding dimension trained for 400K optimization steps. Lines are smoothed data via a Gaussian filter. Left: Accuracy, with delayed generalization. Right: Loss, with a rise in test loss followed by a fast descent.
+
+ Grokking.
+
+ Grokking was first demonstrated by Power et al. (2022) , who state that grokking is distinct from double descent because
+generalization occurs far past the interpolation threshold.
+ Liu et al. (2022) demonstrate that grokking generalization speed can be accelerated in a simple embedding-
+decoder model by using a larger learning rate for the embedding than for the decoder.
+This is in line with findings by Heckel & Yilmaz (2020) on epoch-wise double descent, where decreasing learning rates in later layers (which learn faster) aligns pattern learning speeds. We consider this further evidence that both grokking and epoch-wise double descent occur as a result of similar learning dynamics resulting from different speeds of pattern development.
+ Nanda & Lieberum (2022) investigate grokking through mechanistic interpretability, with findings in line with our results (specifically observing the development of a Type 3 pattern).
+
+ Weight Decay
+
+ Both Nakkiran et al. (2021) and Pezeshki et al. (2021) find that weight decay acts as a capacity constraint, resulting in both weight decay-wise double descent and preventing the learning of slower features. In the grokking setting, however, weight decay plays a significant role in speeding up time to generalization ( Power et al., 2022 ) . We speculate that this occurs due to weight decay hindering the memorization-based solutions, thus accelerating the development of the better-generalizing solution.
+
+ 5 Conclusion
+
+ In this work, we cover two phenomena in deep learning that were previously studied in isolation—grokking and double descent—and argue that they are best understood as instances of the same underlying learning dynamics.
+
+ The project of building a principled understanding of how and when networks generalize may be especially important from the point of view of AGI safety , the problem of ensuring that advanced AI systems are safe despite pursuing misaligned goals ( Carlsmith, 2022 ; Bostrom, 2014 ) and incentives to seek power or deceive human operators for instrumental reasons ( Turner et al., 2021 ; Omohundro, 2008 ) .
+A central problem is that we may need to be certain of the safety of a model before we scale it to a capability level beyond which we cannot control it.
+Concerningly, it is well-known that the out-of-distribution (OOD) generalization behavior of deep learning systems can be hard to control or predict.
+A robust theory of generalization and learning in neural networks may be necessary to solve this problem.
+
+ 6 Acknowledgements
+
+ Thanks to Jesse Hoogland, Antonia Marcu, Dmitrii Krasheninnikov, Robert Kirk, Davis Brown, Peter Barnett, Rohin Shah, Nathan Bernard, Neel Nanda, Max Nadeau, Max Kaufmann, Alan Chan, Michaël Trazzi, and Oam Patel for valuable discussion, feedback on drafts of this paper and / or contributing suggestions for experiments.
+
+ References
+
+ Arpit et al. (2017) 
+ 
+Devansh Arpit, Stanisław Jastrzębski, Nicolas Ballas, David Krueger,
+Emmanuel Bengio, Maxinder S Kanwal, Tegan Maharaj, Asja Fischer, Aaron
+Courville, Yoshua Bengio, et al.
+
+ A closer look at memorization in deep networks.
+
+ International Conference on Machine Learning , 2017.
+
+ Bahri et al. (2021) 
+ 
+Yasaman Bahri, Ethan Dyer, Jared Kaplan, Jaehoon Lee, and Utkarsh Sharma.
+
+ Explaining neural scaling laws.
+
+ arXiv preprint arXiv:2102.06701 , 2021.
+
+ Belkin et al. (2018) 
+ 
+Mikhail Belkin, Daniel Hsu, Siyuan Ma, and Soumik Mandal.
+
+ Reconciling modern machine learning practice and the bias-variance
+trade-off.
+
+ arXiv preprint arXiv:1812.11118 , 2018.
+
+ Bostrom (2014) 
+ 
+Nick Bostrom.
+
+ Superintelligence: Paths, Dangers, Strategies .
+
+ Oxford University Press, Inc., 2014.
+
+ ISBN 0199678111.
+
+ Carlsmith (2022) 
+ 
+Joseph Carlsmith.
+
+ Is power-seeking ai an existential risk?
+
+ arXiv preprint arXiv:2206.13353 , 2022.
+
+ Christiano et al. (2021) 
+ 
+Paul Christiano, Mark Xu, and Ajeya Cotra.
+
+ Eliciting latent knowledge, 2021.
+
+ URL
+ https://www.lesswrong.com/posts/qHCDysDnvhteW7kRd/arc-s-first-technical-report-eliciting-latent-knowledge .
+
+ Heckel & Yilmaz (2020) 
+ 
+Reinhard Heckel and Fatih Furkan Yilmaz.
+
+ Early Stopping in Deep Networks: Double Descent and How
+to Eliminate it, September 2020.
+
+ URL http://arxiv.org/abs/2007.10099 .
+
+ arXiv:2007.10099 [cs, stat].
+
+ Lanham (2022) 
+ 
+Tamera Lanham.
+
+ Externalized reasoning oversight, 2022.
+
+ URL https://www.lesswrong.com/posts/FRRb6Gqem8k69ocbi/ .
+
+ Lin et al. (2021) 
+ 
+Stephanie Lin, Jacob Hilton, and Owain Evans.
+
+ Truthfulqa: Measuring how models mimic human falsehoods.
+
+ arXiv preprint arXiv:2109.07958 , 2021.
+
+ Liu et al. (2022) 
+ 
+Ziming Liu, Ouail Kitouni, Niklas Nolte, Eric J Michaud, Max Tegmark, and Mike
+Williams.
+
+ Towards understanding grokking: An effective theory of representation
+learning.
+
+ arXiv preprint arXiv:2205.10343 , 2022.
+
+ Maloney et al. (2022) 
+ 
+Alexander Maloney, Daniel A Roberts, and James Sully.
+
+ A solvable model of neural scaling laws.
+
+ arXiv preprint arXiv:2210.16859 , 2022.
+
+ Nakkiran et al. (2021) 
+ 
+Preetum Nakkiran, Gal Kaplun, Yamini Bansal, Tristan Yang, Boaz Barak, and Ilya
+Sutskever.
+
+ Deep double descent: Where bigger models and more data hurt.
+
+ Journal of Statistical Mechanics: Theory and Experiment ,
+2021(12):124003, 2021.
+
+ Nanda & Lieberum (2022) 
+ 
+Neel Nanda and Tom Lieberum.
+
+ A Mechanistic Interpretability Analysis of Grokking, August
+2022.
+
+ URL
+ https://www.alignmentforum.org/posts/N6WM6hs7RQMKDhYjB/a-mechanistic-interpretability-analysis-of-grokking .
+
+ Olah et al. (2018) 
+ 
+Chris Olah, Arvind Satyanarayan, Ian Johnson, Shan Carter, Ludwig Schubert,
+Katherine Ye, and Alexander Mordvintsev.
+
+ The building blocks of interpretability.
+
+ Distill , 2018.
+
+ doi: 10.23915/distill.00010 .
+
+ https://distill.pub/2018/building-blocks.
+
+ Omohundro (2008) 
+ 
+Stephen Omohundro.
+
+ The basic ai drives.
+
+ In Proceedings of the First AGI Conference , volume 171, pp. 483–492, 01 2008.
+
+ Pezeshki et al. (2021) 
+ 
+Mohammad Pezeshki, Amartya Mitra, Yoshua Bengio, and Guillaume Lajoie.
+
+ Multi-scale Feature Learning Dynamics: Insights for Double
+Descent, December 2021.
+
+ URL http://arxiv.org/abs/2112.03215 .
+
+ arXiv:2112.03215 [cs, stat].
+
+ Power et al. (2022) 
+ 
+Alethea Power, Yuri Burda, Harri Edwards, Igor Babuschkin, and Vedant Misra.
+
+ Grokking: Generalization beyond overfitting on small algorithmic
+datasets.
+
+ arXiv preprint arXiv:2201.02177 , 2022.
+
+ Sharma & Kaplan (2022) 
+ 
+Utkarsh Sharma and Jared Kaplan.
+
+ Scaling laws from the data manifold dimension.
+
+ Journal of Machine Learning Research , 23(9):1–34, 2022.
+
+ URL http://jmlr.org/papers/v23/20-1111.html .
+
+ Siddiqui et al. (2022) 
+ 
+Shoaib Ahmed Siddiqui, Nitarshan Rajkumar, Tegan Maharaj, David Krueger, and
+Sara Hooker.
+
+ Metadata archaeology: Unearthing data subsets by leveraging training
+dynamics.
+
+ arXiv preprint arXiv:2209.10015 , 2022.
+
+ Soares (2021) 
+ 
+Nate Soares.
+
+ Visible thoughts project, 2021.
+
+ URL https://www.alignmentforum.org/posts/zRn6cLtxyNodudzhw/ .
+
+ Stephenson & Lee (2021) 
+ 
+Cory Stephenson and Tyler Lee.
+
+ When and how epochwise double descent happens, August 2021.
+
+ URL http://arxiv.org/abs/2108.12006 .
+
+ arXiv:2108.12006 [cs].
+
+ Turner et al. (2021) 
+ 
+Alex Turner, Logan Smith, Rohin Shah, Andrew Critch, and Prasad Tadepalli.
+
+ Optimal policies tend to seek power.
+
+ In M. Ranzato, A. Beygelzimer, Y. Dauphin, P.S. Liang, and J. Wortman
+Vaughan (eds.), Advances in Neural Information Processing Systems ,
+volume 34, pp. 23063–23074. Curran Associates, Inc., 2021.
+
+ URL
+ https://proceedings.neurips.cc/paper/2021/file/c26820b8a4c1b3c2aa868d6d57e14a79-Paper.pdf .
+
+ Vaswani et al. (2017) 
+ 
+Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones,
+Aidan N Gomez, Łukasz Kaiser, and Illia Polosukhin.
+
+ Attention is all you need.
+
+ Advances in neural information processing systems , 30, 2017.
+
+ Yang & Hu (2021) 
+ 
+Greg Yang and Edward J. Hu.
+
+ Tensor programs iv: Feature learning in infinite-width neural
+networks.
+
+ In Marina Meila and Tong Zhang (eds.), Proceedings of the 38th
+International Conference on Machine Learning , volume 139 of
+ Proceedings of Machine Learning Research , pp. 11727–11737. PMLR,
+18–24 Jul 2021.
+
+ URL https://proceedings.mlr.press/v139/yang21c.html .
+
+ Appendix A An alternative intuition for preferred patterns
+
+ Rather than thinking about patterns as random functions from the entire input distribution 𝒟 \mathcal{D} to the model’s output 𝒪 \mathcal{O} , we can instead think of patterns as functions from a subset of the input distribution 𝒟 i ⊂ 𝒟 \mathcal{D}_{i}\subset\mathcal{D} .
+On this view, a pattern can successfully classify an input from the training set if and only if that input is in the patterns domain. On the test set, a data-point is allocated uniformly at random to patterns whose domain includes that data-point. If allocated to pattern j j , the test data-point is classified successfully with probability g j g_{j} .
+
+ We can then say that a preferred pattern enforces that its domain 𝒟 i \mathcal{D}_{i} is disjoint from all other pattern domains on the test set; that is 𝒟 i \mathcal{D}_{i} is preferred if ∀ j ∈ { 0 , ⋯ , n } , i ≠ j ⟹ 𝒟 i ∩ 𝒟 j = ∅ \forall j\in\{0,\cdots,n\},i\neq j\implies\mathcal{D}_{i}\cap\mathcal{D}_{j}=\emptyset .
+
+ Appendix B Experiment Details
+
+ In all of our experiments, we train decoder-only transformer with causal attention masking.
+Each residue is encoded as a symbol, and loss and accuracy are only evaluated on the answer part of the equation. Unless otherwise stated, we use a 2-layer network of width 128, with a single attention head. We typically train for 400 thousand optimization steps via AdamW ( β 1 = 0.9 \beta_{1}=0.9 , β 2 = 0.98 \beta_{2}=0.98 ), with learning rate of 1e-3 and weight decay of 1e-5.
+
+ Appendix C Discussion: how relevant is the science of deep learning for AI safety?
+
+ A key factor that influences whether we will be able to build safe AI systems is the degree to which our systems are transparent and well-understood.
+A system is transparent if we are able to ascertain what process lead it to produce a specific output or action; we might try to train a system to produce visible thoughts, truthfully report its knowledge, or probe it with interpretability tools ( Christiano et al., 2021 ; Soares, 2021 ; Lanham, 2022 ; Lin et al., 2021 ; Olah et al., 2018 ) .
+A system is well-understood to the extent that we have a broader theory about why it works and how it scales with respect to training time, model size, or dataset size. To name a few examples: we might try to quantitatively understand why models follow certain scaling laws, how they behave in the infinite-width limit, or what training curves look like on different input types
+ ( Sharma & Kaplan, 2022 ; Bahri et al., 2021 ; Maloney et al., 2022 ; Yang & Hu, 2021 ; Siddiqui et al., 2022 ) .
+
+ We use the term science of deep learning to refer to the latter kind of inquiry,
+which can be directly useful for safety: for example, it might help us predict when and how a neural network acquires a certain capability or behavior. This is helpful if we want to build a system that can perform a specific feat of engineering, while making sure that it does not have the capability to model humans; or if we tried to build a system that optimizes for the short-term approval of its operator, and would like to know in advance if it will generalize in a way that leads to it deceiving its operator in order to gain a higher measured approval score once it gains the ability to do so.
+In addition, a better science of deep learning may help us build better interpretability tools.
+
+ A science of deep learning may also be harmful if theoretical or empirical breakthroughs result in faster advancement of potentially dangerous capabilities. This is a major drawback of this line of research.
+A tentative argument in favor of scientific / conceptual work is that it seems possible to build human-level AI systems without a radically improved understanding of deep learning; however, building safe human-level AI is a harder problem that will likely require a more robust theory.
+Thus advancing the science of deep learning seems somewhat more critical for solving problems of safety than of capabilities.
+This argument is speculative, and may turn out to be wrong.
+
+ Appendix D Additional Figures
+
+ Figure 6: 
+ Left: Test accuracy as function of training steps and model size. A faint double descent in test accuracy is visible, and delayed generalization is clear both epoch-wise (vertically) and model-wise (horizontally).
+ Right: Training accuracy as a function of training steps and model size.
+
+ Figure 7: 
+Early in training, the model learns 0 / b = 0 mod n 0/b=0\mod n , as the no. 0 / b = 0 mod n 0/b=0\mod n correct (green) matches all such examples (dashed gray). This leads to a brief peak of 96 correct examples, corresponding to perfect performance on the 0 / b = 0 0/b=0 and chance performance (1/97) on other data. Test accuracy on all other examples then falls below chance due to memorization.

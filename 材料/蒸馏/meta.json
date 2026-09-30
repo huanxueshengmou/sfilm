@@ -1,0 +1,2608 @@
+[
+ {
+  "title": "Grokking: Generalization Beyond Overfitting on Small Algorithmic Datasets",
+  "id": "01",
+  "lang": "en",
+  "cat": "经典起点",
+  "source": "https://arxiv.org/html/2201.02177v1",
+  "via": "article",
+  "chars": 32308,
+  "figs": 12,
+  "file": "01_grokking.txt",
+  "images": [
+   {
+    "file": "01_grokking_01.png",
+    "w": 1228,
+    "h": 921,
+    "bytes": 97373,
+    "src": "https://arxiv.org/html/2201.02177v1/images/gen_beyond_overfitting_acc.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "01_grokking_02.png",
+    "w": 1228,
+    "h": 921,
+    "bytes": 138774,
+    "src": "https://arxiv.org/html/2201.02177v1/images/compute.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "01_grokking_03.png",
+    "w": 496,
+    "h": 510,
+    "bytes": 28123,
+    "src": "https://arxiv.org/html/2201.02177v1/images/puzzle.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "01_grokking_04.png",
+    "w": 1920,
+    "h": 960,
+    "bytes": 177623,
+    "src": "https://arxiv.org/html/2201.02177v1/images/ablations.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "01_grokking_05.png",
+    "w": 1920,
+    "h": 960,
+    "bytes": 183819,
+    "src": "https://arxiv.org/html/2201.02177v1/images/variety.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "01_grokking_06.png",
+    "w": 807,
+    "h": 560,
+    "bytes": 101391,
+    "src": "https://arxiv.org/html/2201.02177v1/images/s5_unembedding_tsne.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "01_grokking_07.png",
+    "w": 598,
+    "h": 517,
+    "bytes": 82739,
+    "src": "https://arxiv.org/html/2201.02177v1/images/addition_unembedding_tsne_cropped.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "01_grokking_08.png",
+    "w": 432,
+    "h": 288,
+    "bytes": 28407,
+    "src": "https://arxiv.org/html/2201.02177v1/images/gen_beyond_overfitting_loss.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "01_grokking_09.png",
+    "w": 3840,
+    "h": 3840,
+    "bytes": 1044340,
+    "src": "https://arxiv.org/html/2201.02177v1/images/addition_symbols.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "01_grokking_10.png",
+    "w": 1920,
+    "h": 768,
+    "bytes": 125757,
+    "src": "https://arxiv.org/html/2201.02177v1/images/noise.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "01_grokking_11.png",
+    "w": 576,
+    "h": 288,
+    "bytes": 17632,
+    "src": "https://arxiv.org/html/2201.02177v1/images/acc_by_sharpness.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "01_grokking_12.png",
+    "w": 1500,
+    "h": 375,
+    "bytes": 33443,
+    "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+    "alt": "Simons Foundation International"
+   }
+  ]
+ },
+ {
+  "title": "Progress Measures for Grokking via Mechanistic Interpretability",
+  "id": "02",
+  "lang": "en",
+  "cat": "机制可解释性",
+  "source": "https://arxiv.org/html/2301.05217v1",
+  "via": "article",
+  "chars": 121264,
+  "figs": 18,
+  "file": "02_grokking.txt",
+  "images": [
+   {
+    "file": "02_grokking_01.png",
+    "w": 9065,
+    "h": 3616,
+    "bytes": 579944,
+    "src": "https://arxiv.org/html/2301.05217v1/figs/1-layer_transformer.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "02_grokking_02.png",
+    "w": 700,
+    "h": 391,
+    "bytes": 49874,
+    "src": "https://arxiv.org/html/2301.05217v1/figs/opaque_1l_accuracy.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "02_grokking_03.png",
+    "w": 700,
+    "h": 370,
+    "bytes": 55230,
+    "src": "https://arxiv.org/html/2301.05217v1/figs/opaque_1l_loss.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "02_grokking_04.png",
+    "w": 626,
+    "h": 626,
+    "bytes": 206600,
+    "src": "https://arxiv.org/html/2301.05217v1/att_score_pos_0.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "02_grokking_05.png",
+    "w": 626,
+    "h": 626,
+    "bytes": 174086,
+    "src": "https://arxiv.org/html/2301.05217v1/act_mlp_neuron_0.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "02_grokking_06.png",
+    "w": 626,
+    "h": 626,
+    "bytes": 57623,
+    "src": "https://arxiv.org/html/2301.05217v1/norm_fourier_logits.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "02_grokking_07.png",
+    "w": 814,
+    "h": 526,
+    "bytes": 52546,
+    "src": "https://arxiv.org/html/2301.05217v1/w_logit_fourier_basis_freq14.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "02_grokking_08.png",
+    "w": 1000,
+    "h": 500,
+    "bytes": 95290,
+    "src": "https://arxiv.org/html/2301.05217v1/figs/cos_inter.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "02_grokking_09.png",
+    "w": 1250,
+    "h": 500,
+    "bytes": 577812,
+    "src": "https://arxiv.org/html/2301.05217v1/attn_pattern_all_heads.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "02_grokking_10.png",
+    "w": 1250,
+    "h": 500,
+    "bytes": 417829,
+    "src": "https://arxiv.org/html/2301.05217v1/neuron_acts_more_samples.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "02_grokking_11.png",
+    "w": 700,
+    "h": 450,
+    "bytes": 133237,
+    "src": "https://arxiv.org/html/2301.05217v1/figs/average_2l_loss.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "02_grokking_12.png",
+    "w": 1177,
+    "h": 525,
+    "bytes": 85584,
+    "src": "https://arxiv.org/html/2301.05217v1/figs/2l_excluded_loss_full.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "02_grokking_13.png",
+    "w": 700,
+    "h": 450,
+    "bytes": 55458,
+    "src": "https://arxiv.org/html/2301.05217v1/figs/weight_decay_5_small_prime_modulus.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "02_grokking_14.png",
+    "w": 700,
+    "h": 450,
+    "bytes": 34775,
+    "src": "https://arxiv.org/html/2301.05217v1/figs/second_large_prime_loss_graph.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "02_grokking_15.png",
+    "w": 1478,
+    "h": 525,
+    "bytes": 62420,
+    "src": "https://arxiv.org/html/2301.05217v1/figs/withouth-weight-decay-loss-full.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "02_grokking_16.png",
+    "w": 1000,
+    "h": 626,
+    "bytes": 47654,
+    "src": "https://arxiv.org/html/2301.05217v1/5_digit_add_infinite_linear.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "02_grokking_17.png",
+    "w": 1000,
+    "h": 626,
+    "bytes": 34342,
+    "src": "https://arxiv.org/html/2301.05217v1/skip_trigram_infinite_linear.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "02_grokking_18.png",
+    "w": 1500,
+    "h": 375,
+    "bytes": 33443,
+    "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+    "alt": "Simons Foundation International"
+   }
+  ]
+ },
+ {
+  "title": "Omnigrok: Grokking Beyond Algorithmic Data",
+  "id": "03",
+  "lang": "en",
+  "cat": "有效理论",
+  "source": "https://arxiv.org/html/2210.01117v1",
+  "via": "article",
+  "chars": 48373,
+  "figs": 13,
+  "file": "03_grokking.txt",
+  "images": [
+   {
+    "file": "03_grokking_01.png",
+    "w": 589,
+    "h": 481,
+    "bytes": 69923,
+    "src": "https://arxiv.org/html/2210.01117v1/mnist_train_error.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "03_grokking_02.png",
+    "w": 589,
+    "h": 481,
+    "bytes": 96633,
+    "src": "https://arxiv.org/html/2210.01117v1/mnist_val_error.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "03_grokking_03.png",
+    "w": 615,
+    "h": 480,
+    "bytes": 88838,
+    "src": "https://arxiv.org/html/2210.01117v1/imdb_train.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "03_grokking_04.png",
+    "w": 615,
+    "h": 480,
+    "bytes": 100602,
+    "src": "https://arxiv.org/html/2210.01117v1/imdb_test.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "03_grokking_05.png",
+    "w": 534,
+    "h": 480,
+    "bytes": 75448,
+    "src": "https://arxiv.org/html/2210.01117v1/qm9_train.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "03_grokking_06.png",
+    "w": 534,
+    "h": 480,
+    "bytes": 68634,
+    "src": "https://arxiv.org/html/2210.01117v1/qm9_test.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "03_grokking_07.png",
+    "w": 535,
+    "h": 480,
+    "bytes": 53654,
+    "src": "https://arxiv.org/html/2210.01117v1/arithmetic_training_landscape.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "03_grokking_08.png",
+    "w": 535,
+    "h": 480,
+    "bytes": 71641,
+    "src": "https://arxiv.org/html/2210.01117v1/arithmetic_validation_landscape.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "03_grokking_09.png",
+    "w": 535,
+    "h": 480,
+    "bytes": 74025,
+    "src": "https://arxiv.org/html/2210.01117v1/arithmetic_45_contour.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "03_grokking_10.png",
+    "w": 549,
+    "h": 480,
+    "bytes": 85932,
+    "src": "https://arxiv.org/html/2210.01117v1/mnist_train_loss_repr.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "03_grokking_11.png",
+    "w": 549,
+    "h": 480,
+    "bytes": 83459,
+    "src": "https://arxiv.org/html/2210.01117v1/mnist_test_loss_repr.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "03_grokking_12.png",
+    "w": 480,
+    "h": 480,
+    "bytes": 26254,
+    "src": "https://arxiv.org/html/2210.01117v1/mnist-phase-diagram.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "03_grokking_13.png",
+    "w": 1500,
+    "h": 375,
+    "bytes": 33443,
+    "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+    "alt": "Simons Foundation International"
+   }
+  ]
+ },
+ {
+  "title": "Towards Understanding Grokking: An Effective Theory of Representation Learning",
+  "id": "04",
+  "lang": "en",
+  "cat": "有效理论",
+  "source": "https://arxiv.org/html/2205.10343v1",
+  "via": "article",
+  "chars": 68190,
+  "figs": 21,
+  "file": "04_grokking.txt",
+  "images": [
+   {
+    "file": "04_grokking_01.png",
+    "w": 498,
+    "h": 326,
+    "bytes": 35514,
+    "src": "https://arxiv.org/html/2205.10343v1/Add2Dbad400.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "04_grokking_02.png",
+    "w": 498,
+    "h": 326,
+    "bytes": 33148,
+    "src": "https://arxiv.org/html/2205.10343v1/Add2Dgood19900.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "04_grokking_03.png",
+    "w": 498,
+    "h": 326,
+    "bytes": 31498,
+    "src": "https://arxiv.org/html/2205.10343v1/ModAdd2Dbad19900.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "04_grokking_04.png",
+    "w": 498,
+    "h": 326,
+    "bytes": 31608,
+    "src": "https://arxiv.org/html/2205.10343v1/ModAdd2Dgood19990.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "04_grokking_05.png",
+    "w": 873,
+    "h": 843,
+    "bytes": 57123,
+    "src": "https://arxiv.org/html/2205.10343v1/simple_pd_addition_regression_reprlr.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "04_grokking_06.png",
+    "w": 866,
+    "h": 843,
+    "bytes": 52819,
+    "src": "https://arxiv.org/html/2205.10343v1/simple_pd_addition_regression.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "04_grokking_07.png",
+    "w": 851,
+    "h": 843,
+    "bytes": 56196,
+    "src": "https://arxiv.org/html/2205.10343v1/simple_pd_addition_classification.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "04_grokking_08.png",
+    "w": 856,
+    "h": 843,
+    "bytes": 57409,
+    "src": "https://arxiv.org/html/2205.10343v1/simple_pd_permutation_regression.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "04_grokking_09.png",
+    "w": 344,
+    "h": 321,
+    "bytes": 21369,
+    "src": "https://arxiv.org/html/2205.10343v1/phasediagram_transformer.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "04_grokking_10.png",
+    "w": 1659,
+    "h": 458,
+    "bytes": 64460,
+    "src": "https://arxiv.org/html/2205.10343v1/lattice.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "04_grokking_11.png",
+    "w": 2183,
+    "h": 1240,
+    "bytes": 239688,
+    "src": "https://arxiv.org/html/2205.10343v1/dataset2rep.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "04_grokking_12.png",
+    "w": 1412,
+    "h": 611,
+    "bytes": 30664,
+    "src": "https://arxiv.org/html/2205.10343v1/p4_large.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "04_grokking_13.png",
+    "w": 1412,
+    "h": 611,
+    "bytes": 28396,
+    "src": "https://arxiv.org/html/2205.10343v1/p4_small.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "04_grokking_14.png",
+    "w": 839,
+    "h": 893,
+    "bytes": 58669,
+    "src": "https://arxiv.org/html/2205.10343v1/simple_pd_addition_bs_regression.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "04_grokking_15.png",
+    "w": 839,
+    "h": 893,
+    "bytes": 66517,
+    "src": "https://arxiv.org/html/2205.10343v1/simple_pd_addition_bs_classification.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "04_grokking_16.png",
+    "w": 887,
+    "h": 893,
+    "bytes": 47737,
+    "src": "https://arxiv.org/html/2205.10343v1/simple_pd_addition_init_regression.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "04_grokking_17.png",
+    "w": 887,
+    "h": 893,
+    "bytes": 53517,
+    "src": "https://arxiv.org/html/2205.10343v1/simple_pd_addition_init_classification.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "04_grokking_18.png",
+    "w": 873,
+    "h": 893,
+    "bytes": 62837,
+    "src": "https://arxiv.org/html/2205.10343v1/simple_pd_addition_reprwd_regression.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "04_grokking_19.png",
+    "w": 873,
+    "h": 893,
+    "bytes": 71407,
+    "src": "https://arxiv.org/html/2205.10343v1/simple_pd_addition_reprwd_classification.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "04_grokking_20.png",
+    "w": 2373,
+    "h": 1373,
+    "bytes": 278391,
+    "src": "https://arxiv.org/html/2205.10343v1/parallelogram_deduction.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "04_grokking_21.png",
+    "w": 1500,
+    "h": 375,
+    "bytes": 33443,
+    "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+    "alt": "Simons Foundation International"
+   }
+  ]
+ },
+ {
+  "title": "Hidden Progress in Deep Learning: SGD Learns Parities Near the Computational Limit",
+  "id": "05",
+  "lang": "en",
+  "cat": "隐式进展",
+  "source": "https://arxiv.org/html/2207.08799v1",
+  "via": "article",
+  "chars": 186567,
+  "figs": 11,
+  "file": "05_grokking.txt",
+  "images": [
+   {
+    "file": "05_grokking_01.png",
+    "w": 728,
+    "h": 224,
+    "bytes": 17008,
+    "src": "https://arxiv.org/html/2207.08799v1/figures/disjoint-polynet-plot.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "05_grokking_02.png",
+    "w": 1680,
+    "h": 1200,
+    "bytes": 545871,
+    "src": "https://arxiv.org/html/2207.08799v1/extra-examples.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "05_grokking_03.png",
+    "w": 1800,
+    "h": 1080,
+    "bytes": 280010,
+    "src": "https://arxiv.org/html/2207.08799v1/converge_time_table.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "05_grokking_04.png",
+    "w": 1800,
+    "h": 1080,
+    "bytes": 169285,
+    "src": "https://arxiv.org/html/2207.08799v1/converge_probs.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "05_grokking_05.png",
+    "w": 1800,
+    "h": 1080,
+    "bytes": 371148,
+    "src": "https://arxiv.org/html/2207.08799v1/scaling_table.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "05_grokking_06.png",
+    "w": 1680,
+    "h": 720,
+    "bytes": 373724,
+    "src": "https://arxiv.org/html/2207.08799v1/hidden_progress_sin.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "05_grokking_07.png",
+    "w": 1680,
+    "h": 720,
+    "bytes": 440372,
+    "src": "https://arxiv.org/html/2207.08799v1/hidden_progress_mlp.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "05_grokking_08.png",
+    "w": 1680,
+    "h": 1200,
+    "bytes": 311854,
+    "src": "https://arxiv.org/html/2207.08799v1/grokking_all.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "05_grokking_09.png",
+    "w": 1680,
+    "h": 1440,
+    "bytes": 634947,
+    "src": "https://arxiv.org/html/2207.08799v1/noisy.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "05_grokking_10.png",
+    "w": 1680,
+    "h": 960,
+    "bytes": 353058,
+    "src": "https://arxiv.org/html/2207.08799v1/poly_no_plateau.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "05_grokking_11.png",
+    "w": 1500,
+    "h": 375,
+    "bytes": 33443,
+    "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+    "alt": "Simons Foundation International"
+   }
+  ]
+ },
+ {
+  "title": "A Tale of Two Circuits: Grokking as Competition of Sparse and Dense Subnetworks",
+  "id": "06",
+  "lang": "en",
+  "cat": "子网络竞争",
+  "source": "https://arxiv.org/html/2303.11873v1",
+  "via": "article",
+  "chars": 26315,
+  "figs": 2,
+  "file": "06_grokking.txt",
+  "images": [
+   {
+    "file": "06_grokking_01.png",
+    "w": 1505,
+    "h": 580,
+    "bytes": 140053,
+    "src": "https://arxiv.org/html/2303.11873v1/combined3.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "06_grokking_02.png",
+    "w": 1500,
+    "h": 375,
+    "bytes": 33443,
+    "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+    "alt": "Simons Foundation International"
+   }
+  ]
+ },
+ {
+  "title": "Explaining Grokking Through Circuit Efficiency",
+  "id": "07",
+  "lang": "en",
+  "cat": "电路效率",
+  "source": "https://arxiv.org/html/2309.02390v1",
+  "via": "article",
+  "chars": 102620,
+  "figs": 11,
+  "file": "07_grokking.txt",
+  "images": [
+   {
+    "file": "07_grokking_01.png",
+    "w": 737,
+    "h": 164,
+    "bytes": 48278,
+    "src": "https://arxiv.org/html/2309.02390v1/figure_1_mem_efficiency.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "07_grokking_02.png",
+    "w": 737,
+    "h": 164,
+    "bytes": 48278,
+    "src": "https://arxiv.org/html/2309.02390v1/x1.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "07_grokking_03.png",
+    "w": 737,
+    "h": 164,
+    "bytes": 48771,
+    "src": "https://arxiv.org/html/2309.02390v1/figure_1_trig_efficiency.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "07_grokking_04.png",
+    "w": 737,
+    "h": 164,
+    "bytes": 48771,
+    "src": "https://arxiv.org/html/2309.02390v1/x2.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "07_grokking_05.png",
+    "w": 372,
+    "h": 187,
+    "bytes": 17853,
+    "src": "https://arxiv.org/html/2309.02390v1/figure_8_ungrokking_wd_addition.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "07_grokking_06.png",
+    "w": 365,
+    "h": 161,
+    "bytes": 24091,
+    "src": "https://arxiv.org/html/2309.02390v1/figure_9_semi_grokking_more_seeds.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "07_grokking_07.png",
+    "w": 726,
+    "h": 256,
+    "bytes": 70856,
+    "src": "https://arxiv.org/html/2309.02390v1/figure_11_ungrokking_more_seeds.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "07_grokking_08.png",
+    "w": 710,
+    "h": 575,
+    "bytes": 125894,
+    "src": "https://arxiv.org/html/2309.02390v1/figure_8_ungrokking_all.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "07_grokking_09.png",
+    "w": 214,
+    "h": 255,
+    "bytes": 6174,
+    "src": "https://arxiv.org/html/2309.02390v1/figure_3_ttm_colorbar.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "07_grokking_10.png",
+    "w": 9065,
+    "h": 3616,
+    "bytes": 579944,
+    "src": "https://arxiv.org/html/2309.02390v1/nanda-figure.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "07_grokking_11.png",
+    "w": 1500,
+    "h": 375,
+    "bytes": 33443,
+    "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+    "alt": "Simons Foundation International"
+   }
+  ]
+ },
+ {
+  "title": "Unifying Grokking and Double Descent",
+  "id": "08",
+  "lang": "en",
+  "cat": "与双下降统一",
+  "source": "https://arxiv.org/html/2303.06173v1",
+  "via": "article",
+  "chars": 27502,
+  "figs": 3,
+  "file": "08_grokking.txt",
+  "images": [
+   {
+    "file": "08_grokking_01.png",
+    "w": 1477,
+    "h": 381,
+    "bytes": 86355,
+    "src": "https://arxiv.org/html/2303.06173v1/heatmap-loss.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "08_grokking_02.png",
+    "w": 1500,
+    "h": 381,
+    "bytes": 94114,
+    "src": "https://arxiv.org/html/2303.06173v1/heatmap-accuracy.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "08_grokking_03.png",
+    "w": 1500,
+    "h": 375,
+    "bytes": 33443,
+    "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+    "alt": "Simons Foundation International"
+   }
+  ]
+ },
+ {
+  "title": "Grokking as the Transition from Lazy to Rich Training Dynamics",
+  "id": "09",
+  "lang": "en",
+  "cat": "动力学区制",
+  "source": "https://arxiv.org/html/2310.06110v1",
+  "via": "article",
+  "chars": 73559,
+  "figs": 5,
+  "file": "09_grokking.txt",
+  "images": [
+   {
+    "file": "09_grokking_01.png",
+    "w": 784,
+    "h": 687,
+    "bytes": 141877,
+    "src": "https://arxiv.org/html/2310.06110v1/a.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "09_grokking_02.png",
+    "w": 794,
+    "h": 677,
+    "bytes": 164047,
+    "src": "https://arxiv.org/html/2310.06110v1/b.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "09_grokking_03.png",
+    "w": 782,
+    "h": 639,
+    "bytes": 129521,
+    "src": "https://arxiv.org/html/2310.06110v1/c.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "09_grokking_04.png",
+    "w": 768,
+    "h": 576,
+    "bytes": 61455,
+    "src": "https://arxiv.org/html/2310.06110v1/grokking_heatmap.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "09_grokking_05.png",
+    "w": 1500,
+    "h": 375,
+    "bytes": 33443,
+    "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+    "alt": "Simons Foundation International"
+   }
+  ]
+ },
+ {
+  "title": "Sudden Drops in the Loss: Syntax Acquisition, Phase Transitions, and Simplicity Bias in MLMs",
+  "id": "10",
+  "lang": "en",
+  "cat": "突降相变",
+  "source": "https://arxiv.org/html/2309.07311v1",
+  "via": "article",
+  "chars": 93254,
+  "figs": 3,
+  "file": "10_grokking.txt",
+  "images": [
+   {
+    "file": "10_grokking_01.png",
+    "w": 651,
+    "h": 479,
+    "bytes": 26272,
+    "src": "https://arxiv.org/html/2309.07311v1/images_new/correlation_blimp.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "10_grokking_02.png",
+    "w": 2023,
+    "h": 645,
+    "bytes": 354690,
+    "src": "https://arxiv.org/html/2309.07311v1/multiphase_loss_uas_blimp_step.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "10_grokking_03.png",
+    "w": 1500,
+    "h": 375,
+    "bytes": 33443,
+    "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+    "alt": "Simons Foundation International"
+   }
+  ]
+ },
+ {
+  "title": "Grokking Explained: A Statistical Phenomenon",
+  "id": "11",
+  "lang": "en",
+  "cat": "真实模型证据",
+  "source": "https://arxiv.org/html/2502.01774v1",
+  "via": "article",
+  "chars": 44077,
+  "figs": 4,
+  "file": "11_grokking.txt",
+  "images": [
+   {
+    "file": "11_grokking_01.png",
+    "w": 447,
+    "h": 412,
+    "bytes": 32486,
+    "src": "https://arxiv.org/html/2502.01774v1/group_eqdist.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "11_grokking_02.png",
+    "w": 604,
+    "h": 600,
+    "bytes": 82481,
+    "src": "https://arxiv.org/html/2502.01774v1/group_eqvariant.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "11_grokking_03.png",
+    "w": 424,
+    "h": 452,
+    "bytes": 23040,
+    "src": "https://arxiv.org/html/2502.01774v1/figures/result_exp_samples_100-200_frac_0.0-0.2-1.0_1_cut.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "11_grokking_04.png",
+    "w": 1500,
+    "h": 375,
+    "bytes": 33443,
+    "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+    "alt": "Simons Foundation International"
+   }
+  ]
+ },
+ {
+  "title": "Emergent Abilities of Large Language Models",
+  "id": "12",
+  "lang": "en",
+  "cat": "涌现争议",
+  "source": "https://arxiv.org/html/2206.07682v1",
+  "via": "article",
+  "chars": 56490,
+  "figs": 1,
+  "file": "12_grokking.txt",
+  "images": [
+   {
+    "file": "12_grokking_01.png",
+    "w": 1500,
+    "h": 375,
+    "bytes": 33443,
+    "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+    "alt": "Simons Foundation International"
+   }
+  ]
+ },
+ {
+  "title": "Are Emergent Abilities of Large Language Models a Mirage?",
+  "id": "13",
+  "lang": "en",
+  "cat": "涌现争议",
+  "source": "https://arxiv.org/html/2304.15004v1",
+  "via": "article",
+  "chars": 48901,
+  "figs": 9,
+  "file": "13_grokking.txt",
+  "images": [
+   {
+    "file": "13_grokking_01.png",
+    "w": 1617,
+    "h": 1096,
+    "bytes": 151455,
+    "src": "https://arxiv.org/html/2304.15004v1/figures/wei_2022_emergence/wei_2022_emergence_fig2.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "13_grokking_02.png",
+    "w": 1981,
+    "h": 1177,
+    "bytes": 199196,
+    "src": "https://arxiv.org/html/2304.15004v1/toy_analytical_model_try2.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "13_grokking_03.png",
+    "w": 1860,
+    "h": 1375,
+    "bytes": 324668,
+    "src": "https://arxiv.org/html/2304.15004v1/figures/gpt3_integer_multiplication/multiplication_acc_log_vs_model_size_by_temp_by_target_str_len.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "13_grokking_04.png",
+    "w": 1860,
+    "h": 1375,
+    "bytes": 343912,
+    "src": "https://arxiv.org/html/2304.15004v1/figures/gpt3_integer_addition/addition_acc_log_vs_model_size_by_temp_by_target_str_len.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "13_grokking_05.png",
+    "w": 1509,
+    "h": 1381,
+    "bytes": 97397,
+    "src": "https://arxiv.org/html/2304.15004v1/figures/big_bench_emergent_tasks/emergence_percent_pie.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "13_grokking_06.png",
+    "w": 1778,
+    "h": 1381,
+    "bytes": 142173,
+    "src": "https://arxiv.org/html/2304.15004v1/figures/big_bench_emergent_tasks/metric_given_emergent_pie.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "13_grokking_07.png",
+    "w": 4493,
+    "h": 1466,
+    "bytes": 288703,
+    "src": "https://arxiv.org/html/2304.15004v1/figures/big_bench_emergent_tasks/score_vs_model_size_by_task_split_shot_other_metric=multiple_choice_grade.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "13_grokking_08.png",
+    "w": 4494,
+    "h": 1466,
+    "bytes": 270109,
+    "src": "https://arxiv.org/html/2304.15004v1/figures/big_bench_emergent_tasks/score_vs_model_size_by_task_split_shot_other_metric=calibration_multiple_choice_brier_score.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "13_grokking_09.png",
+    "w": 1500,
+    "h": 375,
+    "bytes": 33443,
+    "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+    "alt": "Simons Foundation International"
+   }
+  ]
+ },
+ {
+  "title": "Data Distributional Properties Drive Emergent In-Context Learning in Transformers",
+  "id": "14",
+  "lang": "en",
+  "cat": "上下文学习",
+  "source": "https://arxiv.org/html/2205.05055v1",
+  "via": "article",
+  "chars": 48331,
+  "figs": 5,
+  "file": "14_grokking.txt",
+  "images": [
+   {
+    "file": "14_grokking_01.png",
+    "w": 446,
+    "h": 264,
+    "bytes": 14748,
+    "src": "https://arxiv.org/html/2205.05055v1/model.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "14_grokking_02.png",
+    "w": 499,
+    "h": 234,
+    "bytes": 39101,
+    "src": "https://arxiv.org/html/2205.05055v1/train.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "14_grokking_03.png",
+    "w": 1362,
+    "h": 203,
+    "bytes": 75325,
+    "src": "https://arxiv.org/html/2205.05055v1/figures/results/class_variation/image_examples.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "14_grokking_04.png",
+    "w": 398,
+    "h": 223,
+    "bytes": 12682,
+    "src": "https://arxiv.org/html/2205.05055v1/figures/results/zipf_sweep/zipf_brown_corpus.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "14_grokking_05.png",
+    "w": 1500,
+    "h": 375,
+    "bytes": 33443,
+    "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+    "alt": "Simons Foundation International"
+   }
+  ]
+ },
+ {
+  "title": "Do Machine Learning Models Memorize or Generalize?",
+  "id": "15",
+  "lang": "en",
+  "cat": "交互科普",
+  "source": "https://pair.withgoogle.com/explorables/grokking/",
+  "via": "body",
+  "chars": 8408,
+  "figs": 0,
+  "file": "15_grokking.txt",
+  "images": []
+ },
+ {
+  "title": "A Spectral Theory of Grokking: Weight Decay Induces Feature Learning",
+  "id": "16",
+  "lang": "en",
+  "cat": "谱理论",
+  "source": "https://arxiv.org/html/2609.26679v1",
+  "via": "article",
+  "chars": 106965,
+  "figs": 4,
+  "file": "16_grokking.txt",
+  "images": [
+   {
+    "file": "16_grokking_01.png",
+    "w": 810,
+    "h": 690,
+    "bytes": 321074,
+    "src": "https://arxiv.org/html/2609.26679v1/figure_ntk_accuracy_eigenvectors.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "16_grokking_02.png",
+    "w": 811,
+    "h": 342,
+    "bytes": 88680,
+    "src": "https://arxiv.org/html/2609.26679v1/figure_mlp_phase_and_clock.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "16_grokking_03.png",
+    "w": 810,
+    "h": 306,
+    "bytes": 49848,
+    "src": "https://arxiv.org/html/2609.26679v1/figure_transformer_phase_and_clock.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "16_grokking_04.png",
+    "w": 1500,
+    "h": 375,
+    "bytes": 33443,
+    "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+    "alt": "Simons Foundation International"
+   }
+  ]
+ },
+ {
+  "title": "Circuit Synchronization Precedes Generalization: A Causal Precursor to Grokking",
+  "id": "17",
+  "lang": "en",
+  "cat": "因果前兆",
+  "source": "https://arxiv.org/html/2606.12966v1",
+  "via": "article",
+  "chars": 56084,
+  "figs": 7,
+  "file": "17_grokking.txt",
+  "images": [
+   {
+    "file": "17_grokking_01.png",
+    "w": 1367,
+    "h": 587,
+    "bytes": 38209,
+    "src": "https://arxiv.org/html/2606.12966v1/fig8_fsd_vs_exloss.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "17_grokking_02.png",
+    "w": 2179,
+    "h": 1975,
+    "bytes": 191911,
+    "src": "https://arxiv.org/html/2606.12966v1/fig5_two_phase_grokking.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "17_grokking_03.png",
+    "w": 1517,
+    "h": 587,
+    "bytes": 111664,
+    "src": "https://arxiv.org/html/2606.12966v1/fig7_wd_intervention.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "17_grokking_04.png",
+    "w": 1979,
+    "h": 1375,
+    "bytes": 157734,
+    "src": "https://arxiv.org/html/2606.12966v1/fig6_memorisation_trajectory.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "17_grokking_05.png",
+    "w": 917,
+    "h": 557,
+    "bytes": 43104,
+    "src": "https://arxiv.org/html/2606.12966v1/fig9_arch_ablation.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "17_grokking_06.png",
+    "w": 1517,
+    "h": 602,
+    "bytes": 109726,
+    "src": "https://arxiv.org/html/2606.12966v1/fig10_crossprime_timing.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "17_grokking_07.png",
+    "w": 1500,
+    "h": 375,
+    "bytes": 33443,
+    "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+    "alt": "Simons Foundation International"
+   }
+  ]
+ },
+ {
+  "title": "A Pre-Training Analogue of Grokking in Language Models: Delayed Grammatical Generalization",
+  "id": "18",
+  "lang": "en",
+  "cat": "语言模型迁移",
+  "source": "https://arxiv.org/html/2606.00230v1",
+  "via": "article",
+  "chars": 61272,
+  "figs": 11,
+  "file": "18_grokking.txt",
+  "images": [
+   {
+    "file": "18_grokking_01.png",
+    "w": 3204,
+    "h": 1629,
+    "bytes": 357917,
+    "src": "https://arxiv.org/html/2606.00230v1/result_plots/grokking_curves/combined_grokking_curves.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "18_grokking_02.png",
+    "w": 1967,
+    "h": 1048,
+    "bytes": 144407,
+    "src": "https://arxiv.org/html/2606.00230v1/result_plots/concept_vector_auc/concept_pref_auroc_dot.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "18_grokking_03.png",
+    "w": 1974,
+    "h": 1048,
+    "bytes": 187988,
+    "src": "https://arxiv.org/html/2606.00230v1/result_plots/spectral_rank_concepts/eff_rank_last_layer.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "18_grokking_04.png",
+    "w": 2998,
+    "h": 1385,
+    "bytes": 602580,
+    "src": "https://arxiv.org/html/2606.00230v1/result_plots/attention_plots/paper_attn_to_context_by_layer.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "18_grokking_05.png",
+    "w": 3272,
+    "h": 1611,
+    "bytes": 256239,
+    "src": "https://arxiv.org/html/2606.00230v1/result_plots/grokking_curves/35m_grokking.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "18_grokking_06.png",
+    "w": 3272,
+    "h": 1611,
+    "bytes": 196675,
+    "src": "https://arxiv.org/html/2606.00230v1/result_plots/grokking_curves/130m_grokking.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "18_grokking_07.png",
+    "w": 1967,
+    "h": 1048,
+    "bytes": 280593,
+    "src": "https://arxiv.org/html/2606.00230v1/result_plots/concept_vector_auc/concept_pref_auroc_dot_all_layers.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "18_grokking_08.png",
+    "w": 1974,
+    "h": 1048,
+    "bytes": 366452,
+    "src": "https://arxiv.org/html/2606.00230v1/result_plots/spectral_rank_concepts/eff_rank_all_layers.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "18_grokking_09.png",
+    "w": 2982,
+    "h": 1385,
+    "bytes": 554820,
+    "src": "https://arxiv.org/html/2606.00230v1/result_plots/attention_plots/paper_entropy_by_layer.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "18_grokking_10.png",
+    "w": 1297,
+    "h": 2033,
+    "bytes": 178918,
+    "src": "https://arxiv.org/html/2606.00230v1/combined_attention_heatmaps.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "18_grokking_11.png",
+    "w": 1500,
+    "h": 375,
+    "bytes": 33443,
+    "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+    "alt": "Simons Foundation International"
+   }
+  ]
+ },
+ {
+  "title": "What Does the Weight Norm Control in Grokking? Logit-Scale Mediation under Cross-Entropy",
+  "id": "19",
+  "lang": "en",
+  "cat": "权重范数",
+  "source": "https://arxiv.org/html/2606.18465v1",
+  "via": "article",
+  "chars": 52477,
+  "figs": 3,
+  "file": "19_grokking.txt",
+  "images": [
+   {
+    "file": "19_grokking_01.png",
+    "w": 1075,
+    "h": 524,
+    "bytes": 83855,
+    "src": "https://arxiv.org/html/2606.18465v1/fig_mediation.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "19_grokking_02.png",
+    "w": 1089,
+    "h": 524,
+    "bytes": 73287,
+    "src": "https://arxiv.org/html/2606.18465v1/fig_collapse.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "19_grokking_03.png",
+    "w": 1500,
+    "h": 375,
+    "bytes": 33443,
+    "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+    "alt": "Simons Foundation International"
+   }
+  ]
+ },
+ {
+  "title": "Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization",
+  "id": "20",
+  "lang": "en",
+  "cat": "研究工具",
+  "source": "https://arxiv.org/html/2609.20166v1",
+  "via": "article",
+  "chars": 31834,
+  "figs": 3,
+  "file": "20_grokking.txt",
+  "images": [
+   {
+    "file": "20_grokking_01.png",
+    "w": 996,
+    "h": 341,
+    "bytes": 212122,
+    "src": "https://arxiv.org/html/2609.20166v1/x1.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "20_grokking_02.png",
+    "w": 499,
+    "h": 398,
+    "bytes": 71552,
+    "src": "https://arxiv.org/html/2609.20166v1/x2.png",
+    "alt": "Refer to caption"
+   },
+   {
+    "file": "20_grokking_03.png",
+    "w": 1500,
+    "h": 375,
+    "bytes": 33443,
+    "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+    "alt": "Simons Foundation International"
+   }
+  ]
+ },
+ {
+  "title": "【文献精读】Explaining grokking through circuit efficiency",
+  "id": "21",
+  "lang": "zh",
+  "cat": "中文解读",
+  "source": "https://blog.csdn.net/weixin_54607024/article/details/148411515",
+  "via": "site:blog.csdn.net",
+  "chars": 9120,
+  "figs": 2,
+  "file": "21_grokking.txt",
+  "images": [
+   {
+    "file": "21_grokking_01.png",
+    "w": 1389,
+    "h": 759,
+    "bytes": 472398,
+    "src": "https://i-blog.csdnimg.cn/direct/0f447b4bd0d9408ea3a544b82e5636d3.png",
+    "alt": ""
+   },
+   {
+    "file": "21_grokking_02.png",
+    "w": 1369,
+    "h": 135,
+    "bytes": 29355,
+    "src": "https://i-blog.csdnimg.cn/direct/32a0ce15c82549438cb2db2204f8e31a.png",
+    "alt": ""
+   }
+  ]
+ },
+ {
+  "title": "神经网络Grokking现象的电路效率公式——揭秘学习飞跃的秘密",
+  "id": "22",
+  "lang": "zh",
+  "cat": "中文解读",
+  "source": "https://blog.csdn.net/qq_37148940/article/details/141947800",
+  "via": "site:blog.csdn.net",
+  "chars": 2724,
+  "figs": 6,
+  "file": "22_grokking.txt",
+  "images": [
+   {
+    "file": "22_grokking_01.png",
+    "w": 224,
+    "h": 224,
+    "bytes": 25192,
+    "src": "https://i-blog.csdnimg.cn/columns/default/20201014180756923.png?x-oss-process=image/resize,m_fixed,h_224,w_224",
+    "alt": ""
+   },
+   {
+    "file": "22_grokking_02.png",
+    "w": 224,
+    "h": 224,
+    "bytes": 23859,
+    "src": "https://i-blog.csdnimg.cn/columns/default/20201014180756919.png?x-oss-process=image/resize,m_fixed,h_224,w_224",
+    "alt": ""
+   },
+   {
+    "file": "22_grokking_03.gif",
+    "w": 806,
+    "h": 586,
+    "bytes": 6706482,
+    "src": "https://img-blog.csdnimg.cn/img_convert/2906907751b33dc1db514fe1dd94f76e.gif#pic_center",
+    "alt": "在这里插入图片描述"
+   },
+   {
+    "file": "22_grokking_04.png",
+    "w": 1086,
+    "h": 1292,
+    "bytes": 414545,
+    "src": "https://i-blog.csdnimg.cn/direct/6b19c81de20d445a942fcb6d45e8d1b9.png",
+    "alt": "在这里插入图片描述"
+   },
+   {
+    "file": "22_grokking_05.png",
+    "w": 1820,
+    "h": 1024,
+    "bytes": 7605,
+    "src": "https://csdnimg.cn/release/blogv2/dist/pc/img/arrowDownAttend.png",
+    "alt": ""
+   },
+   {
+    "file": "22_grokking_06.png",
+    "w": 2368,
+    "h": 1088,
+    "bytes": 2364025,
+    "src": "https://i-operation.csdnimg.cn/images/e6e7a35477544c888a142e19f7080c95.jpeg",
+    "alt": ""
+   }
+  ]
+ },
+ {
+  "title": "AI顿悟现象被破解：田渊栋研究揭示大模型开窍的数学原理",
+  "id": "23",
+  "lang": "zh",
+  "cat": "中文解读",
+  "source": "https://blog.csdn.net/2301_80239908/article/details/154192271",
+  "via": "site:blog.csdn.net",
+  "chars": 3910,
+  "figs": 14,
+  "file": "23_grokking.txt",
+  "images": [
+   {
+    "file": "23_grokking_01.png",
+    "w": 948,
+    "h": 343,
+    "bytes": 18179,
+    "src": "https://i-blog.csdnimg.cn/img_convert/e8102308584212e0535fa9c8ce28748e.jpeg",
+    "alt": ""
+   },
+   {
+    "file": "23_grokking_02.png",
+    "w": 794,
+    "h": 203,
+    "bytes": 58521,
+    "src": "https://i-blog.csdnimg.cn/img_convert/aa871e578c78beea8d3dda5bc4df8f3c.jpeg",
+    "alt": ""
+   },
+   {
+    "file": "23_grokking_03.png",
+    "w": 716,
+    "h": 213,
+    "bytes": 33779,
+    "src": "https://i-blog.csdnimg.cn/img_convert/2025611ea7ae54caf12aa3e67c8ea9a4.jpeg",
+    "alt": ""
+   },
+   {
+    "file": "23_grokking_04.png",
+    "w": 764,
+    "h": 249,
+    "bytes": 71849,
+    "src": "https://i-blog.csdnimg.cn/img_convert/7edac67b14f6a45e45e18b56905dbf5a.jpeg",
+    "alt": ""
+   },
+   {
+    "file": "23_grokking_05.png",
+    "w": 770,
+    "h": 439,
+    "bytes": 92394,
+    "src": "https://i-blog.csdnimg.cn/img_convert/af824faa63bb6ae4dc8408d2444fcdf6.jpeg",
+    "alt": ""
+   },
+   {
+    "file": "23_grokking_06.png",
+    "w": 782,
+    "h": 231,
+    "bytes": 85279,
+    "src": "https://i-blog.csdnimg.cn/img_convert/981cdcbe3b9a9584b31abff668791e36.jpeg",
+    "alt": ""
+   },
+   {
+    "file": "23_grokking_07.jpg",
+    "w": 2200,
+    "h": 2055,
+    "bytes": 1234843,
+    "src": "https://i-blog.csdnimg.cn/direct/f8f72f003f904a63b4e33514c0a31b2e.jpeg#pic_center",
+    "alt": "在这里插入图片描述"
+   },
+   {
+    "file": "23_grokking_08.png",
+    "w": 1030,
+    "h": 670,
+    "bytes": 216508,
+    "src": "https://i-blog.csdnimg.cn/direct/bbe35bb9b8e34bca8616aaebacef6ca2.png#pic_center",
+    "alt": "在这里插入图片描述"
+   },
+   {
+    "file": "23_grokking_09.jpg",
+    "w": 1465,
+    "h": 861,
+    "bytes": 409672,
+    "src": "https://i-blog.csdnimg.cn/direct/e414b6af83dc4d83ade84dd2e1951f7b.jpeg#pic_center",
+    "alt": "在这里插入图片描述"
+   },
+   {
+    "file": "23_grokking_10.jpg",
+    "w": 1480,
+    "h": 915,
+    "bytes": 397699,
+    "src": "https://i-blog.csdnimg.cn/direct/375720df216d43cc89bceaf4aab16bdf.jpeg#pic_center",
+    "alt": "在这里插入图片描述"
+   },
+   {
+    "file": "23_grokking_11.jpg",
+    "w": 1222,
+    "h": 850,
+    "bytes": 349242,
+    "src": "https://i-blog.csdnimg.cn/direct/fa5e8ed7566e4d60b7b5bd6debcf1728.jpeg#pic_center",
+    "alt": "在这里插入图片描述"
+   },
+   {
+    "file": "23_grokking_12.jpg",
+    "w": 1245,
+    "h": 746,
+    "bytes": 281689,
+    "src": "https://i-blog.csdnimg.cn/direct/fab5c15c712a42149475bc7b96188e4f.jpeg#pic_center",
+    "alt": "在这里插入图片描述"
+   },
+   {
+    "file": "23_grokking_13.jpg",
+    "w": 1222,
+    "h": 860,
+    "bytes": 341014,
+    "src": "https://i-blog.csdnimg.cn/direct/2a9ac26aa8244bc28d834ec3d1a2ab9d.jpeg#pic_center",
+    "alt": "在这里插入图片描述"
+   },
+   {
+    "file": "23_grokking_14.jpg",
+    "w": 1351,
+    "h": 853,
+    "bytes": 369305,
+    "src": "https://i-blog.csdnimg.cn/direct/a8e5a19e8e97446fa529cc53a9d79a43.jpeg#pic_center",
+    "alt": "在这里插入图片描述"
+   }
+  ]
+ },
+ {
+  "title": "Meta FAIR：大模型顿悟现象的数学机制被彻底破解",
+  "id": "24",
+  "lang": "zh",
+  "cat": "中文解读",
+  "source": "https://blog.csdn.net/2401_85390073/article/details/153398536",
+  "via": "site:blog.csdn.net",
+  "chars": 2805,
+  "figs": 12,
+  "file": "24_grokking.txt",
+  "images": [
+   {
+    "file": "24_grokking_01.jpg",
+    "w": 1080,
+    "h": 1082,
+    "bytes": 201148,
+    "src": "https://i-blog.csdnimg.cn/img_convert/e8f1f1099ca8aa11a644ef98ca5fd384.jpeg",
+    "alt": ""
+   },
+   {
+    "file": "24_grokking_02.jpg",
+    "w": 1080,
+    "h": 309,
+    "bytes": 47158,
+    "src": "https://i-blog.csdnimg.cn/img_convert/96220ea316bd4b56352717cb4bc6b8ad.jpeg",
+    "alt": ""
+   },
+   {
+    "file": "24_grokking_03.jpg",
+    "w": 822,
+    "h": 243,
+    "bytes": 27761,
+    "src": "https://i-blog.csdnimg.cn/img_convert/dd3aa52aefc51713cec770b107c4da7b.jpeg",
+    "alt": ""
+   },
+   {
+    "file": "24_grokking_04.jpg",
+    "w": 730,
+    "h": 176,
+    "bytes": 13988,
+    "src": "https://i-blog.csdnimg.cn/img_convert/b283e9f6df3bba3fd0048505b9f6e3f6.jpeg",
+    "alt": ""
+   },
+   {
+    "file": "24_grokking_05.jpg",
+    "w": 1080,
+    "h": 363,
+    "bytes": 45984,
+    "src": "https://i-blog.csdnimg.cn/img_convert/2a16e356d31495db82f57d8a5b95504f.jpeg",
+    "alt": ""
+   },
+   {
+    "file": "24_grokking_06.jpg",
+    "w": 1080,
+    "h": 622,
+    "bytes": 59269,
+    "src": "https://i-blog.csdnimg.cn/img_convert/2823bd8bcc44efa2a32ef28eb79eabec.jpeg",
+    "alt": ""
+   },
+   {
+    "file": "24_grokking_07.jpg",
+    "w": 1080,
+    "h": 481,
+    "bytes": 88735,
+    "src": "https://i-blog.csdnimg.cn/img_convert/c5037cbfe7bae58154260766177719f4.jpeg",
+    "alt": ""
+   },
+   {
+    "file": "24_grokking_08.jpg",
+    "w": 1920,
+    "h": 1080,
+    "bytes": 422232,
+    "src": "https://i-blog.csdnimg.cn/blog_migrate/3c3a284aea75af128b0d778ce659e582.jpeg#pic_center",
+    "alt": "在这里插入图片描述"
+   },
+   {
+    "file": "24_grokking_09.png",
+    "w": 1454,
+    "h": 1942,
+    "bytes": 2062187,
+    "src": "https://i-blog.csdnimg.cn/blog_migrate/26837cac94c3b677bad169b26a9e1e46.png",
+    "alt": "在这里插入图片描述"
+   },
+   {
+    "file": "24_grokking_10.jpg",
+    "w": 1242,
+    "h": 1660,
+    "bytes": 514134,
+    "src": "https://i-blog.csdnimg.cn/blog_migrate/542f58910ba9a5939dc266222e08e2ce.jpeg#pic_center",
+    "alt": "在这里插入图片描述"
+   },
+   {
+    "file": "24_grokking_11.jpg",
+    "w": 1242,
+    "h": 1660,
+    "bytes": 561669,
+    "src": "https://i-blog.csdnimg.cn/blog_migrate/c400d99382638099028a1e0493884952.jpeg#pic_center",
+    "alt": "在这里插入图片描述"
+   },
+   {
+    "file": "24_grokking_12.png",
+    "w": 2368,
+    "h": 1088,
+    "bytes": 2364025,
+    "src": "https://i-operation.csdnimg.cn/images/e6e7a35477544c888a142e19f7080c95.jpeg",
+    "alt": ""
+   }
+  ]
+ },
+ {
+  "title": "机器学习模型的grokking是记忆还是泛化",
+  "id": "29",
+  "lang": "zh",
+  "cat": "中文解读",
+  "source": "https://blog.aicoco.net/2023/08/08/grokking/",
+  "via": "body",
+  "chars": 1047,
+  "figs": 0,
+  "file": "29_grokking.txt",
+  "images": []
+ },
+ {
+  "title": "AI「领悟」有理论解释了，谷歌：两种脑回路内部竞争",
+  "id": "30",
+  "lang": "zh",
+  "cat": "科技媒体",
+  "source": "https://www.36kr.com/p/2437259014263168",
+  "via": "site:36kr.com",
+  "chars": 1288,
+  "figs": 15,
+  "file": "30_grokking.txt",
+  "images": [
+   {
+    "file": "30_grokking_01.jpg",
+    "w": 1080,
+    "h": 855,
+    "bytes": 99166,
+    "src": "https://img.36krcdn.com/hsossms/20230918/v2_d935d22d8b644fab81af2f8d85c83ed0@46958_oswg388783oswg1080oswg855_img_000?x-oss-process=image/format,jpg/interlace,1/format,jpg/interlace,1",
+    "alt": ""
+   },
+   {
+    "file": "30_grokking_02.jpg",
+    "w": 1080,
+    "h": 251,
+    "bytes": 26999,
+    "src": "https://img.36krcdn.com/hsossms/20230918/v2_d67a6f7213934e928456f7bce9e4dba8@46958_oswg94991oswg1080oswg251_img_000?x-oss-process=image/format,jpg/interlace,1/format,jpg/interlace,1",
+    "alt": ""
+   },
+   {
+    "file": "30_grokking_03.jpg",
+    "w": 806,
+    "h": 586,
+    "bytes": 83056,
+    "src": "https://img.36krcdn.com/hsossms/20230918/v2_f789593c19e44edaa789791757ebc3c9@46958_img_000?x-oss-process=image/format,jpg/interlace,1/format,jpg/interlace,1",
+    "alt": ""
+   },
+   {
+    "file": "30_grokking_04.jpg",
+    "w": 1068,
+    "h": 348,
+    "bytes": 55718,
+    "src": "https://img.36krcdn.com/hsossms/20230918/v2_ebed8f7df83c4a1696147c80b9680277@46958_oswg101546oswg1068oswg348_img_000?x-oss-process=image/format,jpg/interlace,1/format,jpg/interlace,1",
+    "alt": ""
+   },
+   {
+    "file": "30_grokking_05.jpg",
+    "w": 1056,
+    "h": 316,
+    "bytes": 54195,
+    "src": "https://img.36krcdn.com/hsossms/20230918/v2_20437cf0165c4fa29302250332c429b7@46958_oswg171234oswg1056oswg316_img_000?x-oss-process=image/format,jpg/interlace,1/format,jpg/interlace,1",
+    "alt": ""
+   },
+   {
+    "file": "30_grokking_06.jpg",
+    "w": 1032,
+    "h": 1052,
+    "bytes": 64344,
+    "src": "https://img.36krcdn.com/hsossms/20230918/v2_c8af2e258dbe4b3b8cf5ece62b7daf09@46958_oswg306368oswg1032oswg1052_img_000?x-oss-process=image/format,jpg/interlace,1/format,jpg/interlace,1",
+    "alt": ""
+   },
+   {
+    "file": "30_grokking_07.jpg",
+    "w": 586,
+    "h": 416,
+    "bytes": 15390,
+    "src": "https://img.36krcdn.com/hsossms/20230918/v2_ae20be2ec76145808fa2628b84be8080@46958_oswg115601oswg586oswg416_img_000?x-oss-process=image/format,jpg/interlace,1/format,jpg/interlace,1",
+    "alt": ""
+   },
+   {
+    "file": "30_grokking_08.jpg",
+    "w": 1080,
+    "h": 1043,
+    "bytes": 63740,
+    "src": "https://img.36krcdn.com/hsossms/20230918/v2_8d44f59bd511449d858707a3b2233c65@46958_oswg297598oswg1080oswg1043_img_000?x-oss-process=image/format,jpg/interlace,1/format,jpg/interlace,1",
+    "alt": ""
+   },
+   {
+    "file": "30_grokking_09.jpg",
+    "w": 1080,
+    "h": 872,
+    "bytes": 61510,
+    "src": "https://img.36krcdn.com/hsossms/20230918/v2_a61a1af1f03b4b4ea099c6db9ea1779c@46958_oswg275209oswg1080oswg872_img_000?x-oss-process=image/format,jpg/interlace,1/format,jpg/interlace,1",
+    "alt": ""
+   },
+   {
+    "file": "30_grokking_10.jpg",
+    "w": 1080,
+    "h": 300,
+    "bytes": 55623,
+    "src": "https://img.36krcdn.com/hsossms/20230918/v2_2dcc8feff24241b39a6ae8efe55a10a3@46958_oswg79200oswg1080oswg300_img_000?x-oss-process=image/format,jpg/interlace,1/format,jpg/interlace,1",
+    "alt": ""
+   },
+   {
+    "file": "30_grokking_11.jpg",
+    "w": 1080,
+    "h": 303,
+    "bytes": 41936,
+    "src": "https://img.36krcdn.com/hsossms/20230918/v2_a59e2da3994243568ede3a51fe15842e@46958_oswg138187oswg1080oswg303_img_000?x-oss-process=image/format,jpg/interlace,1/format,jpg/interlace,1",
+    "alt": ""
+   },
+   {
+    "file": "30_grokking_12.png",
+    "w": 400,
+    "h": 400,
+    "bytes": 6723,
+    "src": "https://staticx.36krcdn.com/36kr-web/static/code_production.72d61993.png",
+    "alt": ""
+   },
+   {
+    "file": "30_grokking_13.jpg",
+    "w": 900,
+    "h": 900,
+    "bytes": 81092,
+    "src": "https://staticx.36krcdn.com/36kr-web/static/kr.ad0c1158.jpg",
+    "alt": ""
+   },
+   {
+    "file": "30_grokking_14.jpg",
+    "w": 430,
+    "h": 430,
+    "bytes": 29315,
+    "src": "https://staticx.36krcdn.com/36kr-web/static/jingzhun.9a251862.jpg",
+    "alt": ""
+   },
+   {
+    "file": "30_grokking_15.jpg",
+    "w": 900,
+    "h": 900,
+    "bytes": 83166,
+    "src": "https://staticx.36krcdn.com/36kr-web/static/krSpace.7efbe7d3.jpg",
+    "alt": ""
+   }
+  ]
+ },
+ {
+  "title": "训练越久，模型反而越会泛化吗？理解 Grokking 现象",
+  "id": "31",
+  "lang": "zh",
+  "cat": "中文解读",
+  "source": "https://blog.csdn.net/transformer_WSZ/article/details/164146375",
+  "via": "site:blog.csdn.net",
+  "chars": 5689,
+  "figs": 3,
+  "file": "31_grokking.txt",
+  "images": [
+   {
+    "file": "31_grokking_01.png",
+    "w": 224,
+    "h": 224,
+    "bytes": 39049,
+    "src": "https://i-blog.csdnimg.cn/columns/default/20201014180756916.png?x-oss-process=image/resize,m_fixed,h_224,w_224",
+    "alt": ""
+   },
+   {
+    "file": "31_grokking_02.png",
+    "w": 1002,
+    "h": 730,
+    "bytes": 112283,
+    "src": "https://i-blog.csdnimg.cn/direct/6b2efdeda5494749aa618d55aab6fd38.png",
+    "alt": "grok"
+   },
+   {
+    "file": "31_grokking_03.png",
+    "w": 2368,
+    "h": 1088,
+    "bytes": 2364025,
+    "src": "https://i-operation.csdnimg.cn/images/e6e7a35477544c888a142e19f7080c95.jpeg",
+    "alt": ""
+   }
+  ]
+ },
+ {
+  "title": "大模型的涌现能力：现象、表现与成因解析",
+  "id": "32",
+  "lang": "zh",
+  "cat": "中文解读",
+  "source": "https://blog.csdn.net/qq_16242613/article/details/149134614",
+  "via": "site:blog.csdn.net",
+  "chars": 3355,
+  "figs": 4,
+  "file": "32_grokking.txt",
+  "images": [
+   {
+    "file": "32_grokking_01.png",
+    "w": 224,
+    "h": 224,
+    "bytes": 19060,
+    "src": "https://i-blog.csdnimg.cn/columns/default/20201014180756922.png?x-oss-process=image/resize,m_fixed,h_224,w_224",
+    "alt": ""
+   },
+   {
+    "file": "32_grokking_02.gif",
+    "w": 1080,
+    "h": 300,
+    "bytes": 190536,
+    "src": "https://i-blog.csdnimg.cn/direct/3c03ef62ac754f839f499605f2789c6e.gif#pic_center",
+    "alt": "在这里插入图片描述"
+   },
+   {
+    "file": "32_grokking_03.png",
+    "w": 1820,
+    "h": 1024,
+    "bytes": 7605,
+    "src": "https://csdnimg.cn/release/blogv2/dist/pc/img/arrowDownAttend.png",
+    "alt": ""
+   },
+   {
+    "file": "32_grokking_04.png",
+    "w": 2368,
+    "h": 1088,
+    "bytes": 2364025,
+    "src": "https://i-operation.csdnimg.cn/images/e6e7a35477544c888a142e19f7080c95.jpeg",
+    "alt": ""
+   }
+  ]
+ },
+ {
+  "title": "神经网络训练到最后，权重到底经历了什么",
+  "id": "33",
+  "lang": "zh",
+  "cat": "中文解读",
+  "source": "https://blog.csdn.net/weixin_49122920/article/details/165491623",
+  "via": "site:blog.csdn.net",
+  "chars": 8577,
+  "figs": 2,
+  "file": "33_grokking.txt",
+  "images": [
+   {
+    "file": "33_grokking_01.png",
+    "w": 1200,
+    "h": 648,
+    "bytes": 193014,
+    "src": "https://i-blog.csdnimg.cn/img_convert/1f4953d05b972aca5eae7795d8054f05.png",
+    "alt": ""
+   },
+   {
+    "file": "33_grokking_02.png",
+    "w": 2368,
+    "h": 1088,
+    "bytes": 2364025,
+    "src": "https://i-operation.csdnimg.cn/images/e6e7a35477544c888a142e19f7080c95.jpeg",
+    "alt": ""
+   }
+  ]
+ },
+ {
+  "title": "RL Grokking：RL如何解锁LLM中的新推理策略",
+  "id": "34",
+  "lang": "zh",
+  "cat": "中文解读",
+  "source": "https://blog.csdn.net/cyril_ki/article/details/153819664",
+  "via": "site:blog.csdn.net",
+  "chars": 5737,
+  "figs": 7,
+  "file": "34_grokking.txt",
+  "images": [
+   {
+    "file": "34_grokking_01.png",
+    "w": 224,
+    "h": 224,
+    "bytes": 41596,
+    "src": "https://i-blog.csdnimg.cn/blog_column_migrate/cd5e07472906b7c6c5b3b0f697874457.png?x-oss-process=image/resize,m_fixed,h_224,w_224",
+    "alt": ""
+   },
+   {
+    "file": "34_grokking_02.png",
+    "w": 750,
+    "h": 279,
+    "bytes": 47410,
+    "src": "https://i-blog.csdnimg.cn/direct/1a5b483c825540eb928f85154794e9c1.png#pic_center",
+    "alt": "在这里插入图片描述"
+   },
+   {
+    "file": "34_grokking_03.png",
+    "w": 742,
+    "h": 510,
+    "bytes": 154063,
+    "src": "https://i-blog.csdnimg.cn/direct/73a04d3cb1ca47eb85ffd06e7dbfc1e3.png#pic_center",
+    "alt": "在这里插入图片描述"
+   },
+   {
+    "file": "34_grokking_04.png",
+    "w": 319,
+    "h": 396,
+    "bytes": 56311,
+    "src": "https://i-blog.csdnimg.cn/direct/b60e605b7abf4fce80fe595f810fb41e.png#pic_center",
+    "alt": "在这里插入图片描述"
+   },
+   {
+    "file": "34_grokking_05.png",
+    "w": 549,
+    "h": 233,
+    "bytes": 40394,
+    "src": "https://i-blog.csdnimg.cn/direct/04939b3f39054091bc66305b8c309cf0.png#pic_center",
+    "alt": "在这里插入图片描述"
+   },
+   {
+    "file": "34_grokking_06.png",
+    "w": 734,
+    "h": 404,
+    "bytes": 115073,
+    "src": "https://i-blog.csdnimg.cn/direct/5d805397097d4c66a61d6c1edc4a0ea1.png#pic_center",
+    "alt": "在这里插入图片描述"
+   },
+   {
+    "file": "34_grokking_07.png",
+    "w": 2368,
+    "h": 1088,
+    "bytes": 2364025,
+    "src": "https://i-operation.csdnimg.cn/images/e6e7a35477544c888a142e19f7080c95.jpeg",
+    "alt": ""
+   }
+  ]
+ },
+ {
+  "title": "AI的顿悟时刻：大模型能力涌现的临界点与相变机制",
+  "id": "36",
+  "lang": "zh",
+  "cat": "中文解读",
+  "source": "https://blog.csdn.net/tsh2005974tsh/article/details/163198133",
+  "via": "site:blog.csdn.net",
+  "chars": 17197,
+  "figs": 3,
+  "file": "36_grokking.txt",
+  "images": [
+   {
+    "file": "36_grokking_01.png",
+    "w": 960,
+    "h": 540,
+    "bytes": 100440,
+    "src": "https://i-blog.csdnimg.cn/direct/d6032f179e8244a297474657e700ad7c.png#pic_center",
+    "alt": "在这里插入图片描述"
+   },
+   {
+    "file": "36_grokking_02.png",
+    "w": 1820,
+    "h": 1024,
+    "bytes": 7605,
+    "src": "https://csdnimg.cn/release/blogv2/dist/pc/img/arrowDownAttend.png",
+    "alt": ""
+   },
+   {
+    "file": "36_grokking_03.png",
+    "w": 2368,
+    "h": 1088,
+    "bytes": 2364025,
+    "src": "https://i-operation.csdnimg.cn/images/e6e7a35477544c888a142e19f7080c95.jpeg",
+    "alt": ""
+   }
+  ]
+ },
+ {
+  "title": "In-Context Learning and Induction Heads",
+  "id": "37",
+  "lang": "en",
+  "cat": "训练相变",
+  "source": "https://transformer-circuits.pub/2022/in-context-learning-and-induction-heads/index.html",
+  "via": "body",
+  "chars": 124562,
+  "figs": 0,
+  "file": "37_grokking.txt",
+  "images": []
+ },
+ {
+  "title": "Zoom In: An Introduction to Circuits",
+  "id": "38",
+  "lang": "en",
+  "cat": "机制背景",
+  "source": "https://distill.pub/2020/circuits/zoom-in/",
+  "via": "body",
+  "chars": 59672,
+  "figs": 32,
+  "file": "38_grokking.txt",
+  "images": [
+   {
+    "file": "38_grokking_01.png",
+    "w": 2270,
+    "h": 1046,
+    "bytes": 935603,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/car-circuit.png",
+    "alt": "Hooke’s Micrographia revealed a rich microscopic world as seen\n through a microscope, including the initial discovery of cells.\n \nImages from the National Library of Wales."
+   },
+   {
+    "file": "38_grokking_02.jpg",
+    "w": 1776,
+    "h": 784,
+    "bytes": 600786,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/micrographia2.jpg",
+    "alt": "Over the last few years, we’ve seen many incredible visualizations and analyses hinting at a rich world of internal features in modern\n neural networks. Above, we see a DeepDream image, which sparked a great deal of excitement in this space."
+   },
+   {
+    "file": "38_grokking_03.jpg",
+    "w": 1624,
+    "h": 540,
+    "bytes": 363214,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/deepdream.jpg",
+    "alt": ""
+   },
+   {
+    "file": "38_grokking_04.jpg",
+    "w": 478,
+    "h": 720,
+    "bytes": 86058,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/schwann-book.jpg",
+    "alt": ""
+   },
+   {
+    "file": "38_grokking_05.png",
+    "w": 558,
+    "h": 828,
+    "bytes": 809118,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/atlas-book-crop.png",
+    "alt": ""
+   },
+   {
+    "file": "38_grokking_06.png",
+    "w": 2530,
+    "h": 802,
+    "bytes": 1944569,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/curves.png",
+    "alt": "4e:55 is a polysemantic neuron which responds to cat faces, fronts of cars, and cat legs. It was discussed in more depth in Feature Visualization ."
+   },
+   {
+    "file": "38_grokking_07.png",
+    "w": 207,
+    "h": 208,
+    "bytes": 73446,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/arg-fv.png",
+    "alt": ""
+   },
+   {
+    "file": "38_grokking_08.png",
+    "w": 660,
+    "h": 656,
+    "bytes": 335727,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/arg-data.png",
+    "alt": "The raw weights between the early curve detector and late curve detector in the same orientation are a curve of positive weights surrounded by small negative or zero weights."
+   },
+   {
+    "file": "38_grokking_09.png",
+    "w": 312,
+    "h": 312,
+    "bytes": 6718,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/arg-synthetic.png",
+    "alt": "This can be interpreted as looking for “tangent curves”\nat each point along the curve."
+   },
+   {
+    "file": "38_grokking_10.png",
+    "w": 272,
+    "h": 284,
+    "bytes": 31775,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/arg-tune.png",
+    "alt": ""
+   },
+   {
+    "file": "38_grokking_11.png",
+    "w": 280,
+    "h": 276,
+    "bytes": 143075,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/arg-use.png",
+    "alt": ""
+   },
+   {
+    "file": "38_grokking_12.png",
+    "w": 370,
+    "h": 370,
+    "bytes": 96986,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/arg-hand.png",
+    "alt": ""
+   },
+   {
+    "file": "38_grokking_13.png",
+    "w": 1952,
+    "h": 438,
+    "bytes": 779377,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/high-low.png",
+    "alt": ""
+   },
+   {
+    "file": "38_grokking_14.png",
+    "w": 1242,
+    "h": 376,
+    "bytes": 484455,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/dog-pose.png",
+    "alt": ""
+   },
+   {
+    "file": "38_grokking_15.png",
+    "w": 1886,
+    "h": 604,
+    "bytes": 1357859,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/polysemantic.png",
+    "alt": ""
+   },
+   {
+    "file": "38_grokking_16.png",
+    "w": 3134,
+    "h": 1012,
+    "bytes": 1945081,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/curve-circuit.png",
+    "alt": "Curve detectors"
+   },
+   {
+    "file": "38_grokking_17.png",
+    "w": 1302,
+    "h": 580,
+    "bytes": 173248,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/curve-weights-a.png",
+    "alt": "High-Low Frequency detectors"
+   },
+   {
+    "file": "38_grokking_18.png",
+    "w": 970,
+    "h": 440,
+    "bytes": 278201,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/curve-weights-b.png",
+    "alt": ""
+   },
+   {
+    "file": "38_grokking_19.png",
+    "w": 920,
+    "h": 1160,
+    "bytes": 504145,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/curve-orientations-a.png",
+    "alt": ""
+   },
+   {
+    "file": "38_grokking_20.png",
+    "w": 798,
+    "h": 1016,
+    "bytes": 397325,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/curve-orientations-b.png",
+    "alt": ""
+   },
+   {
+    "file": "38_grokking_21.png",
+    "w": 3030,
+    "h": 1860,
+    "bytes": 2806095,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/dog-circuit-2.png",
+    "alt": ""
+   },
+   {
+    "file": "38_grokking_22.png",
+    "w": 1676,
+    "h": 1058,
+    "bytes": 1071880,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/oriented-dog-heads.png",
+    "alt": ""
+   },
+   {
+    "file": "38_grokking_23.png",
+    "w": 1296,
+    "h": 1202,
+    "bytes": 666890,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/dog-merge.png",
+    "alt": ""
+   },
+   {
+    "file": "38_grokking_24.png",
+    "w": 2194,
+    "h": 1136,
+    "bytes": 916227,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/superposition.png",
+    "alt": ""
+   },
+   {
+    "file": "38_grokking_25.png",
+    "w": 227,
+    "h": 227,
+    "bytes": 86087,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/universality/curves/AlexNet/unit-0.png",
+    "alt": ""
+   },
+   {
+    "file": "38_grokking_26.png",
+    "w": 227,
+    "h": 227,
+    "bytes": 86431,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/universality/curves/AlexNet/unit-1.png",
+    "alt": ""
+   },
+   {
+    "file": "38_grokking_27.png",
+    "w": 227,
+    "h": 227,
+    "bytes": 87661,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/universality/curves/AlexNet/unit-2.png",
+    "alt": ""
+   },
+   {
+    "file": "38_grokking_28.png",
+    "w": 227,
+    "h": 227,
+    "bytes": 85867,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/universality/curves/AlexNet/unit-3.png",
+    "alt": ""
+   },
+   {
+    "file": "38_grokking_29.png",
+    "w": 224,
+    "h": 224,
+    "bytes": 87499,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/universality/curves/GoogLeNet/unit-0.png",
+    "alt": ""
+   },
+   {
+    "file": "38_grokking_30.png",
+    "w": 224,
+    "h": 224,
+    "bytes": 87709,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/universality/curves/GoogLeNet/unit-1.png",
+    "alt": ""
+   },
+   {
+    "file": "38_grokking_31.png",
+    "w": 224,
+    "h": 224,
+    "bytes": 95904,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/universality/curves/GoogLeNet/unit-2.png",
+    "alt": ""
+   },
+   {
+    "file": "38_grokking_32.png",
+    "w": 224,
+    "h": 224,
+    "bytes": 93064,
+    "src": "https://distill.pub/2020/circuits/zoom-in/images/universality/curves/GoogLeNet/unit-3.png",
+    "alt": ""
+   }
+  ]
+ },
+ {
+  "title": "为什么小数据集上神经网络会突然开窍？揭秘Grokking背后的LU机制",
+  "id": "43",
+  "lang": "zh",
+  "cat": "中文解读",
+  "source": "https://blog.csdn.net/weixin_29168153/article/details/159631309",
+  "via": "site:blog.csdn.net",
+  "chars": 2095,
+  "figs": 1,
+  "file": "43_grokking.txt",
+  "images": [
+   {
+    "file": "43_grokking_01.png",
+    "w": 2368,
+    "h": 1088,
+    "bytes": 2364025,
+    "src": "https://i-operation.csdnimg.cn/images/e6e7a35477544c888a142e19f7080c95.jpeg",
+    "alt": ""
+   }
+  ]
+ },
+ {
+  "title": "Grokking与Double Descent：现代神经网络的泛化新范式",
+  "id": "45",
+  "lang": "zh",
+  "cat": "中文解读",
+  "source": "https://blog.csdn.net/weixin_42544663/article/details/162378216",
+  "via": "site:blog.csdn.net",
+  "chars": 2612,
+  "figs": 2,
+  "file": "45_grokking.txt",
+  "images": [
+   {
+    "file": "45_grokking_01.png",
+    "w": 942,
+    "h": 144,
+    "bytes": 121888,
+    "src": "https://i-operation.csdnimg.cn/images/9b8d0d477b4d448787612f4a30dc7431.png",
+    "alt": ""
+   },
+   {
+    "file": "45_grokking_02.png",
+    "w": 2368,
+    "h": 1088,
+    "bytes": 2364025,
+    "src": "https://i-operation.csdnimg.cn/images/e6e7a35477544c888a142e19f7080c95.jpeg",
+    "alt": ""
+   }
+  ]
+ },
+ {
+  "title": "Grokking与双下降：深度学习中的结构发现与泛化新范式",
+  "id": "46",
+  "lang": "zh",
+  "cat": "中文解读",
+  "source": "https://blog.csdn.net/weixin_33724570/article/details/86334239",
+  "via": "site:blog.csdn.net",
+  "chars": 10780,
+  "figs": 1,
+  "file": "46_grokking.txt",
+  "images": [
+   {
+    "file": "46_grokking_01.png",
+    "w": 2368,
+    "h": 1088,
+    "bytes": 2364025,
+    "src": "https://i-operation.csdnimg.cn/images/e6e7a35477544c888a142e19f7080c95.jpeg",
+    "alt": ""
+   }
+  ]
+ },
+ {
+  "title": "Grokfast 加速理解：通过放大缓慢梯度加速训练指南",
+  "id": "48",
+  "lang": "zh",
+  "cat": "工程实践",
+  "source": "https://blog.csdn.net/gitblog_00601/article/details/141552086",
+  "via": "site:blog.csdn.net",
+  "chars": 1824,
+  "figs": 0,
+  "file": "48_grokking.txt",
+  "images": []
+ },
+ {
+  "title": "Axolotl 中的 Grokfast 集成：用慢梯度放大加速 Grokking 收敛",
+  "id": "49",
+  "lang": "zh",
+  "cat": "工程实践",
+  "source": "https://blog.csdn.net/gitblog_00601/article/details/163664694",
+  "via": "site:blog.csdn.net",
+  "chars": 5281,
+  "figs": 0,
+  "file": "49_grokking.txt",
+  "images": []
+ },
+ {
+  "title": "Grokking现象为什么不能泛化到第二跳推理",
+  "id": "52",
+  "lang": "zh",
+  "cat": "中文解读",
+  "source": "https://blog.csdn.net/xian_ren008/article/details/148923484",
+  "via": "site:blog.csdn.net",
+  "chars": 8691,
+  "figs": 13,
+  "file": "52_grokking.txt",
+  "images": [
+   {
+    "file": "52_grokking_01.png",
+    "w": 224,
+    "h": 224,
+    "bytes": 39049,
+    "src": "https://i-blog.csdnimg.cn/columns/default/20201014180756916.png?x-oss-process=image/resize,m_fixed,h_224,w_224",
+    "alt": ""
+   },
+   {
+    "file": "52_grokking_02.png",
+    "w": 1076,
+    "h": 680,
+    "bytes": 317972,
+    "src": "https://i-blog.csdnimg.cn/direct/b2a6b98574f740f98547916874f1ec1e.png",
+    "alt": ""
+   },
+   {
+    "file": "52_grokking_03.png",
+    "w": 1802,
+    "h": 700,
+    "bytes": 459492,
+    "src": "https://i-blog.csdnimg.cn/direct/1327add7e726406faba76006a8f5e0a0.png",
+    "alt": ""
+   },
+   {
+    "file": "52_grokking_04.png",
+    "w": 1860,
+    "h": 1066,
+    "bytes": 680952,
+    "src": "https://i-blog.csdnimg.cn/direct/bec76c871df344e2a553beca5e42a3e0.png",
+    "alt": ""
+   },
+   {
+    "file": "52_grokking_05.png",
+    "w": 1800,
+    "h": 838,
+    "bytes": 538107,
+    "src": "https://i-blog.csdnimg.cn/direct/fe31a5f59dea4e4e842c30b8efb8a66e.png",
+    "alt": ""
+   },
+   {
+    "file": "52_grokking_06.png",
+    "w": 1826,
+    "h": 788,
+    "bytes": 541516,
+    "src": "https://i-blog.csdnimg.cn/direct/36881298f192403da1fc0a8b36204298.png",
+    "alt": ""
+   },
+   {
+    "file": "52_grokking_07.png",
+    "w": 1728,
+    "h": 632,
+    "bytes": 375080,
+    "src": "https://i-blog.csdnimg.cn/direct/bc039e63f83c4013bc5f81f301f3b219.png",
+    "alt": ""
+   },
+   {
+    "file": "52_grokking_08.png",
+    "w": 1740,
+    "h": 1084,
+    "bytes": 591115,
+    "src": "https://i-blog.csdnimg.cn/direct/bf29b8bf314f4debad65db8096361029.png",
+    "alt": ""
+   },
+   {
+    "file": "52_grokking_09.png",
+    "w": 1730,
+    "h": 876,
+    "bytes": 631257,
+    "src": "https://i-blog.csdnimg.cn/direct/abcd6b3700374720991822f6a893cac9.png",
+    "alt": ""
+   },
+   {
+    "file": "52_grokking_10.png",
+    "w": 1812,
+    "h": 976,
+    "bytes": 803159,
+    "src": "https://i-blog.csdnimg.cn/direct/d009f066149a4645b0faa685602041f3.png",
+    "alt": ""
+   },
+   {
+    "file": "52_grokking_11.png",
+    "w": 1832,
+    "h": 1018,
+    "bytes": 746677,
+    "src": "https://i-blog.csdnimg.cn/direct/fdcfacc0f4e54a7cb89a48d8022f02fd.png",
+    "alt": ""
+   },
+   {
+    "file": "52_grokking_12.png",
+    "w": 1826,
+    "h": 826,
+    "bytes": 635235,
+    "src": "https://i-blog.csdnimg.cn/direct/4caca63fe3094e2cbec8aca5624c5b70.png",
+    "alt": ""
+   },
+   {
+    "file": "52_grokking_13.png",
+    "w": 1912,
+    "h": 850,
+    "bytes": 561236,
+    "src": "https://i-blog.csdnimg.cn/direct/e9456f514ae94278bb3558ba4b3ce226.png",
+    "alt": ""
+   }
+  ]
+ }
+]

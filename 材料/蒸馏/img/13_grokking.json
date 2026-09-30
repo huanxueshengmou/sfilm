@@ -1,0 +1,74 @@
+[
+ {
+  "file": "13_grokking_01.png",
+  "w": 1617,
+  "h": 1096,
+  "bytes": 151455,
+  "src": "https://arxiv.org/html/2304.15004v1/figures/wei_2022_emergence/wei_2022_emergence_fig2.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "13_grokking_02.png",
+  "w": 1981,
+  "h": 1177,
+  "bytes": 199196,
+  "src": "https://arxiv.org/html/2304.15004v1/toy_analytical_model_try2.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "13_grokking_03.png",
+  "w": 1860,
+  "h": 1375,
+  "bytes": 324668,
+  "src": "https://arxiv.org/html/2304.15004v1/figures/gpt3_integer_multiplication/multiplication_acc_log_vs_model_size_by_temp_by_target_str_len.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "13_grokking_04.png",
+  "w": 1860,
+  "h": 1375,
+  "bytes": 343912,
+  "src": "https://arxiv.org/html/2304.15004v1/figures/gpt3_integer_addition/addition_acc_log_vs_model_size_by_temp_by_target_str_len.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "13_grokking_05.png",
+  "w": 1509,
+  "h": 1381,
+  "bytes": 97397,
+  "src": "https://arxiv.org/html/2304.15004v1/figures/big_bench_emergent_tasks/emergence_percent_pie.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "13_grokking_06.png",
+  "w": 1778,
+  "h": 1381,
+  "bytes": 142173,
+  "src": "https://arxiv.org/html/2304.15004v1/figures/big_bench_emergent_tasks/metric_given_emergent_pie.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "13_grokking_07.png",
+  "w": 4493,
+  "h": 1466,
+  "bytes": 288703,
+  "src": "https://arxiv.org/html/2304.15004v1/figures/big_bench_emergent_tasks/score_vs_model_size_by_task_split_shot_other_metric=multiple_choice_grade.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "13_grokking_08.png",
+  "w": 4494,
+  "h": 1466,
+  "bytes": 270109,
+  "src": "https://arxiv.org/html/2304.15004v1/figures/big_bench_emergent_tasks/score_vs_model_size_by_task_split_shot_other_metric=calibration_multiple_choice_brier_score.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "13_grokking_09.png",
+  "w": 1500,
+  "h": 375,
+  "bytes": 33443,
+  "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+  "alt": "Simons Foundation International"
+ }
+]

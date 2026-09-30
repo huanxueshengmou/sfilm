@@ -1,0 +1,40 @@
+id	lang	category	chars	figures	title	source
+01	en	经典起点	32308	12	Grokking: Generalization Beyond Overfitting on Small Algorithmic Datasets	https://arxiv.org/html/2201.02177v1
+02	en	机制可解释性	121264	18	Progress Measures for Grokking via Mechanistic Interpretability	https://arxiv.org/html/2301.05217v1
+03	en	有效理论	48373	13	Omnigrok: Grokking Beyond Algorithmic Data	https://arxiv.org/html/2210.01117v1
+04	en	有效理论	68190	21	Towards Understanding Grokking: An Effective Theory of Representation Learning	https://arxiv.org/html/2205.10343v1
+05	en	隐式进展	186567	11	Hidden Progress in Deep Learning: SGD Learns Parities Near the Computational Limit	https://arxiv.org/html/2207.08799v1
+06	en	子网络竞争	26315	2	A Tale of Two Circuits: Grokking as Competition of Sparse and Dense Subnetworks	https://arxiv.org/html/2303.11873v1
+07	en	电路效率	102620	11	Explaining Grokking Through Circuit Efficiency	https://arxiv.org/html/2309.02390v1
+08	en	与双下降统一	27502	3	Unifying Grokking and Double Descent	https://arxiv.org/html/2303.06173v1
+09	en	动力学区制	73559	5	Grokking as the Transition from Lazy to Rich Training Dynamics	https://arxiv.org/html/2310.06110v1
+10	en	突降相变	93254	3	Sudden Drops in the Loss: Syntax Acquisition, Phase Transitions, and Simplicity Bias in MLMs	https://arxiv.org/html/2309.07311v1
+11	en	真实模型证据	44077	4	Grokking Explained: A Statistical Phenomenon	https://arxiv.org/html/2502.01774v1
+12	en	涌现争议	56490	1	Emergent Abilities of Large Language Models	https://arxiv.org/html/2206.07682v1
+13	en	涌现争议	48901	9	Are Emergent Abilities of Large Language Models a Mirage?	https://arxiv.org/html/2304.15004v1
+14	en	上下文学习	48331	5	Data Distributional Properties Drive Emergent In-Context Learning in Transformers	https://arxiv.org/html/2205.05055v1
+15	en	交互科普	8408	0	Do Machine Learning Models Memorize or Generalize?	https://pair.withgoogle.com/explorables/grokking/
+16	en	谱理论	106965	4	A Spectral Theory of Grokking: Weight Decay Induces Feature Learning	https://arxiv.org/html/2609.26679v1
+17	en	因果前兆	56084	7	Circuit Synchronization Precedes Generalization: A Causal Precursor to Grokking	https://arxiv.org/html/2606.12966v1
+18	en	语言模型迁移	61272	11	A Pre-Training Analogue of Grokking in Language Models: Delayed Grammatical Generalization	https://arxiv.org/html/2606.00230v1
+19	en	权重范数	52477	3	What Does the Weight Norm Control in Grokking? Logit-Scale Mediation under Cross-Entropy	https://arxiv.org/html/2606.18465v1
+20	en	研究工具	31834	3	Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization	https://arxiv.org/html/2609.20166v1
+21	zh	中文解读	9120	2	【文献精读】Explaining grokking through circuit efficiency	https://blog.csdn.net/weixin_54607024/article/details/148411515
+22	zh	中文解读	2724	6	神经网络Grokking现象的电路效率公式——揭秘学习飞跃的秘密	https://blog.csdn.net/qq_37148940/article/details/141947800
+23	zh	中文解读	3910	14	AI顿悟现象被破解：田渊栋研究揭示大模型开窍的数学原理	https://blog.csdn.net/2301_80239908/article/details/154192271
+24	zh	中文解读	2805	12	Meta FAIR：大模型顿悟现象的数学机制被彻底破解	https://blog.csdn.net/2401_85390073/article/details/153398536
+29	zh	中文解读	1047	0	机器学习模型的grokking是记忆还是泛化	https://blog.aicoco.net/2023/08/08/grokking/
+30	zh	科技媒体	1288	15	AI「领悟」有理论解释了，谷歌：两种脑回路内部竞争	https://www.36kr.com/p/2437259014263168
+31	zh	中文解读	5689	3	训练越久，模型反而越会泛化吗？理解 Grokking 现象	https://blog.csdn.net/transformer_WSZ/article/details/164146375
+32	zh	中文解读	3355	4	大模型的涌现能力：现象、表现与成因解析	https://blog.csdn.net/qq_16242613/article/details/149134614
+33	zh	中文解读	8577	2	神经网络训练到最后，权重到底经历了什么	https://blog.csdn.net/weixin_49122920/article/details/165491623
+34	zh	中文解读	5737	7	RL Grokking：RL如何解锁LLM中的新推理策略	https://blog.csdn.net/cyril_ki/article/details/153819664
+36	zh	中文解读	17197	3	AI的顿悟时刻：大模型能力涌现的临界点与相变机制	https://blog.csdn.net/tsh2005974tsh/article/details/163198133
+37	en	训练相变	124562	0	In-Context Learning and Induction Heads	https://transformer-circuits.pub/2022/in-context-learning-and-induction-heads/index.html
+38	en	机制背景	59672	32	Zoom In: An Introduction to Circuits	https://distill.pub/2020/circuits/zoom-in/
+43	zh	中文解读	2095	1	为什么小数据集上神经网络会突然开窍？揭秘Grokking背后的LU机制	https://blog.csdn.net/weixin_29168153/article/details/159631309
+45	zh	中文解读	2612	2	Grokking与Double Descent：现代神经网络的泛化新范式	https://blog.csdn.net/weixin_42544663/article/details/162378216
+46	zh	中文解读	10780	1	Grokking与双下降：深度学习中的结构发现与泛化新范式	https://blog.csdn.net/weixin_33724570/article/details/86334239
+48	zh	工程实践	1824	0	Grokfast 加速理解：通过放大缓慢梯度加速训练指南	https://blog.csdn.net/gitblog_00601/article/details/141552086
+49	zh	工程实践	5281	0	Axolotl 中的 Grokfast 集成：用慢梯度放大加速 Grokking 收敛	https://blog.csdn.net/gitblog_00601/article/details/163664694
+52	zh	中文解读	8691	13	Grokking现象为什么不能泛化到第二跳推理	https://blog.csdn.net/xian_ren008/article/details/148923484

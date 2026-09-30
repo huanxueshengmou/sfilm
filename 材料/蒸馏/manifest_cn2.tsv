@@ -1,0 +1,13 @@
+id	lang	cat	title	url	kind
+41	zh	中文解读	Grokking 现象解析：小数据集下神经网络的泛化之谜	https://blog.csdn.net/深度学习/article/details/158983625	html
+42	zh	中文解读	超越过拟合的实战指南：用PyTorch在小数据集上实现Grokking效果	https://blog.csdn.net/pytorch/article/details/158780898	html
+43	zh	中文解读	为什么小数据集上神经网络会突然开窍？揭秘Grokking背后的LU机制	https://blog.csdn.net/weixin_29168153/article/details/159631309	html
+44	zh	中文解读	小模型顿悟机制：Grokking与双下降的数学原理与实操指南	https://blog.csdn.net/数学基础/article/details/98293836	html
+45	zh	中文解读	Grokking与Double Descent：现代神经网络的泛化新范式	https://blog.csdn.net/weixin_42544663/article/details/162378216	html
+46	zh	中文解读	Grokking与双下降：深度学习中的结构发现与泛化新范式	https://blog.csdn.net/weixin_33724570/article/details/86334239	html
+47	zh	中文解读	Decoding Grokking: How Neural Networks Achieve Perfect Generalization	https://blog.csdn.net/深度学习/article/details/158449093	html
+48	zh	工程实践	Grokfast 加速理解：通过放大缓慢梯度加速训练指南	https://blog.csdn.net/gitblog_00601/article/details/141552086	html
+49	zh	工程实践	Axolotl 中的 Grokfast 集成：用慢梯度放大加速 Grokking 收敛	https://blog.csdn.net/gitblog_00601/article/details/163664694	html
+50	zh	中文解读	大模型基础知识入门：涌现能力、泛化能力与Grokking	https://blog.csdn.net/深度学习/article/details/95274869	html
+51	zh	中文解读	机器学习中的Grokking现象与傅里叶稀疏性解析	https://blog.csdn.net/weixin_42544663/article/details/159631310	html
+52	zh	中文解读	Grokking现象为什么不能泛化到第二跳推理	https://blog.csdn.net/xian_ren008/article/details/148923484	html

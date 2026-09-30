@@ -1,0 +1,804 @@
+# Towards Understanding Grokking: An Effective Theory of Representation Learning
+# id: 04 | lang: en | category: 有效理论
+# source: https://arxiv.org/html/2205.10343v1
+# extracted_via: article | chars: 68190 | figures: 21
+==============================================================================
+
+Towards Understanding Grokking:
+ An Effective Theory of Representation Learning
+
+ Ziming Liu
+ † † thanks: zmliu@mit.edu 
+    
+ Ouail Kitouni
+
+ Niklas Nolte
+
+ Eric J. Michaud
+
+ Max Tegmark
+
+ Mike Williams
+ 
+ Affiliation: Department of Physics, Institute for AI and Fundamental Interactions, MIT
+
+ Abstract
+
+ We aim to understand grokking , a phenomenon where models generalize long after overfitting their training set.
+We present both a microscopic analysis anchored by an effective theory and a macroscopic analysis of phase diagrams describing learning performance across hyperparameters. We find that generalization originates from structured representations whose training dynamics and dependence on training set size can be predicted by our effective theory in a toy setting. We observe empirically the presence of four learning phases: comprehension , grokking , memorization , and confusion . We find representation learning to occur only in a “Goldilocks zone” (including comprehension and grokking) between memorization and confusion. Compared to the comprehension phase, the grokking phase stays closer to the memorization phase, leading to delayed generalization. The Goldilocks phase is reminiscent of “intelligence from starvation” in Darwinian evolution, where resource limitations drive discovery of more efficient solutions. This study not only provides intuitive explanations of the origin of grokking, but also highlights the usefulness of physics-inspired tools, e.g., effective theories and phase diagrams, for understanding deep learning.
+
+ 1 Introduction
+
+ Perhaps the central challenge of a scientific understanding of deep learning lies in accounting for neural network generalization.
+Power et al. [ 1 ] recently added a new puzzle to the task of understanding generalization with their discovery of grokking . Grokking refers to the surprising phenomenon of delayed generalization where neural networks, on certain learning problems, generalize long after overfitting their training set. It is a rare albeit striking phenomenon that violates common machine learning intuitions, raising three key puzzles:
+
+ Q1 
+ 
+ The origin of generalization : When trained on the algorithmic datasets where grokking occurs, how do models generalize at all?
+
+ Q2 
+ 
+ The critical training size : Why does the training time needed to “grok” (generalize) diverge as the training set size decreases toward a critical point?
+
+ Q3 
+ 
+ Delayed generalization : Under what conditions does delayed generalization occur?
+
+ We provide evidence that representation learning is central to answering each of these questions. Our answers can be summarized as follows:
+
+ A1 
+ 
+ Generalization can be attributed to learning a good representation of the inputs, i.e. a representation that has the appropriate structure for the task. See Figures 1 and 2 .
+
+ A2 
+ 
+ The critical training set size corresponds to the least amount of training data that can determine such a representation (which, in some cases, is unique up to linear transformations).
+
+ A3 
+ 
+ Grokking is a phase between “comprehension” and “memorization” phases and it can be remedied with proper hyperparmeter tuning, as illustrated by the phase diagrams in Figure 5 .
+
+ Figure 1 : Visualization of the first two principal components of the learned input embeddings at different training stages of a transformer learning modular addition. We observe that generalization coincides with the emergence of structure in the embeddings. See Section 4.2 for the training details. 
+
+ This paper is organized as follows: In Section 2 , we introduce the problem setting and build a simplified toy model. In Section 3 , we will use an effective theory approach, a useful tool from theoretical physics, to shed some light on questions Q1 and Q2 and show the relationship between generalization and the learning of structured representations.
+In Section 4 , we explain Q3 by displaying phase diagrams from a grid search of hyperparameters and show how we can "de-delay" generalization by following intuition developed from the phase diagram. We discuss related work in Section 5 , followed by conclusions in Section 6 .
+
+ 2 Problem Setting
+
+ Power et al. [ 1 ] observe grokking on an unusual task – learning an “algorithmic” binary operation.
+Given some binary operation ∘ \circ , a network is tasked with learning the map ( a , b ) ↦ c (a,b)\mapsto c where a ∘ b = c a\circ b=c .
+They use a decoder-only transformer to predict the second to last token in a tokenized equation of the form “<lhs> <op> <rhs> <eq> <result> <eos>”.
+Each token is represented as a 256-dimensional embedding vector.
+The embeddings are learnable and initialized randomly.
+After the transformer, a final linear layer maps the output to class logits for each token.
+
+ Toy Model We primarily study grokking in a simpler toy model, which still retains the key behaviors from the setup of [ 1 ] .
+Although [ 1 ] treated this as a classification task, we study both regression and classification problems. The basic setup is as follows:
+our model takes as input the symbols a , b a,b and maps them to trainable embedding vectors 𝐄 a , 𝐄 b ∈ ℝ d in \mathbf{E}_{a},\mathbf{E}_{b}\in\mathbb{R}^{d_{\text{in}}} .
+It then sums 𝐄 a , 𝐄 b \mathbf{E}_{a},\mathbf{E}_{b} and sends the resulting vector through a “decoder” MLP. The target output vector, denoted 𝐘 c ∈ ℝ d out \mathbf{Y}_{c}\in\mathbb{R}^{d_{\text{out}}} 
+is a fixed random vector (regression task) or a one-hot vector (classification task). Our model architecture can therefore be compactly described as ( a , b ) ↦ Dec ⁡ ( 𝐄 a + 𝐄 b ) (a,b)\mapsto{\rm Dec}(\mathbf{E}_{a}+\mathbf{E}_{b}) , where the embeddings 𝐄 ∗ \mathbf{E}_{*} and the decoder are trainable. Despite its simplicity, this toy model can generalize to all abelian groups (discussed in Appendix A ).
+In sections 3 - 4.1 , we consider only the binary operation of addition. We consider modular addition in Section 4.2 to generalize some of our results to a transformer architecture and study general non-abelian operations in Appendix F .
+
+ Dataset In our toy setting, we are concerned with learning the addition operation. A data sample corresponding to i + j i+j is denoted as ( i , j ) (i,j) for simplicity. If i , j ∈ { 0 , … , p − 1 } i,j\in\{0,\ldots,p-1\} , there are in total p ⁡ ( p + 1 ) / 2 p(p+1)/2 different samples since we consider i + j i+j and j + i j+i to be the same sample. A dataset D D is a set of non-repeating data samples. We denote the full dataset as D 0 D_{0} and split it into a training dataset D D and a validation dataset D ′ D^{\prime} , i.e., D ​ ⋃ D ′ = D 0 D\bigcup D^{\prime}=D_{0} , D ​ ⋂ D ′ = ∅ D\bigcap D^{\prime}=\emptyset . We define training data fraction = | D | / | D 0 | =|D|/|D_{0}| where | ⋅ | |\cdot| denotes the cardinality of the set.
+
+ 3 Why Generalization: Representations and Dynamics
+
+ We can see that generalization appears to be linked to the emergence of highly-structured embeddings in Figure 2 . In particular, Figure 2 (b) shows parallelograms in toy addition, and (d) shows a circle in toy modular addition. We now restrict ourselves to the toy addition setup and formalize a notion of representation quality and show that it predicts the model’s performance. We then develop a physics-inspired effective theory of learning which can accurately predict the critical training set size and training trajectories of representations. In physics, effective theories aim to describe observed phenomena
+without implying that the mechanisms used in the description necessarily have an exact counterpart in the true underlying causes.
+In our effective theory, we will model the dynamics of representation learning not as gradient descent of the true task loss but rather a simpler effective loss function ℓ eff \ell_{\text{eff}} which depends only on the representations and not on the decoder.
+
+ 3.1 Representation quality predicts generalization for the toy model
+
+ A rigorous definition for structure in the learned representation is necessary. We propose the following definition,
+
+ Definition 1 . 
+
+ ( i , j , m , n ) (i,j,m,n) is a δ \delta - parallelogram in the representation 𝐑 ≡ [ 𝐄 0 , ⋯ , 𝐄 p − 1 ] \mathbf{R}\equiv[\mathbf{E}_{0},\cdots,\mathbf{E}_{p-1}] if 
+
+ | ( 𝐄 i + 𝐄 j ) − ( 𝐄 m + 𝐄 n ) | ≤ δ . |(\mathbf{E}_{i}+\mathbf{E}_{j})-(\mathbf{E}_{m}+\mathbf{E}_{n})|\leq\delta. 
+
+ In the following derivations, we can take δ \delta , which is a small threshold to tolerate numerical errors, to be zero.
+
+ (a) Memorization in toy addition 
+
+ (b) Generalization in toy addition 
+
+ (c) Memorization in toy modular addition 
+
+ (d) Generalization in toy modular addition 
+
+ Figure 2 : Visualization of the learned set of embeddings ( p = 11 p=11 ) and the decoder function associated with it for the case of 2D embeddings.
+Axes refer to each dimension of the learned embeddings. The decoder is evaluated on a grid of points in embedding-space and the color at each point represents the highest probability class. For visualization purposes, the decoder is trained on inputs of the form ( 𝐄 i + 𝐄 j ) / 2 (\mathbf{E}_{i}+\mathbf{E}_{j})/2 . One can read off the output of the decoder when fed the operation i ∘ j i\circ j from this figure simply by taking the midpoint between the respective embeddings of i i and j j .
+
+ As long as training loss is effectively zero, any parallelogram ( i , j , m , n ) (i,j,m,n) should satisfy i + j = m + n i+j=m+n .
+Suppose that this is not the case, i.e., suppose 𝐄 i + 𝐄 j = 𝐄 m + 𝐄 n \mathbf{E}_{i}+\mathbf{E}_{j}=\mathbf{E}_{m}+\mathbf{E}_{n} but i + j ≠ m + n i+j\neq m+n , then 𝐘 i + j = Dec ⁡ ( 𝐄 i + 𝐄 j ) = Dec ⁡ ( 𝐄 m + 𝐄 n ) = 𝐘 m + n \mathbf{Y}_{i+j}=\mathrm{Dec}(\mathbf{E}_{i}+\mathbf{E}_{j})=\mathrm{Dec}(\mathbf{E}_{m}+\mathbf{E}_{n})=\mathbf{Y}_{m+n} where the first and last equalities come from the zero training loss assumption. However, since i + j ≠ m + n i+j\neq m+n , we have 𝐘 i + j ≠ 𝐘 n + m \mathbf{Y}_{i+j}\neq\mathbf{Y}_{n+m} (almost surely in the regression task), a contradiction.
+
+ It is convenient to define the permissible parallelogram set associated with a training dataset D D (“permissible” means consistent with 100% training accuracy) as
+
+ P 0 ( D ) = { ( i , j , m , n ) | ( i , j ) ∈ D , ( m , n ) ∈ D , i + j = m + n } . P_{0}(D)=\{(i,j,m,n)|(i,j)\in D,\,(m,n)\in D,\,i+j=m+n\}. 
+ 
+ (1) 
+
+ For simplicity, we denote P 0 ≡ P 0 ​ ( D 0 ) P_{0}\equiv P_{0}(D_{0}) . Given a representation 𝐑 \mathbf{R} , we can check how many permissible parallelograms actually exist in 𝐑 \mathbf{R} within error δ \delta , so we define the parallelogram set corresponding to 𝐑 \mathbf{R} as
+
+ P ( 𝐑 , δ ) = { ( i , j , m , n ) | ( i , j , m , n ) ∈ P 0 , | ( 𝐄 i + 𝐄 j ) − ( 𝐄 m + 𝐄 n ) | ≤ δ } . P(\mathbf{R},\delta)=\{(i,j,m,n)|(i,j,m,n)\in P_{0},|(\mathbf{E}_{i}+\mathbf{E}_{j})-(\mathbf{E}_{m}+\mathbf{E}_{n})|\leq\delta\}. 
+ 
+ (2) 
+
+ For brevity we will write P ⁡ ( 𝐑 ) P(\mathbf{R}) , suppressing the dependence on δ \delta . We define the representation quality index (RQI) as
+
+ RQI ⁡ ( 𝐑 ) = | P ⁡ ( 𝐑 ) | | P 0 | ∈ [ 0 , 1 ] . {\rm RQI}(\mathbf{R})=\frac{|P(\mathbf{R})|}{|P_{0}|}\in[0,1]. 
+ 
+ (3) 
+
+ We will use the term linear representation or linear structure to refer to a representation whose embeddings are of the form 𝐄 k = 𝐚 + k ​ 𝐛 ​ ( k = 0 , ⋯ , p − 1 , 𝐚 , 𝐛 ∈ ℝ d in ) \mathbf{E}_{k}=\mathbf{a}+k\mathbf{b}\ (k=0,\cdots,p-1;\mathbf{a},\mathbf{b}\in\mathbb{R}^{d_{\text{in}}}) . A linear representation has RQI = 1 {\rm RQI}=1 , while a random representation (sampled from, say, a normal dstribution) has RQI = 0 {\rm RQI}=0 with high probability.
+
+ Quantitatively, we denote the “predicted accuracy” Acc ^ \widehat{{\rm Acc}} as the accuracy achievable on the whole dataset given the representation 𝐑 \mathbf{R} (see Appendix B for the full details). In Figure 3 , we see that the predicted Acc ^ \widehat{{\rm Acc}} aligns well with the true accuracy Acc {\rm Acc} , establishing good evidence that representation leads to generalization. We use an example to illustrate the origin of generalization here. In the setup of Figure 2 (a), suppose the decoder can achieve zero training loss and 𝐄 6 + 𝐄 8 \mathbf{E}_{6}+\mathbf{E}_{8} is a training sample hence Dec ⁡ ( 𝐄 6 + 𝐄 8 ) = 𝐘 14 {\rm Dec}(\mathbf{E}_{6}+\mathbf{E}_{8})=\mathbf{Y}_{14} . At validation time, the decoder is tasked with predicting a validation sample 𝐄 5 + 𝐄 9 \mathbf{E}_{5}+\mathbf{E}_{9} . Since ( 5 , 9 , 6 , 8 ) (5,9,6,8) forms a parallelogram such that 𝐄 5 + 𝐄 9 = 𝐄 6 + 𝐄 8 \mathbf{E}_{5}+\mathbf{E}_{9}=\mathbf{E}_{6}+\mathbf{E}_{8} , the decoder can predict the validation sample correctly because Dec ⁡ ( 𝐄 5 + 𝐄 9 ) = Dec ⁡ ( 𝐄 6 + 𝐄 8 ) = 𝐘 14 {\rm Dec}(\mathbf{E}_{5}+\mathbf{E}_{9})={\rm Dec}(\mathbf{E}_{6}+\mathbf{E}_{8})=\mathbf{Y}_{14} .
+
+ Figure 3 : We compute accuracy (of the full dataset) either measured empirically Acc {\rm Acc} , or predicted from representation Acc ^ \widehat{{\rm Acc}} . These two accuracies as a function of training data fraction are plotted in (a)(b), and their agreement is shown in (c). 
+
+ 3.2 The critical training set size
+
+ Suppose that we have an ideal model ℳ ∗ = ( Dec ∗ , 𝐑 ∗ ) \mathcal{M}^{*}=({\rm Dec}^{*},\mathbf{R}^{*}) such that: 1 1 
+ 1 
+
+ One can verify a posteriori if a trained model ℳ \mathcal{M} is close to being an ideal model ℳ ∗ \mathcal{M}^{*} . Please refer to Appendix C for details. 
+
+ • 
+ 
+ (1) ℳ ∗ \mathcal{M}^{*} can achieve zero training loss;
+
+ • 
+ 
+ (2) ℳ ∗ \mathcal{M}^{*} has an injective decoder, i.e., Dec ∗ ​ ( 𝐱 1 ) ≠ Dec ∗ ​ ( 𝐱 2 ) {\rm Dec^{*}}(\mathbf{x}_{1})\neq{\rm Dec^{*}}(\mathbf{x}_{2}) for any 𝐱 1 ≠ 𝐱 2 \mathbf{x}_{1}\neq\mathbf{x}_{2} .
+
+ Then Proposition 1 provides a mechanism for the formation of parallelograms.
+
+ Proposition 1 . 
+
+ If a training set D D contains two samples ( i , j ) (i,j) and ( m , n ) (m,n) with i + j = m + n i+j=m+n , then ℳ ∗ \mathcal{M}^{*} learns a representation 𝐑 ∗ \mathbf{R}^{*} such that 𝐄 i + 𝐄 j = 𝐄 m + 𝐄 n \mathbf{E}_{i}+\mathbf{E}_{j}=\mathbf{E}_{m}+\mathbf{E}_{n} , i.e., ( i , j , m , n ) (i,j,m,n) forms a parallelogram. 
+
+ Proof.
+
+ Due to the zero training loss assumption, we have Dec ∗ ​ ( 𝐄 i + 𝐄 j ) = 𝐘 i + j = 𝐘 m + n = Dec ∗ ​ ( 𝐄 m + 𝐄 n ) {\rm Dec}^{*}(\mathbf{E}_{i}+\mathbf{E}_{j})=\mathbf{Y}_{i+j}=\mathbf{Y}_{m+n}={\rm Dec}^{*}(\mathbf{E}_{m}+\mathbf{E}_{n}) . Then the injectivity of Dec ∗ {\rm Dec^{*}} implies 𝐄 i + 𝐄 j = 𝐄 m + 𝐄 n \mathbf{E}_{i}+\mathbf{E}_{j}=\mathbf{E}_{m}+\mathbf{E}_{n} .
+∎ 
+
+ The dynamics of the trained embedding parameters are determined by various factors interacting in complex ways, for instance: the details of the decoder architecture, the optimizer hyperparameters, and the various kinds of implicit regularization induced by the training procedure. We will see that the dynamics of normalized quantities, namely, the normalized embeddings at time t t , defined as 𝐄 ~ k ( t ) = 𝐄 k ( t ) − μ t σ t \tilde{\mathbf{E}}_{k}^{(t)}=\frac{\mathbf{E}_{k}^{(t)}-\mu_{t}}{\sigma_{t}} , where μ t = 1 p ​ ∑ k 𝐄 k ( t ) \mu_{t}=\frac{1}{p}\sum_{k}\mathbf{E}_{k}^{(t)} and σ t = 1 p ​ ∑ k | 𝐄 k ( t ) − μ t | 2 \sigma_{t}=\frac{1}{p}\sum_{k}|\mathbf{E}_{k}^{(t)}-\mu_{t}|^{2} , can be qualitatively described by a simple effective loss.
+We will assume that the normalized embedding vectors obey a gradient flow for an effective loss function of the form
+
+ d ​ 𝐄 ~ i d ​ t = − ∂ ℓ eff ∂ 𝐄 ~ i , \frac{d\mathbf{\tilde{E}}_{i}}{dt}=-\frac{\partial\ell_{\text{eff}}}{\partial\mathbf{\tilde{E}}_{i}}, 
+ 
+ (4) 
+
+ ℓ eff = ℓ 0 Z 0 , ℓ 0 ≡ ∑ ( i , j , m , n ) ∈ P 0 ​ ( D ) | 𝐄 ~ i + 𝐄 ~ j − 𝐄 ~ m − 𝐄 ~ n | 2 , Z 0 ≡ ∑ k | 𝐄 ~ k | 2 , \ell_{\text{eff}}=\frac{\ell_{0}}{Z_{0}},\quad\ell_{0}\equiv\sum_{(i,j,m,n)\in P_{0}(D)}|\mathbf{\tilde{E}}_{i}+\mathbf{\tilde{E}}_{j}-\mathbf{\tilde{E}}_{m}-\mathbf{\tilde{E}}_{n}|^{2},\quad Z_{0}\equiv\sum_{k}|\mathbf{\tilde{E}}_{k}|^{2}, 
+ 
+ (5) 
+
+ where
+ | ⋅ | |\cdot| denotes Euclidean vector norm. Note that the embeddings do not collapse to the trivial solution 𝐄 0 = ⋯ = 𝐄 p − 1 = 0 \mathbf{E}_{0}=\cdots=\mathbf{E}_{p-1}=0 unless initialized as such, because two conserved quantities exist, as proven in Appendix D :
+
+ 𝐂 = ∑ k 𝐄 k , Z 0 = ∑ k | 𝐄 k | 2 . \mathbf{C}=\sum_{k}\mathbf{E}_{k},\quad Z_{0}=\sum_{k}|\mathbf{E}_{k}|^{2}. 
+ 
+ (6) 
+
+ We shall now use the effective dynamics to explain empirical observations such as the existence of a critical training set size for generalization.
+
+ Figure 4 : (a) The effective theory predicts a phase transition in the probability of obtaining a linear representation around r c = 0.4 r_{c}=0.4 . (b) Empirical results display a phase transition of RQI around r c = 0.4 r_{c}=0.4 , in agreement with the theory (the blue line shows the median of multiple random seeds). The evolution of 1D representations predicted by the effective theory or obtained from neural network training (shown in (c) and (d) respectively) agree creditably well. 
+
+ Degeneracy of ground states (loss optima) We define ground states as those representations satisfying ℓ eff = 0 \ell_{\text{eff}}=0 , which requires the following linear equations to hold:
+
+ A ⁡ ( P ) = { 𝐄 i + 𝐄 j = 𝐄 m + 𝐄 n | ( i , j , m , n ) ∈ P } A(P)=\{\mathbf{E}_{i}+\mathbf{E}_{j}=\mathbf{E}_{m}+\mathbf{E}_{n}|(i,j,m,n)\in P\} 
+ 
+ (7) 
+
+ Since each embedding dimension obeys the same set of linear equations, we will assume, without loss of generality, that d in = 1 d_{\rm in}=1 . The dimension of the null space of A ⁡ ( P ) A(P) , denoted as n 0 n_{0} , is the number of degrees of freedom of the ground states. Given a set of parallelograms implied by a training dataset D D , the nullity of A ⁡ ( P ⁡ ( D ) ) A(P(D)) could be obtained by computing the singular values 0 ≤ σ 1 ≤ ⋯ ≤ σ p 0\leq\sigma_{1}\leq\cdots\leq\sigma_{p} .
+We always have n 0 ≥ 2 n_{0}\geq 2 , i.e., σ 1 = σ 2 = 0 \sigma_{1}=\sigma_{2}=0 because the nullity of A ⁡ ( P 0 ) A(P_{0}) , the set of linear equations given by all possible parallelograms, is Nullity ⁡ ( A ⁡ ( P 0 ) ) = 2 \mathrm{Nullity}(A(P_{0}))=2 which can be attributed to two degrees of freedom (translation and scaling).
+If n 0 = 2 n_{0}=2 , the representation is unique up to translations and scaling factors, and the embeddings have the form 𝐄 k = 𝐚 + k ​ 𝐛 \mathbf{E}_{k}=\mathbf{a}+k\mathbf{b} . Otherwise, when n 0 > 2 n_{0}>2 , the representation is not constrained enough such that all the embeddings lie on a line.
+
+ We present theoretical predictions alongside empirical results for addition ( p = 10 p=10 ) in Figure 4 . As shown in Figure 4 (a), our effective theory predicts that the probability that the training set implies a unique linear structure (which would result in perfect generalization) depends on the training data fraction and has a phase transition around r c = 0.4 r_{c}=0.4 . Empirical results from training different models are shown in Figure 4 (b). The number of steps to reach RQI > 0.95 {\rm RQI}>0.95 is seen to have a phase transition at r c = 0.4 r_{c}=0.4 , agreeing with the proposed effective theory and with the empirical findings in [ 1 ] .
+
+ Time towards the linear structure We define the Hessian matrix of ℓ 0 \ell_{0} as
+
+ 𝐇 i ​ j = 1 Z 0 ​ ∂ 2 ℓ 0 ∂ 𝐄 i ​ ∂ 𝐄 j , \mathbf{H}_{ij}=\frac{1}{Z_{0}}\frac{\partial^{2}\ell_{0}}{\partial\mathbf{E}_{i}\partial\mathbf{E}_{j}}, 
+ 
+ (8) 
+
+ Note that ℓ 0 = 1 2 ​ 𝐑 T ​ 𝐇𝐑 \ell_{0}=\frac{1}{2}\mathbf{R}^{T}\mathbf{H}\mathbf{R} , 𝐑 = [ 𝐄 0 , 𝐄 1 , ⋯ , 𝐄 p − 1 ] \mathbf{R}=[\mathbf{E}_{0},\mathbf{E}_{1},\cdots,\mathbf{E}_{p-1}] , so the gradient descent is linear, i.e.,
+
+ d ​ 𝐑 d ​ t = − 𝐇𝐑 . \frac{d\mathbf{R}}{dt}=-\mathbf{H}\mathbf{R}. 
+ 
+ (9) 
+
+ If 𝐇 \mathbf{H} has eigenvalues λ i = σ i 2 \lambda_{i}=\sigma_{i}^{2} (sorted in increasing order) and eigenvectors 𝐯 ¯ i \bar{\mathbf{v}}_{i} , and we have the initial condition 𝐑 ⁡ ( t = 0 ) = a i ​ 𝐯 ¯ i \mathbf{R}(t=0)=a_{i}\bar{\mathbf{v}}_{i} , then we have 𝐑 ⁡ ( t ) = a i ​ 𝐯 ¯ i ​ e − λ i ​ t \mathbf{R}(t)=a_{i}\bar{\mathbf{v}}_{i}e^{-\lambda_{i}t} . The first two eigenvalues vanish and t h = 1 / λ 3 t_{h}=1/\lambda_{3} determines the timescale for the slowest component to decrease by a factor of e e . When the step size is η \eta , the corresponding number of steps is n h = t h / η = 1 / ( λ 3 ​ η ) n_{h}=t_{h}/\eta=1/(\lambda_{3}\eta) .
+
+ We verify the above analysis with empirical results. Figure 4 (c)(d) show the trajectories obtained from the effective theory and from neural network training, respectively. The 1D neural representation in Figure 4 (d) are manually normalized to zero mean and unit variance. The two trajectories agree qualitatively, and it takes about 3 ​ n h 3n_{h} steps for two trajectories to converge to the linear structure. The quantitative differences might be due to the absence of the decoder in the effective theory, which assumes the decoder to be adiabatic in the sense that it takes infinitesimal step sizes.
+
+ Limitations of the effective theory 
+While our theory defines an effective loss based on the Euclidean distance between embeddings 𝐄 i + 𝐄 j \mathbf{E}_{i}+\mathbf{E}_{j} and 𝐄 n + 𝐄 m \mathbf{E}_{n}+\mathbf{E}_{m} , one could imagine generalizing the theory to define a broader notion of parallogram given by some other metric on the representation space. For instance, if we have a decoder like in Figure 2 (c) then the distance between distinct representations within the same “pizza slice” is low, meaning that representations arranged not in parallelograms w.r.t. the Euclidean metric may be parallelograms with respect to the metric defined by the decoder.
+
+ 4 Delayed Generalization: A Phase Diagram
+
+ So far, we have (1) observed empirically that generalization on algorithmic datasets corresponds with the emergence of well-structured representations, (2) defined a notion of representation quality in a toy setting and shown that it predicts generalization, and (3) developed an effective theory to describe the learning dynamics of the representations in the same toy setting. We now study how optimizer hyperparameters affect high-level learning performance. In particular, we develop phase diagrams for how learning performance depend on the representation learning rate, decoder learning rate and the decoder weight decay. These parameters are of interest since they most explicitly regulate a kind of competition between the encoder and decoder, as we elaborate below.
+
+ 4.1 Phase diagram of a toy model
+
+ Training details We update the representation and the decoder with different optimizers. For the 1D embeddings, we use the Adam optimizer with learning rate [ 10 − 4 , 10 − 2 ] [10^{-4},10^{-2}] and zero weight decay. For the decoder, we use an AdamW optimizer with the learning rate in [ 10 − 4 , 10 − 2 ] [10^{-4},10^{-2}] and the weight decay in [ 0 , 10 ] [0,10] (regression) or [ 0 , 20 ] [0,20] (classification). For training/validation spliting, we choose 45/10 for non-modulo addition ( p = 10 p=10 ) and 24/12 for the permutation group S 3 S_{3} . We hard-code addition or matrix multiplication (details in Appendix F ) in the decoder for the addition group and the permutation group, respectively.
+
+ For each choice of learning rate and weight decay, we compute the number of steps to reach high (90%) training/validation accuracy The 2D plane is split into four phases: comprehension , grokking , memorization and confusion , defined in Table 1 . Both comprehension and grokking are able to generalize (in the “Goldilocks zone"), although the grokking phase has delayed generalization. Memorization is also called overfitting, and confusion means failure to even memorize training data. Figure 5 shows the phase diagrams for the addition group and the permutation group.
+They display quite rich phenomenon.
+
+ (a) Addition, regression 
+
+ (b) Addition, regression 
+
+ (c) Addition, classification 
+
+ (d) Permutation, regression 
+
+ Figure 5 : Phase diagrams of learning for the addition group and the permutation group. (a) shows the competition between representation and decoder. (b)(c)(d): each phase diagram contains four phases: comprehension, grokking, memorization and confusion, defined in Table 1 . Grokking is sandwiched between comprehension and memorization. 
+
+ Table 1 : Definitions of the four phases of learning 
+
+ criteria 
+
+ Phase 
+
+ training acc > 90% 
+ 
+ within 10 5 10^{5} steps 
+
+ validation acc > 90% 
+ 
+ within 10 5 10^{5} steps 
+
+ step(validation acc>90%) 
+ 
+ − - step(training acc>90%)< 10 3 10^{3} 
+
+ Comprehension 
+ Yes 
+ Yes 
+ Yes 
+
+ Grokking 
+ Yes 
+ Yes 
+ No 
+
+ Memorization 
+ Yes 
+ No 
+ Not Applicable 
+
+ Confusion 
+ No 
+ No 
+ Not Applicable 
+
+ Competition between representation learning and decoder overfitting In the regression setup of the addition dataset, we show how the competition between representation learning rate and decoder learning rate lead to different learning phases in Figure 5 (a). As expected, a fast decoder coupled with slow representation learning (bottom right) lead to memorization. In the opposite extreme, although an extremely slow decoder coupled with fast representation learning (top left) will generalize in the end, the generalization time is long due to the inefficient decoder training. The ideal phase (comprehension) requires representation learning to be faster, but not too much, than the decoder.
+
+ Drawing from an analogy to physical systems, one can think of embedding vectors as a group of particles. In our effective theory from Section 3.2 , internal particle interactions promote the formation of structure, while external forces inhibit it. The decoder plays the role of an environment exerting external forces on the embeddings. If the decoder changes slowly/fast, the magnitude of the external forces are small/large, leading to better/worse representations.
+
+ Universality of phase diagrams We fix representation learning to be 10 − 3 10^{-3} and sweep instead decoder weight decay in Figure 5 (b)(c)(d). The phase diagrams correspond to addition regression (b), addition classification (c) and permutation regression (d), respectively. Common phenomenon emerge from these different tasks: (i) they all include four phases; (ii) The top right corner (a fast and capable decoder) is the memorization phase; (iii) the bottom right corner (a fast and simple decoder) is the confusion phase; (iv) grokking is sandwiched between comprehension and memorization, which seems to imply that it is an undesirable phase that stems from improperly tuned hyperparameters.
+
+ Due to limited space, we include phase diagrams of other hyperparameters (batch size, intialization scale and weight decay on representation) in Appendix E .
+
+ 4.2 Beyond the toy model
+
+ We conjecture that many of the principles which we saw dictate the training dynamics in the toy model also apply more generally. Below, we will see how our framework generalizes to transformer architectures for the task of addition modulo p p , a minimal reproducible example of the original grokking paper [ 1 ] .
+
+ We first encode p = 53 p=53 integers into 256D learnable embeddings, then pass two integers to a decoder-only transformer architecture. For simplicity, we do not encode the operation symbols here. The outputs from the last layer are concatenated and passed to a linear layer for classification. Training both the encoder and the decoder with the same optimizer (i.e., with the same hyperparameters) leads to the grokking phenomenon.
+Generalization appears much earlier once we lower the effective decoder capacity with weight decay
+(full phase diagram in Figure 6 ).
+
+ Figure 6 : 
+Left: Evolution of the effective dimension of the embeddings (defined as the exponential of the entropy) during training and evaluated over 100 seeds.
+Center: Effect of dropout on speeding up generalization.
+Right: Phase diagram of the transformer architecture. A scan is performed over the weight decay and learning rate of the decoder while the learning rate of the embeddings is kept fixed at 10 − 3 10^{-3} (with zero weight decay).
+
+ Early on, the model is able to perfectly fit the training set while having no generalization. We study the embeddings at different training times and find that neither PCA (shown in Figure 1 ) nor t-SNE (not shown here) reveal any structure. Eventually, validation accuracy starts to increase, and perfect generalization coincides with the PCA projecting the embeddings into a circle in 2D. Of course, no choice of dimensionality reduction is guaranteed to find any structure, and thus, it is challenging to show explicitly that generalization only occurs when a structure exists. Nevertheless, the fact that, when coupled with the implicit regularization of the optimizer for sparse solutions, such a clear structure appears in a simple PCA so quickly at generalization time suggests that our analysis in the toy setting is applicable here as well. This is also seen in the evolution of the entropy of the explained variance ratio in the PCA of the embeddings (defined as S = − ∑ i σ i log σ i S=-\sum_{i}\sigma_{i}\log\sigma_{i} where σ i \sigma_{i} is the fractional variance explained by the i i th principal component). As seen in Figure 6 , the entropy increases up to generalization time then decreases drastically afterwards which would be consistent with the conjecture that generalization occurs when a low-dimensional structure is discovered. The decoder then primarily relies on the information in this low-dimensional manifold and essentially “prunes” the rest of the high-dimensional embedding space.
+
+ In Figure 6 (right), we show a comparable phase diagram to Figure 5 evaluated now in the transformer setting.
+Note that, as opposed to the setting in [ 1 ] , weight decay has only been applied to the decoder and not to the embedding layer.
+Contrary to the toy model, a certain amount of weight decay proves beneficial to generalization and speeds it up significantly.
+We conjecture that this difference comes from the different embedding dimensions. With a highly over-parameterized setting, a non-zero weight decay gives a crucial incentive to reduce complexity in the decoder and help generalize in fewer steps.
+This is subject to further investigation.
+We also explore the effect of dropout layers in the decoder blocks of the transformer.
+With a significant dropout rate, the generalization time can be brought down to under 10 3 10^{3} steps and the grokking phenomenon vanishes completely.
+The overall trend suggests that constraining the decoder with the same tools used to avoid overfitting reduces generalization time and can avoid the grokking phenomenon.
+
+ 5 Related work
+
+ We are not aware of other formal attempts to understand grokking, though some authors have provided speculative, informal accounts.
+For instance, [ 2 ] describes training as a random walk over parameters, and draws connections to Solomonoff induction.
+Separately, [ 3 ] suggest that simpler functions which generalize achieve lower loss than complicated functions which memorize, providing a training signal encouraging generalization. More broadly, our work is related to the following research directions:
+
+ Learning mathematical structures [ 4 ] trains a neural network to learn arithmetic operation from pictures of digits, but they do not observe grokking due to their abundant training data. Beyond arithmetic relations, machine learning has been applied to learn other mathematical structures, including geometry [ 5 ] , knot theory [ 6 ] and group theory [ 7 ] .
+
+ Double descent Grokking is somewhat reminiscent of the phenomena of “epoch-wise” double descent [ 8 ] , where generalization can improve after a period of overfitting. [ 9 ] find that regularization can mitigate double descent, similar perhaps to how weight decay influences grokking.
+
+ Representation learning Representation learning lies at the core of machine learning [ 10 , 11 , 12 , 13 ] . Representation quality is usually measured by (perhaps vague) semantic meanings or performance on downstream tasks. In our study, the simplicity of arithmetic datasets allows us to define representation quality and study evolution of representations in a quantitative way.
+
+ Physics of learning Physics-inspired tools have been proved useful to understand machine learning from a theoretical perspective. These tools include effective theories [ 14 , 15 ] , conservation laws [ 16 ] and free energy principle [ 17 ] . However, none of these works aim to develop an effective theory of representation learning.
+
+ We have argued that grokking occurs when models learn a particularly structured representation of their inputs. This connects a low-level understanding of the internal operation of our models with a high-level phenomenon: an increase in validation accuracy. In a recent work, researchers at Anthropic [ 18 ] , connect a sudden decrease in loss during training with the emergence of induction heads within their models. They analogize their work to statistical physics , since it bridges a “microscopic”, mechanistic understanding of networks with “macroscopic” facts about overall model performance. We view our work in the same vein, but we make the additional contribution that we develop, in a toy setting, an analytic model of low-level representation learning dynamics .
+
+ 6 Conclusion
+
+ We have shown how, in both toy models and more general settings, that representation enables generalization when it reflects structure in the data. We developed an effective theory of representation learning dynamics (in a toy setting) which predicts the critical dependence of learning on the training data fraction.
+We then presented phase transitions between comprehension, grokking, memorization and confusion where the learning “phase” depends on the decoder capacity and learning rate in decoder-only architectures. While we have mostly focused on a toy model, we find preliminary evidence that our results generalize to the setting of [ 1 ] .
+
+ Our work can be viewed as a step towards a statistical physics of deep learning , a theory which connects the “microphysics” of low-level network dynamics with the “thermodynamics” of high-level model behavior. We view the application of theoretical tools from physics, such as effective theories [ 19 ] , to be a rich area for further work. The broader impact of such work, if successful, would be to make models more transparent and predictable [ 18 , 20 , 21 ] , crucial to the task of ensuring the safety of advanced AI systems.
+
+ Acknowledgement
+
+ We thank Liping Liu for helpful discussions. This work was supported by The Casey and Family Foundation, the Foundational Questions
+Institute, the Rothberg Family Fund for Cognitive Science
+and the NSF AI Institute for Artificial Intelligence and Fundamental Interactions (IAIFI) through NSF Grant No. PHY-2019786.
+
+ References
+
+ [1] 
+ 
+Alethea Power, Yuri Burda, Harri Edwards, Igor Babuschkin, and Vedant Misra.
+
+ Grokking: Generalization beyond overfitting on small algorithmic
+datasets.
+
+ arXiv preprint arXiv:2201.02177 , 2022.
+
+ [2] 
+ 
+Beren Millidge.
+
+ Grokking ’grokking’.
+
+ https://beren.io/2022-01-11-Grokking-Grokking/ , 2022.
+
+ [3] 
+ 
+Rohin Shah.
+
+ Alignment Newsletter #159.
+
+ https://www.alignmentforum.org/posts/zvWqPmQasssaAWkrj/an-159-building-agents-that-know-how-to-experiment-by#DEEP_LEARNING_ ,
+2021.
+
+ [4] 
+ 
+Yedid Hoshen and Shmuel Peleg.
+
+ Visual learning of arithmetic operation.
+
+ In AAAI , 2016.
+
+ [5] 
+ 
+Yang-Hui He.
+
+ Machine-learning mathematical structures.
+
+ arXiv preprint arXiv:2101.06317 , 2021.
+
+ [6] 
+ 
+Sergei Gukov, James Halverson, Fabian Ruehle, and Piotr Sułkowski.
+
+ Learning to unknot.
+
+ Machine Learning: Science and Technology , 2(2):025035, 2021.
+
+ [7] 
+ 
+Alex Davies, Petar Veličković, Lars Buesing, Sam Blackwell, Daniel
+Zheng, Nenad Tomašev, Richard Tanburn, Peter Battaglia, Charles
+Blundell, András Juhász, et al.
+
+ Advancing mathematics by guiding human intuition with ai.
+
+ Nature , 600(7887):70–74, 2021.
+
+ [8] 
+ 
+Preetum Nakkiran, Gal Kaplun, Yamini Bansal, Tristan Yang, Boaz Barak, and Ilya
+Sutskever.
+
+ Deep double descent: Where bigger models and more data hurt.
+
+ Journal of Statistical Mechanics: Theory and Experiment ,
+2021(12):124003, 2021.
+
+ [9] 
+ 
+Preetum Nakkiran, Prayaag Venkat, Sham Kakade, and Tengyu Ma.
+
+ Optimal regularization can mitigate double descent.
+
+ arXiv preprint arXiv:2003.01897 , 2020.
+
+ [10] 
+ 
+Yoshua Bengio, Aaron Courville, and Pascal Vincent.
+
+ Representation learning: A review and new perspectives.
+
+ IEEE transactions on pattern analysis and machine
+intelligence , 35(8):1798–1828, 2013.
+
+ [11] 
+ 
+Yassine Ouali, Céline Hudelot, and Myriam Tami.
+
+ An overview of deep semi-supervised learning.
+
+ arXiv preprint arXiv:2006.05278 , 2020.
+
+ [12] 
+ 
+Jean-Bastien Grill, Florian Strub, Florent Altché, Corentin Tallec, Pierre
+Richemond, Elena Buchatskaya, Carl Doersch, Bernardo Avila Pires, Zhaohan
+Guo, Mohammad Gheshlaghi Azar, et al.
+
+ Bootstrap your own latent-a new approach to self-supervised learning.
+
+ Advances in Neural Information Processing Systems ,
+33:21271–21284, 2020.
+
+ [13] 
+ 
+Phuc H Le-Khac, Graham Healy, and Alan F Smeaton.
+
+ Contrastive representation learning: A framework and review.
+
+ IEEE Access , 8:193907–193934, 2020.
+
+ [14] 
+ 
+James Halverson, Anindita Maiti, and Keegan Stoner.
+
+ Neural networks and quantum field theory.
+
+ Machine Learning: Science and Technology , 2(3):035002, 2021.
+
+ [15] 
+ 
+Daniel A Roberts, Sho Yaida, and Boris Hanin.
+
+ The principles of deep learning theory.
+
+ arXiv preprint arXiv:2106.10165 , 2021.
+
+ [16] 
+ 
+Daniel Kunin, Javier Sagastuy-Brena, Surya Ganguli, Daniel LK Yamins, and
+Hidenori Tanaka.
+
+ Neural mechanics: Symmetry and broken conservation laws in deep
+learning dynamics.
+
+ arXiv preprint arXiv:2012.04728 , 2020.
+
+ [17] 
+ 
+Yansong Gao and Pratik Chaudhari.
+
+ A free-energy principle for representation learning.
+
+ In International Conference on Machine Learning , pages
+3367–3376. PMLR, 2020.
+
+ [18] 
+ 
+Catherine Olsson, Nelson Elhage, Neel Nanda, Nicholas Joseph, Nova DasSarma,
+Tom Henighan, Ben Mann, Amanda Askell, Yuntao Bai, Anna Chen, Tom Conerly,
+Dawn Drain, Deep Ganguli, Zac Hatfield-Dodds, Danny Hernandez, Scott
+Johnston, Andy Jones, Jackson Kernion, Liane Lovitt, Kamal Ndousse, Dario
+Amodei, Tom Brown, Jack Clark, Jared Kaplan, Sam McCandlish, and Chris Olah.
+
+ In-context learning and induction heads.
+
+ Transformer Circuits Thread , 2022.
+
+ https://transformer-circuits.pub/2022/in-context-learning-and-induction-heads/index.html.
+
+ [19] 
+ 
+Daniel A. Roberts, Sho Yaida, and Boris Hanin.
+
+ The Principles of Deep Learning Theory .
+
+ Cambridge University Press, 2022.
+
+ https://deeplearningtheory.com .
+
+ [20] 
+ 
+Deep Ganguli, Danny Hernandez, Liane Lovitt, Nova DasSarma, Tom Henighan, Andy
+Jones, Nicholas Joseph, Jackson Kernion, Ben Mann, Amanda Askell, et al.
+
+ Predictability and surprise in large generative models.
+
+ arXiv preprint arXiv:2202.07785 , 2022.
+
+ [21] 
+ 
+Jacob Steinhardt.
+
+ Future ML Systems Will Be Qualitatively Different.
+
+ https://www.lesswrong.com/s/4aARF2ZoBpFZAhbbe/p/pZaPhGg2hmmPwByHc ,
+2022.
+
+ [22] 
+ 
+Manzil Zaheer, Satwik Kottur, Siamak Ravanbakhsh, Barnabas Poczos, Russ R
+Salakhutdinov, and Alexander J Smola.
+
+ Deep sets.
+
+ Advances in neural information processing systems , 30, 2017.
+
+ Appendix 
+
+ Appendix A Applicability of our toy setting
+
+ In the main paper, we focused on the toy setting with (1) the addition dataset and (2) the addition operation hard coded in the decoder. Although both simplifications appear to have quite limited applicability, we argue below that the analysis of the toy setting can actually apply to all Abelian groups.
+
+ The addition dataset is the building block of all Abelian groups 
+A cyclic group is a group that is generated by a single element. A finite cyclic group with order n n is C n = { e , g , g 2 , ⋯ , g n − 1 } C_{n}=\{e,g,g^{2},\cdots,g^{n-1}\} where e e is the identify element and g g is the generator and g i = g j g^{i}=g^{j} whenever i = j ⁡ ( mod ​ n ) i=j\ ({\rm mod\ }n) . The modulo addition and { 0 , 1 , ⋯ , n − 1 } \{0,1,\cdots,n-1\} form a cyclic group with e = 0 e=0 and g g can be any number q q coprime to n n such that ( q , n ) = 1 (q,n)=1 . Since algorithmic datasets contain only symbolic but no arithmetic information, the datasets of modulo addition could apply to all other cyclic groups, e.g., modulo multiplication and discrete rotation groups in 2D.
+
+ Although not all Abelian groups are cyclic, a finite Abelian group G G can be always decomposed into a direct product of k k cyclic groups G = C n 1 × C n 2 ⋯ C n k G=C_{n_{1}}\times C_{n_{2}}\cdots C_{n_{k}} . So after training k k neural networks with each handling one cyclic group separately, it is easy to construct a larger neural network that handles the whole Abelian group.
+
+ The addition operation is valid for all Abelian groups 
+It is proved in [ 22 ] that for a permutation invariant function f ⁡ ( x 1 , x 2 , ⋯ , x n ) f(x_{1},x_{2},\cdots,x_{n}) , there exists ρ \rho and ϕ \phi such that
+
+ f ⁡ ( x 1 , x 2 , ⋯ , x n ) = ρ ⁡ [ ∑ i = 1 n ϕ ⁡ ( x i ) ] , f(x_{1},x_{2},\cdots,x_{n})=\rho[\sum_{i=1}^{n}\phi(x_{i})], 
+ 
+ (10) 
+
+ or f ⁡ ( x 1 , x 2 ) = ρ ⁡ ( ϕ ⁡ ( x 1 ) + ϕ ⁡ ( x 2 ) ) f(x_{1},x_{2})=\rho(\phi(x_{1})+\phi(x_{2})) for n = 2 n=2 . Notice that ϕ ⁡ ( x i ) \phi(x_{i}) corresponds to the embedding vector 𝐄 i \mathbf{E}_{i} , ρ \rho corresponds to the decoder. The addition operator naturally emerges from the commutativity of the operator, not restricting the operator itself to be addition. For example, multiplication of two numbers x 1 x_{1} and x 2 x_{2} can be written as x 1 ​ x 2 = exp ⁡ ( ln ⁡ ( x 1 ) + ln ⁡ ( x 2 ) ) x_{1}x_{2}={\rm exp}({\rm ln}(x_{1})+{\rm ln}(x_{2})) where ρ ⁡ ( x ) = exp ⁡ ( x ) \rho(x)={\rm exp}(x) and ϕ ⁡ ( x ) = ln ⁡ ( x ) \phi(x)={\rm ln}(x) .
+
+ Figure 7 : As we include more data in the training set, the (ideal) model have a more structured representation, from (a) to (b) to (c). 
+
+ Appendix B Definition of Acc ^ \widehat{\rm Acc} 
+
+ Given a training set D D and a representation 𝐑 \mathbf{R} , if ( i , j ) (i,j) is a validation sample, can the neural network correctly predict its output, i.e., Dec ⁡ ( 𝐄 i + 𝐄 j ) = 𝐘 i + j {\rm Dec}(\mathbf{E}_{i}+\mathbf{E}_{j})=\mathbf{Y}_{i+j} ? Since neural network has never seen ( i , j ) (i,j) in the training set, one possible mechanism of induction is through
+
+ Dec ⁡ ( 𝐄 i + 𝐄 j ) = Dec ⁡ ( 𝐄 m + 𝐄 n ) = 𝐘 m + n ( = 𝐘 i + j ) . {\rm Dec}(\mathbf{E}_{i}+\mathbf{E}_{j})={\rm Dec}(\mathbf{E}_{m}+\mathbf{E}_{n})=\mathbf{Y}_{m+n}(=\mathbf{Y}_{i+j}). 
+ 
+ (11) 
+
+ The first equality Dec ⁡ ( 𝐄 i + 𝐄 j ) = Dec ⁡ ( 𝐄 m + 𝐄 n ) {\rm Dec}(\mathbf{E}_{i}+\mathbf{E}_{j})={\rm Dec}(\mathbf{E}_{m}+\mathbf{E}_{n}) holds only when 𝐄 i + 𝐄 j = 𝐄 m + 𝐄 n \mathbf{E}_{i}+\mathbf{E}_{j}=\mathbf{E}_{m}+\mathbf{E}_{n} (i.e., ( i , j , m , n ) (i,j,m,n) is a parallelogram). The second equality Dec ⁡ ( 𝐄 m + 𝐄 n ) = 𝐘 m + n \rm{Dec}(\mathbf{E}_{m}+\mathbf{E}_{n})=\mathbf{Y}_{m+n} , holds when ( m , n ) (m,n) in training set, i.e., ( m , n ) ∈ D (m,n)\in D , under the zero training loss assumption. Rigorously, given a training set D D and a parallelogram set P P (which can be calculated from 𝐑 \mathbf{R} ), we collect all zero loss samples in an augmented training set D ¯ \overline{D} 
+
+ D ¯ ( D , P ) = D ⋃ { ( i , j ) | ∃ ( m , n ) ∈ D , ( i , j , m , n ) ∈ P } . \overline{D}(D,P)=D\bigcup\{(i,j)|\exists(m,n)\in D,(i,j,m,n)\in P\}. 
+ 
+ (12) 
+
+ Keeping D D fixed, a larger P P would probably produce a larger D ¯ \overline{D} , i.e., if P 1 ⊆ P 2 P_{1}\subseteq P_{2} , then D ¯ ​ ( D , P 1 ) ⊆ D ¯ ​ ( P , P 2 ) \overline{D}(D,P_{1})\subseteq\overline{D}(P,P_{2}) , which is why in Eq. ( 3 ) our defined RQI ∝ | P | {\rm RQI}\propto|P| gets its name “representation quality index", because higher RQI normally means better generalization. Finally, the expected accuracy from a dataset D D and a parallelogram set P P is:
+
+ Acc ^ = | D ¯ ​ ( D , P ) | | D 0 | , \widehat{{\rm Acc}}=\frac{|\overline{D}(D,P)|}{|D_{0}|}, 
+ 
+ (13) 
+
+ which is the estimated accuracy (of the full dataset), and P = P ⁡ ( 𝐑 ) P=P(\mathbf{R}) is defined on the representation after training. On the other hand, accuracy Acc {\rm Acc} can be accessed empirically from trained neural network.
+We verified Acc ≈ Acc ^ {\rm Acc}\approx\widehat{\rm Acc} in a toy setup (addition dataset p = 10 p=10 , 1D embedding space, hard code addition), as shown in FIG. 3 (c). FIG. 3 (a)(b) show Acc {\rm Acc} and Acc ^ \widehat{\rm Acc} as a function of training set ratio, with each dot corresponding to a different random seed. The dashed red diagonal corresponds to memorization of the training set, and the vertical gap refers to generalization.
+
+ Although the agreement is good for 1D embedding space, we do not expect such agreement can trivially extend to high dimensional embedding space. In high dimensions, our definition of RQI is too restrictive. For example, suppose we have an embedding space with N N dimensions. Although the representation may form a linear structure in the first dimension, the representation can be arbitrary in other N − 1 N-1 dimensions, leading to RQI ≈ 0 \text{RQI}\approx 0 . However, the model may still generalize well if the decoder learns to keep only the useful information (the 1st dimension) and drop all other useless information (other 31 dimensions). It would be interesting to investigate how to define an RQI that takes into account the role of decoder in future works.
+
+ Appendix C The gap of a realistic model ℳ \mathcal{M} and the ideal model ℳ ∗ \mathcal{M}^{*} 
+
+ Realistic models ℳ \mathcal{M} usually form fewer number of parallelograms than ideal models ℳ ∗ \mathcal{M}^{*} . In this section, we analyze the properties of ideal models and calculated ideal RQI and ideal accuracy, which set upper bounds for empirical RQI and accuracy. The upper bound relations are verified via numerical experiments in Fig. 8 .
+
+ Similar to Eq. ( 12 ) where some validation samples can be derived from training samples, we demonstrate how implicit parallelograms can be ‘derived’ from explicit ones in P 0 ​ ( D ) P_{0}(D) . The so-called derivation follows a simple geometric argument that: if A 1 ​ B 1 A_{1}B_{1} is equal and parallel to A 2 ​ B 2 A_{2}B_{2} , and A 2 ​ B 2 A_{2}B_{2} is equal and parallel to A 3 ​ B 3 A_{3}B_{3} , then we can deduce that A 1 ​ B 1 A_{1}B_{1} is equal and parallel to A 3 ​ B 3 A_{3}B_{3} (hence ( A 1 , B 2 , A 2 , B 1 ) (A_{1},B_{2},A_{2},B_{1}) is a parallelogram).
+
+ Recall that a parallelogram ( i , j , m , n ) (i,j,m,n) is equivalent to 𝐄 i + 𝐄 j = 𝐄 m + 𝐄 n \mathbf{E}_{i}+\mathbf{E}_{j}=\mathbf{E}_{m}+\mathbf{E}_{n} ( ∗ ) (*) . So we are equivalently asking if equation ( ∗ ) (*) can be expressed as a linear combination of equations in A ​ ( P 0 ​ ( D ) ) A(P_{0}(D)) . If yes, then ( ∗ ) (*) is dependent on A ​ ( P 0 ​ ( D ) ) A(P_{0}(D)) (defined in Eq. ( 7 )), i.e., A ​ ( P 0 ​ ( D ) ) A(P_{0}(D)) and A ⁡ ( P 0 ​ ( D ) ​ ⋃ ( i , j , m , n ) ) A(P_{0}(D)\bigcup{(i,j,m,n)}) should have the same rank. We augment P 0 ​ ( D ) P_{0}(D) by adding implicit parallelograms, and denote the augmented parallelogram set as
+
+ P ( D ) = P 0 ( D ) ⋃ { q ≡ ( i , j , m , n ) | q ∈ P 0 , rank ( A ( P 0 ( D ) ) ) = rank ( A ( P 0 ( D ) ⋃ q ) ) } . P(D)=P_{0}(D)\bigcup\{q\equiv(i,j,m,n)|q\in P_{0},{\rm rank}(A(P_{0}(D)))={\rm rank}(A(P_{0}(D)\bigcup q))\}. 
+ 
+ (14) 
+
+ We need to emphasize that an assumption behind Eq. ( 14 ) is that we have an ideal model ℳ ∗ \mathcal{M}^{*} . When the model is not ideal, e.g., when the injectivity of the encoder breaks down, fewer parallelograms are expected to form, i.e.,
+
+ P ⁡ ( R ) ⊆ P ⁡ ( D ) . P(R)\subseteq P(D). 
+ 
+ (15) 
+
+ The inequality is saying, whenever a parallelogram is formed in the representation after training, the reason is hidden in the training set. This is not a strict argument, but rather a belief that today’s neural networks can only copy what datasets (explicitly or implicitly) tell it to do, without any autonomous creativity or intelligence. For simplicity we call this belief Alexander Principle . In very rare cases when something lucky happens (e.g., neural networks are initialized at approximate correct weights), Alexander principle may be violated. Alexander principle sets an upper bound for RQI {\rm RQI} :
+
+ RQI ⁡ ( R ) ≤ | P ⁡ ( D ) | | P 0 | ≡ RQI ¯ , {\rm RQI}(R)\leq\frac{|P(D)|}{|P_{0}|}\equiv\overline{\rm RQI}, 
+ 
+ (16) 
+
+ and sets an upper bound for Acc ^ \widehat{\rm Acc} :
+
+ Acc ^ ≡ Acc ^ ​ ( D , P ⁡ ( R ) ) ≤ Acc ^ ​ ( D , P ⁡ ( D ) ) ≡ Acc ¯ , \widehat{\rm Acc}\equiv\widehat{\rm Acc}(D,P(R))\leq\widehat{\rm Acc}(D,P(D))\equiv\overline{{\rm Acc}}, 
+ 
+ (17) 
+
+ Figure 8 : We compare RQI and Acc for an ideal algorithm (with bar) and a realistic algorithm (without bar). In (a)(b)(d)(e), four quantities (RQI, RQI ¯ \overline{\rm RQI} , Acc, Acc ¯ \overline{\rm Acc} ) as functions of training data fraction are shown. In (c)(f), RQI and Acc of the ideal algorithm sets upper bounds for those of the realistic algorithm. 
+
+ In Figure 8 (c)(f), we verify Eq. ( 16 ) and Eq. ( 17 ). We choose δ = 0.01 \delta=0.01 to compute RQI( R R , δ \delta ). We find the trained models are usually far from being ideal, although we already include a few useful tricks proposed in Section 4 to enhance representation learning. It would be an interesting future direction to develop better algorithms so that the gap due to Alexander principle can be reduced or even closed. In Figure 8 (a)(b)(d)(e), four quantities (RQI, RQI ¯ \overline{\rm RQI} , Acc, Acc ¯ \overline{\rm Acc} ) as functions of the training data fraction are shown, each dot corresponding to one random seed. It is interesting to note that it is possible to have RQI ¯ = 1 \overline{\rm RQI}=1 only with < 40 % <40\% training data, i.e., 55 × 0.4 = 22 55\times 0.4=22 samples, agreeing with our observation in Section 3 .
+
+ Realistic representations Suppose an ideal model ℳ ∗ \mathcal{M}^{*} and a realistic model ℳ \mathcal{M} which train on the training set D D give the representation R ∗ R^{*} and R R , respectively. What is the relationship between R R and R ∗ R_{*} ? Due to the Alexander principle we know P ⁡ ( R ) ⊆ P ⁡ ( D ) = P ⁡ ( R ∗ ) P(R)\subseteq P(D)=P(R^{*}) . This means R ∗ R^{*} has more parallelograms than R R , hence R ∗ R^{*} has fewer degrees of freedom than R R .
+
+ We illustrate with the toy case p = 4 p=4 . The whole dataset contains p ⁡ ( p + 1 ) / 2 = 10 p(p+1)/2=10 samples, i.e.,
+
+ D 0 = { ( 0 , 0 ) , ( 0 , 1 ) , ( 0 , 2 ) , ( 0 , 3 ) , ( 1 , 1 ) , ( 1 , 2 ) , ( 1 , 3 ) , ( 2 , 2 ) , ( 2 , 3 ) , ( 3 , 3 ) } . D_{0}=\{(0,0),(0,1),(0,2),(0,3),(1,1),(1,2),(1,3),(2,2),(2,3),(3,3)\}. 
+ 
+ (18) 
+
+ The parallelogram set contains only three elements, i.e.,
+
+ P 0 = { ( 0 , 1 , 1 , 2 ) , ( 0 , 1 , 2 , 3 ) , ( 1 , 2 , 2 , 3 ) } , P_{0}=\{(0,1,1,2),(0,1,2,3),(1,2,2,3)\}, 
+ 
+ (19) 
+
+ Or equivalently the equation set
+
+ A 0 = { A1 : 𝐄 0 + 𝐄 2 = 2 𝐄 1 , A2 : 𝐄 0 + 𝐄 3 = 𝐄 1 + 𝐄 2 , A3 : 𝐄 1 + 𝐄 3 = 2 𝐄 2 } . A_{0}=\{{\rm A1:\mathbf{E}_{0}+\mathbf{E}_{2}=2\mathbf{E}_{1},A2:\mathbf{E}_{0}+\mathbf{E}_{3}=\mathbf{E}_{1}+\mathbf{E}_{2},A3:\mathbf{E}_{1}+\mathbf{E}_{3}=2\mathbf{E}_{2}}\}. 
+ 
+ (20) 
+
+ Pictorially, we can split all possible subsets { A | A ⊆ A 0 } \{A|A\subseteq A_{0}\} into different levels, each level defined by | A | |A| (the number of elements). A subset A 1 A_{1} in the i th i^{\rm th} level points an direct arrow to another subset A 2 A_{2} in the ( i + 1 ) th (i+1)^{\rm th} level if A 2 ⊂ A 1 A_{2}\subset A_{1} , and we say A 2 A_{2} is a child of A 1 A_{1} , and A 1 A_{1} is a parent of A 2 A_{2} . Each subset A A can determine a representation R R with n ⁡ ( A ) n(A) degrees of freedom. So R R should be a descendant of R ∗ R_{*} , and n ⁡ ( R ∗ ) ≤ n ⁡ ( R ) n(R_{*})\leq n(R) . Numerically, n ⁡ ( A ) n(A) is equal to the dimension of the null space of A A .
+
+ Figure 9 : p = 4 p=4 case. Equation set A A (or geometrically, representation) has a hierarchy: a → b a\to b means a a is a parent of b b , and b b is a child of a a . A realistic model can only generate representations that are descendants of the representation generated by an ideal model. 
+
+ Figure 10 : p = 4 p=4 case. Representations obtained from training neural networks are displayed. η 1 \eta_{1} and η 2 \eta_{2} are learning rates of the representation and the decoder, respectively. As described in the main text, ( η 1 , η 2 ) = ( 10 − 2 , 10 − 3 ) (\eta_{1},\eta_{2})=(10^{-2},10^{-3}) (right) is more ideal than ( η 1 , η 2 ) = ( 10 − 3 , 10 − 2 ) (\eta_{1},\eta_{2})=(10^{-3},10^{-2}) (left), thus producing representations containing more parallelograms. 
+
+ Suppose we have a training set
+
+ D = { ( 0 , 2 ) , ( 1 , 1 ) , ( 0 , 3 ) , ( 1 , 2 ) , ( 1 , 3 ) , ( 2 , 2 ) } , D=\{(0,2),(1,1),(0,3),(1,2),(1,3),(2,2)\}, 
+ 
+ (21) 
+
+ and correspondingly P ⁡ ( D ) = P 0 , A ⁡ ( P ) = A 0 P(D)=P_{0},A(P)=A_{0} . So an ideal model ℳ ∗ \mathcal{M}_{*} will have the linear structure 𝐄 k = 𝐚 + k ​ 𝐛 \mathbf{E}_{k}=\mathbf{a}+k\mathbf{b} (see Figure 9 leftmost). However, a realistic model ℳ \mathcal{M} may produce any descendants of the linear structure, depending on various hyperparameters and even random seeds.
+
+ In Figure 10 , we show our algorithms actually generates all possible representations. We have two settings: (1) fast decoder ( η 1 , η 2 ) = ( 10 − 3 , 10 − 2 ) (\eta_{1},\eta_{2})=(10^{-3},10^{-2}) (Figure 10 left), and (2) relatively slow decoder ( η 1 , η 2 ) = ( 10 − 2 , 10 − 3 ) (\eta_{1},\eta_{2})=(10^{-2},10^{-3}) (Figure 10 ) right). The relatively slow decoder produces better representations (in the sense of higher RQI) than a fast decoder, agreeing with our observation in Section 4 .
+
+ Appendix D Conservation laws of the effective theory
+
+ Recall that the effective loss function
+
+ ℓ eff = ℓ 0 Z 0 , ℓ 0 ≡ ∑ ( i , j , m , n ) ∈ P 0 ​ ( D ) | 𝐄 i + 𝐄 j − 𝐄 m − 𝐄 n | 2 , Z 0 ≡ ∑ k | 𝐄 k | 2 \ell_{\text{eff}}=\frac{\ell_{0}}{Z_{0}},\quad\ell_{0}\equiv\sum_{(i,j,m,n)\in P_{0}(D)}|\mathbf{E}_{i}+\mathbf{E}_{j}-\mathbf{E}_{m}-\mathbf{E}_{n}|^{2},\quad Z_{0}\equiv\sum_{k}|\mathbf{E}_{k}|^{2} 
+ 
+ (22) 
+
+ where ℓ 0 \ell_{0} and Z 0 Z_{0} are both quadratic functions of R = { 𝐄 0 , ⋯ , 𝐄 p − 1 } R=\{\mathbf{E}_{0},\cdots,\mathbf{E}_{p-1}\} , and ℓ eff = 0 \ell_{\text{eff}}=0 remains zero under rescaling and translation 𝐄 i ′ = a ​ 𝐄 i + 𝐛 \mathbf{E}_{i}^{\prime}=a\mathbf{E}_{i}+\mathbf{b} . The representation vector 𝐄 i \mathbf{E}_{i} evolves according to the gradient descent
+
+ d ​ 𝐄 i d ​ t = − ∂ ℓ eff ∂ 𝐄 i . \frac{d\mathbf{E}_{i}}{dt}=-\frac{\partial\ell_{\text{eff}}}{\partial\mathbf{E}_{i}}. 
+ 
+ (23) 
+
+ We will prove the following two quantities are conserved:
+
+ 𝐂 = ∑ k 𝐄 k , Z 0 = ∑ k | 𝐄 k | 2 \mathbf{C}=\sum_{k}\mathbf{E}_{k},\quad Z_{0}=\sum_{k}|\mathbf{E}_{k}|^{2} 
+ 
+ (24) 
+
+ Eq. ( 22 ) and Eq. ( 23 ) give
+
+ d ​ 𝐄 i d ​ t = − ℓ eff ∂ 𝐄 i = − ∂ ( ℓ 0 Z 0 ) ∂ 𝐄 i = − 1 Z 0 ​ ∂ ℓ 0 ∂ 𝐄 i + ℓ 0 Z 0 2 ​ ∂ Z 0 ∂ 𝐄 i . \frac{d\mathbf{E}_{i}}{dt}=-\frac{\ell_{\text{eff}}}{\partial\mathbf{E}_{i}}=-\frac{\partial(\frac{\ell_{0}}{Z_{0}})}{\partial\mathbf{E}_{i}}=-\frac{1}{Z_{0}}\frac{\partial\ell_{0}}{\partial\mathbf{E}_{i}}+\frac{\ell_{0}}{Z_{0}^{2}}\frac{\partial Z_{0}}{\partial\mathbf{E}_{i}}. 
+ 
+ (25) 
+
+ Then
+
+ d ​ Z 0 d ​ t \displaystyle\frac{dZ_{0}}{dt} 
+ = 2 ​ ∑ i 𝐄 k ⋅ d ​ 𝐄 k d ​ t \displaystyle=2\sum_{i}\mathbf{E}_{k}\cdot\frac{d\mathbf{E}_{k}}{dt} 
+ 
+ (26) 
+
+ = 2 Z 0 2 ​ ∑ i 𝐄 i ⋅ ( − Z 0 ​ ∂ ℓ 0 ∂ 𝐄 k + 2 ​ ℓ 0 ​ 𝐄 k ) \displaystyle=\frac{2}{Z_{0}^{2}}\sum_{i}\mathbf{E}_{i}\cdot(-Z_{0}\frac{\partial\ell_{0}}{\partial\mathbf{E}_{k}}+2\ell_{0}\mathbf{E}_{k}) 
+
+ = 2 Z 0 ( − ∑ k ∂ ℓ 0 ∂ 𝐄 k ⋅ 𝐄 k + 2 ℓ 0 ) \displaystyle=\frac{2}{Z_{0}}(-\sum_{k}\frac{\partial\ell_{0}}{\partial\mathbf{E}_{k}}\cdot\mathbf{E}_{k}+2\ell_{0}) 
+
+ = 0 . \displaystyle=0. 
+
+ where the last equation uses the fact that
+
+ ∑ k ∂ ℓ 0 ∂ 𝐄 k ⋅ 𝐄 k \displaystyle\sum_{k}\frac{\partial\ell_{0}}{\partial\mathbf{E}_{k}}\cdot\mathbf{E}_{k} 
+ = 2 ​ ∑ k ∑ ( i , j , m , n ) ∈ P 0 ​ ( D ) ( 𝐄 i + 𝐄 j − 𝐄 m − 𝐄 n ) ​ ( δ i ​ k + δ j ​ k − δ m ​ k − δ n ​ k ) ⋅ 𝐄 k \displaystyle=2\sum_{k}\sum_{(i,j,m,n)\in P_{0}(D)}(\mathbf{E}_{i}+\mathbf{E}_{j}-\mathbf{E}_{m}-\mathbf{E}_{n})(\delta_{ik}+\delta_{jk}-\delta_{mk}-\delta_{nk})\cdot\mathbf{E}_{k} 
+
+ = 2 ​ ∑ ( i , j , m , n ) ∈ P 0 ​ ( D ) ( 𝐄 i + 𝐄 j − 𝐄 m − 𝐄 n ) ​ ∑ k ( δ i ​ k + δ j ​ k − δ m ​ k − δ n ​ k ) ⋅ 𝐄 k \displaystyle=2\sum_{(i,j,m,n)\in P_{0}(D)}(\mathbf{E}_{i}+\mathbf{E}_{j}-\mathbf{E}_{m}-\mathbf{E}_{n})\sum_{k}(\delta_{ik}+\delta_{jk}-\delta_{mk}-\delta_{nk})\cdot\mathbf{E}_{k} 
+
+ = ∑ ( i , j , m , n ) ∈ P 0 ​ ( D ) ( 𝐄 i + 𝐄 j − 𝐄 m − 𝐄 n ) ⋅ ( 𝐄 i + 𝐄 j − 𝐄 m − 𝐄 n ) \displaystyle=\sum_{(i,j,m,n)\in P_{0}(D)}(\mathbf{E}_{i}+\mathbf{E}_{j}-\mathbf{E}_{m}-\mathbf{E}_{n})\cdot(\mathbf{E}_{i}+\mathbf{E}_{j}-\mathbf{E}_{m}-\mathbf{E}_{n}) 
+
+ = 2 ​ ℓ 0 \displaystyle=2\ell_{0} 
+
+ The conservation of Z 0 Z_{0} prohibits the representation from collapsing to zero. Now that we have demonstrated that Z 0 Z_{0} is a conserved quantity, we can also show
+
+ d ​ 𝐂 d ​ t \displaystyle\frac{d\mathbf{C}}{dt} 
+ = ∑ k d ​ 𝐄 k d ​ t \displaystyle=\sum_{k}\frac{d\mathbf{E}_{k}}{dt} 
+ 
+ (27) 
+
+ = − 1 Z 0 ∑ k ∂ ℓ 0 ∂ 𝐄 k \displaystyle=-\frac{1}{Z_{0}}\sum_{k}\frac{\partial\ell_{0}}{\partial\mathbf{E}_{k}} 
+
+ = − 2 Z 0 ∑ k ∑ ( i , j , m , n ) ∈ P 0 ​ ( D ) ( 𝐄 i + 𝐄 j − 𝐄 m − 𝐄 n ) ( δ i ​ k + δ j ​ k − δ m ​ k − δ n ​ k ) \displaystyle=-\frac{2}{Z_{0}}\sum_{k}\sum_{(i,j,m,n)\in P_{0}(D)}(\mathbf{E}_{i}+\mathbf{E}_{j}-\mathbf{E}_{m}-\mathbf{E}_{n})(\delta_{ik}+\delta_{jk}-\delta_{mk}-\delta_{nk}) 
+
+ = 𝟎 . \displaystyle=\bf 0. 
+
+ The last equality holds because the two summations can be swapped and ∑ k ( δ i ​ k + δ j ​ k − δ m ​ k − δ n ​ k ) = 0 \sum_{k}(\delta_{ik}+\delta_{jk}-\delta_{mk}-\delta_{nk})=0 .
+
+ Appendix E More phase diagrams of the toy setup
+
+ We study another three hyperparameters in the toy setup by showing phase diagrams similar to Figure 5 . The toy setup is: (1) addition without modulo ( p = 10 p=10 ); (2) training/validation is split into 45/10; (3) hard code addition; (4) 1D embedding. In the following experiments, the decoder is an MLP with size 1-200-200-30. The representation and the encoder are optimized with AdamW with different hyperparameters. The learning rate of the representation is 10 − 3 10^{-3} . We sweep the learning rate of the decoder in range [ 10 − 4 , 10 − 2 ] [10^{-4},10^{-2}] as the x axis, and sweep another hyperparameter as the y axis. By default, we use full batch size 45, initialization scale s = 1 s=1 and zero weight decay of representation.
+
+ Batch size controls the amount of noise in the training dynamics. In Figure 11 , the grokking region appears at the top left of the phase diagram (small decoder learning rate and small batch size). However, large batch size (with small learning rate) leads to comprehension, implying that smaller batch size seems harmful. This makes sense since to get crystals (good structures) in experiments, one needs a freezer which gradually decreases temperature, rather than something perturbing the system with noise.
+
+ Figure 11 : Phase diagrams of decoder learning rate (x axis) and batch size (y axis) for the addition group (left: regression; right: classification). Small decoder leanrning rate and large batch size (bottom left) lead to comprehension. 
+
+ Initialization scale controls distances among embedding vectors at initialization. We initialize components of embedding vectors from independent uniform distribution U [ − s / 2 , s / 2 ] U[-s/2,s/2] where s s is called the initialization scale. Shown in Figure 12 , it is beneficial to use a smaller initialization scale. This agrees with the physical intuition that closer particles are more likely to interact and form structures. For example, the distances among molecules in ice are much smaller than distances in gas.
+
+ Figure 12 : Phase diagrams of decoder learning rate (x axis) and initialization (y axis) for the addition group (left: regression; right: classification). Small intialization scale (top) leads to comprehension. 
+
+ Representation weight decay controls the magnitude of embedding vectors. Shown in Figure 13 , we see the representation weight decay in general does not affect model performance much.
+
+ Figure 13 : Phase diagrams of decoder learning rate (x axis) and representation weight decay (y axis) for the addition group (left: regression; right: classification). Representation weight decay does not affect model performance much. 
+
+ Appendix F General groups
+
+ F.1 Theory
+
+ We focused on Abelian groups for the most part of the paper. This is, however, simply due to pedagogical reasons. In this section, we show that it is straight-forward to extend definitions of parallelograms and representation quality index (RQI) to general non-Abelian groups. We will also show that most (if not all) qualitative results for the addition group also apply to the permutation group.
+
+ Matrix representation for general groups Let us first review the definition of group representation. A representation of a group G G on a vector space V V is a group homomorphism from G G to GL ⁡ ( V ) {\rm GL}(V) , the general linear group on V V . That is, a representation is a map ρ : G → GL ⁡ ( V ) \rho:G\to{\rm GL}(V) such that
+
+ ρ ⁡ ( g 1 ​ g 2 ) = ρ ⁡ ( g 1 ) ​ ρ ​ ( g 2 ) , ∀ g 1 , g 2 ∈ G . \rho(g_{1}g_{2})=\rho(g_{1})\rho(g_{2}),\quad\forall g_{1},g_{2}\in G. 
+ 
+ (28) 
+
+ In the case V V is of finite dimension n n , it is common to identify GL ⁡ ( V ) {\rm GL}(V) with n n by n n invertible matrices. The punchline is that: each group element can be represented as a matrix, and the binary operation is represented as matrix multiplication.
+
+ A new architecture for general groups Inspired by the matrix representation, we embed each group element a a as a learnable matrix 𝐄 a ∈ ℝ d × d \mathbf{E}_{a}\in\mathbb{R}^{d\times d} (as opposed to a vector), and manually do matrix multiplication before sending the product to the deocder for regression or classification. More concretly, for a ∘ b = c a\circ b=c , our architecture takes as input two embedding matrices 𝐄 a \mathbf{E}_{a} and 𝐄 b \mathbf{E}_{b} and aims to predict 𝐘 c \mathbf{Y}_{c} such that 𝐘 c = Dec ⁡ ( 𝐄 a ​ 𝐄 b ) \mathbf{Y}_{c}={\rm Dec}(\mathbf{E}_{a}\mathbf{E}_{b}) , where 𝐄 a ​ 𝐄 b \mathbf{E}_{a}\mathbf{E}_{b} means the matrix multiplication of 𝐄 a \mathbf{E}_{a} and 𝐄 b \mathbf{E}_{b} . The goal of this simplication is to disentangle learning the representation and learning the arithmetic operation (i.e, the matrix multiplication). We will show that, even with this simplification, we are still able to reproduce the characteristic grokking behavior and other rich phenomenon.
+
+ Generalized parallelograms we define generalized parallelograms: ( a , b , c , d ) (a,b,c,d) is a generalized parallelogram in the representation if ‖ 𝐄 a ​ 𝐄 b − 𝐄 c ​ 𝐄 d ‖ F 2 ≤ δ ||\mathbf{E}_{a}\mathbf{E}_{b}-\mathbf{E}_{c}\mathbf{E}_{d}||_{F}^{2}\leq\delta , where δ > 0 \delta>0 is a threshold to tolerate numerical errors. Before presenting the numerical results for the permutation group, we show an intuitive picture about how new parallelograms can be deduced from old ones for general groups, which is the key to generalization.
+
+ Deduction of parallelograms 
+
+ Figure 14 : Deduction of parallelograms 
+
+ We first recall the case of the Abelian group (e.g., addition group). As shown in Figure 14 , when ( a , d , b , c ) (a,d,b,c) and ( c , f , d , e ) (c,f,d,e) are two parallelograms, we have
+
+ 𝐄 a + 𝐄 d = 𝐄 b + 𝐄 c \displaystyle\mathbf{E}_{a}+\mathbf{E}_{d}=\mathbf{E}_{b}+\mathbf{E}_{c} 
+ 
+ (29) 
+
+ 𝐄 c + 𝐄 f = 𝐄 d + 𝐄 d \displaystyle\mathbf{E}_{c}+\mathbf{E}_{f}=\mathbf{E}_{d}+\mathbf{E}_{d} 
+
+ We can derive that 𝐄 a + 𝐄 f = 𝐄 b + 𝐄 e \mathbf{E}_{a}+\mathbf{E}_{f}=\mathbf{E}_{b}+\mathbf{E}_{e} implying that ( a , f , b , e ) (a,f,b,e) is also a parallelogram. That is, for Abelian groups, two parallelograms are needed to deduce a new parallelogram.
+
+ For the non-Abelian group, if we have only two parallelograms such that
+
+ 𝐄 a ​ 𝐄 d = 𝐄 b ​ 𝐄 c \displaystyle\mathbf{E}_{a}\mathbf{E}_{d}=\mathbf{E}_{b}\mathbf{E}_{c} 
+ 
+ (30) 
+
+ 𝐄 f ​ 𝐄 c = 𝐄 e ​ 𝐄 d \displaystyle\mathbf{E}_{f}\mathbf{E}_{c}=\mathbf{E}_{e}\mathbf{E}_{d} 
+
+ we have 𝐄 b − 1 ​ 𝐄 a = 𝐄 c ​ 𝐄 d − 1 = 𝐄 f − 1 ​ 𝐄 e \mathbf{E}_{b}^{-1}\mathbf{E}_{a}=\mathbf{E}_{c}\mathbf{E}_{d}^{-1}=\mathbf{E}_{f}^{-1}\mathbf{E}_{e} , but this does not lead to something like 𝐄 f ​ 𝐄 a = 𝐄 e ​ 𝐄 b \mathbf{E}_{f}\mathbf{E}_{a}=\mathbf{E}_{e}\mathbf{E}_{b} , hence useless for generalization. However, if we have a third parallelogram such that
+
+ 𝐄 e ​ 𝐄 h = 𝐄 f ​ 𝐄 g \mathbf{E}_{e}\mathbf{E}_{h}=\mathbf{E}_{f}\mathbf{E}_{g} 
+ 
+ (31) 
+
+ we have 𝐄 b − 1 ​ 𝐄 a = 𝐄 c ​ 𝐄 d − 1 = 𝐄 f − 1 ​ 𝐄 e = 𝐄 g ​ 𝐄 h − 1 \mathbf{E}_{b}^{-1}\mathbf{E}_{a}=\mathbf{E}_{c}\mathbf{E}_{d}^{-1}=\mathbf{E}_{f}^{-1}\mathbf{E}_{e}=\mathbf{E}_{g}\mathbf{E}_{h}^{-1} , equivalent to 𝐄 a ​ 𝐄 h = 𝐄 b ​ 𝐄 g \mathbf{E}_{a}\mathbf{E}_{h}=\mathbf{E}_{b}\mathbf{E}_{g} , thus establishing a new parallelogram ( a , h , b , g ) (a,h,b,g) . That is, for non-Abelian groups, three parallelograms are needed to deduce a new parallelogram.
+
+ F.2 Numerical Results
+
+ In this section, we conduct numerical experiments on a simple non-abelian group: the permutation group S 3 S_{3} . The group has 6 group elements, hence the full dataset contains 36 samples. We embed each group element a a into a learnable 3 × 3 3\times 3 embedding matrix 𝐄 a \mathbf{E}_{a} . We adopt the new architecture described in the above subsection: we hard code matrix multiplication of two input embedding matrices before feeding to the decoder. After defining the generalized parallelogram in the last subsection, we can continue to define RQI (as in Section 3 ) and predict accuracy Acc ^ \widehat{\rm Acc} from representation
+(as in appendix B ). We also compute the number of steps needed to reach RQI = 0.95 {\rm RQI}=0.95 .
+
+ Representation We flatten each embedding matrix into a vector, and apply principal component analysis (PCA) to the vectors. We show the first three principal components of these group elements in Figure 15 . On the plane of PC ​ 1 {\rm PC}1 and PC ​ 3 {\rm PC}3 , the six points are organized as a hexagon.
+
+ Figure 15 : Permuation group S 3 S_{3} . First three principal components of six embedding matrices ℝ 3 × 3 \mathbb{R}^{3\times 3} . 
+
+ Figure 16 : Permutation group S 3 S_{3} . (a) RQI increases as training set becomes larger. Each scatter point is a random seed, and the blue line is the highest RQI obtained with a fixed training set ratio; (b) steps to reach RQI>0.95. The blue line is the smallest number of steps required. There is a phase transition around r c = 0.5 r_{c}=0.5 . (c) real accuracy Acc {\rm Acc} ; (d) predicted accuracy Acc ^ \widehat{\rm Acc} ; (e) comparison of Acc {\rm Acc} and Acc ^ \widehat{\rm Acc} : Acc ^ \widehat{\rm Acc} serves as a lower bound of Acc {\rm Acc} . 
+
+ RQI In Figure 16 (a), we show RQI as a function of training data fraction. For each training data fraction, we run 11 random seeds (shown as scatter points), and the blue line corresponds to the highest RQI.
+
+ Steps to reach RQI = 0.95 =0.95 In Figure 16 (b), we whow the steps to reach RQI > 0.95 {\rm RQI}>0.95 as a function of training data fraction, and find a phase transition at r = r c = 0.5 r=r_{c}=0.5 . The blue line corresponds to the best model (smallest number of steps).
+
+ Accuracy The real accuracy Acc {\rm Acc} is shown in Figure 16 (c), while the predicted accuracy Acc ^ \widehat{\rm Acc} (calculated from RQI) is shown in Figure 16 (d). Their comparison is shown in (e): Acc ^ \widehat{\rm Acc} is a lower bound of Acc {\rm Acc} , implying that there must be some generalization mechanism beyond RQI.
+
+ Phase diagram We investigate how the model performance varies under the change of two knobs: decoder learning rate and decoder weight decay. We calculate the number of steps to training accuracy ≥ 0.9 \geq 0.9 and validation accuracy ≥ 0.9 \geq 0.9 , respectively, shown in Figure 5 (d).

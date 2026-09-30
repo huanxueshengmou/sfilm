@@ -1,0 +1,58 @@
+[
+ {
+  "file": "17_grokking_01.png",
+  "w": 1367,
+  "h": 587,
+  "bytes": 38209,
+  "src": "https://arxiv.org/html/2606.12966v1/fig8_fsd_vs_exloss.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "17_grokking_02.png",
+  "w": 2179,
+  "h": 1975,
+  "bytes": 191911,
+  "src": "https://arxiv.org/html/2606.12966v1/fig5_two_phase_grokking.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "17_grokking_03.png",
+  "w": 1517,
+  "h": 587,
+  "bytes": 111664,
+  "src": "https://arxiv.org/html/2606.12966v1/fig7_wd_intervention.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "17_grokking_04.png",
+  "w": 1979,
+  "h": 1375,
+  "bytes": 157734,
+  "src": "https://arxiv.org/html/2606.12966v1/fig6_memorisation_trajectory.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "17_grokking_05.png",
+  "w": 917,
+  "h": 557,
+  "bytes": 43104,
+  "src": "https://arxiv.org/html/2606.12966v1/fig9_arch_ablation.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "17_grokking_06.png",
+  "w": 1517,
+  "h": 602,
+  "bytes": 109726,
+  "src": "https://arxiv.org/html/2606.12966v1/fig10_crossprime_timing.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "17_grokking_07.png",
+  "w": 1500,
+  "h": 375,
+  "bytes": 33443,
+  "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+  "alt": "Simons Foundation International"
+ }
+]

@@ -1,0 +1,2353 @@
+# Hidden Progress in Deep Learning: SGD Learns Parities Near the Computational Limit
+# id: 05 | lang: en | category: 隐式进展
+# source: https://arxiv.org/html/2207.08799v1
+# extracted_via: article | chars: 186567 | figures: 11
+==============================================================================
+
+Hidden Progress in Deep Learning: 
+ SGD Learns Parities Near the Computational Limit
+
+ Boaz Barak
+ 
+ Email: b@boazbarak.org 
+
+ Benjamin L. Edelman
+ 
+ Email: bedelman@g.harvard.edu 
+
+ Surbhi Goel
+ 
+ Email: goel.surbhi@microsoft.com 
+
+ Sham Kakade
+ 
+ Email: sham@seas.harvard.edu 
+
+ Eran Malach
+ 
+ Affiliation: Harvard University Microsoft Research NYC  Hebrew University of Jerusalem
+ 
+ Email: eran.malach@mail.huji.ac.il 
+
+ Cyril Zhang
+ 
+ Email: cyrilzhang@microsoft.com 
+
+ Abstract
+
+ There is mounting empirical evidence of emergent phenomena in the capabilities of deep learning methods as we scale up datasets, model sizes, and training times. While there are some accounts of how these resources modulate statistical capacity, far less is known about their effect on the computational problem of model training. This work conducts such an exploration through the lens of learning k k -sparse parities of n n bits, a canonical family of problems which pose theoretical computational barriers. In this setting, we find that neural networks exhibit surprising phase transitions when scaling up dataset size and running time. In particular, we demonstrate empirically that with standard training, a variety of architectures learn sparse parities with n O ⁡ ( k ) n^{O(k)} examples, with loss (and error) curves abruptly dropping after n O ⁡ ( k ) n^{O(k)} iterations. These positive results nearly match known SQ lower bounds, even without an explicit sparsity-promoting prior. We elucidate the mechanisms of these phenomena with a theoretical analysis: we find that the phase transition in performance is not due to SGD “stumbling in the dark” until it finds the hidden set of features (a natural algorithm which also runs in n O ⁡ ( k ) n^{O(k)} time); instead, we show that SGD gradually amplifies a Fourier gap in the population gradient.
+
+ 1 Introduction
+
+ Neural networks perform better with more resources (data, model size, training time), but different tasks exhibit qualitatively different dependencies of performance on resources.
+In particular, while many learning tasks exhibit continuous improvement in performance with increasing resources, other cases show discontinuous improvement, where a capability emerges at a certain threshold.
+Through a statistical lens, it is well-understood that larger models, trained with more data, can fit more complex and expressive functions. However, far less is known about the analogous computational question: how does the scaling of these resources influence the success of gradient-based optimization for training these models?
+
+ These emergent phase transitions cannot be explained via statistical capacity alone. In many cases we see a phase transition even when the amount of data remains fixed, with only model size or training time increasing.
+A timely example is the emergence of reasoning and few-shot learning capabilities when scaling up language models ( Radford et al., 2019 , Brown et al., 2020 , Chowdhery et al., 2022 , Hoffmann et al., 2022 ) . Power et al. (2022) give examples exhibiting discontinuous improvements in population accuracy (“grokking”) when running time increases, while data and model size remain fixed.
+
+ In this work, we analyze the computational aspect of scaling in deep learning in a simple synthetic setting which already exhibits discontinuous improvements. Specifically, we consider the sparse parity problem — where the label is the parity (XOR) of k ≪ n k\ll n bits in a random length- n n binary string. This is a canonical problem which is computationally difficult for a range of algorithms, including gradient-based ( Kearns, 1998 ) and streaming ( Kol et al., 2017 ) algorithms. We focus on analyzing the resource measure of training time , and demonstrate that the loss curves for sparse parities display a phase transition across a variety of architectures and hyperparameters (see Figure 1 , left). A striking observation is that SGD robustly finds the sparse subset (and hence, effectively, reaches 0 error) with a variety of activation functions and initialization schemes, even with no over-parameterization. This robust convergence is the starting point for our investigation.
+
+ Figure 1: Main empirical findings at a glance. A variety of neural networks, with standard training and initialization, can solve the ( n , k ) (n,k) -parity learning problem, with a number of iterations scaling as n O ⁡ ( k ) n^{O(k)} . Left: Training curves under various algorithmic choices (architecture, batch size, learning rate) on the ( n = 50 , k = 3 ) (n=50,k=3) -parity problem. Right: Median convergence times for small ( n , k ) (n,k) .
+
+ Perhaps the most natural hypothesis to explain SGD’s success in learning parities would be that it simply “stumbles in the dark”, essentially performing random search for the unknown target (e.g. via stochastic gradient Langevin dynamics). If that were the case, we might expect to observe a convergence time of 2 Ω ⁡ ( n ) 2^{\Omega(n)} , like a naive search over parameters or subsets of indices.
+However, Figure 1 (right) , already provides some evidence against this “random search” hypothesis: the convergence time is closer to an n O ⁡ ( k ) n^{O(k)} scaling. Notably, such a convergence rate implies that SGD is closer to achieving the optimal computation time among a natural class of algorithms, namely SQ (statistical query) algorithms.
+
+ In this work, through an extensive empirical analysis of the scaling behavior of a variety of models, as well as theoretical analysis, we give strong evidence against the “stumbling in the dark” viewpoint. Instead, there is a hidden progress measure under which SGD is steadily improving. Furthermore, and perhaps surprisingly, we show that SGD achieves a computational runtime much closer to the optimal SQ lower bound than simply doing (non-sparse) parameter search. More generally, our theoretical and empirical investigations reveal a number of notable phenomena regarding the dependence of SGD’s performance on resources, and we provide further theoretical and empirical evidence of phase transitions with data, model size, and training time.
+
+ 1.1 Our contributions
+
+ SGD efficiently learns sparse parities, in theory and practice.
+
+ It is known from SQ lower bounds that (noisy) gradient descent on any architecture requires at least n Ω ⁡ ( k ) n^{\Omega(k)} computational steps to learn k k -sparse n n -dimensional parities (for background, see Appendix A ). However, with standard architectures and initialization, which do not explicitly encode a sparsity prior, one may expect SGD’s performance to be much worse, on the order of 2 Ω ⁡ ( n ) 2^{\Omega(n)} . We give extensive empirical evidence that this is not the case.
+
+ Empirical Finding 1 . 
+
+ For all small instances ( n ≤ 30 , k ≤ 4 n\leq 30,k\leq 4 ) of the sparse parity problem, architectures 𝒜 ∈ { \mathcal{A}\in\{ 2-layer MLPs, Transformers 1 1 
+ 1 
+
+ With a smaller range of hyperparameters. , sinusoidal (and other non-standard) neurons, PolyNets 2 2 
+ 2 
+
+ A non-standard architecture introduced in this work; see Section 3 for the definition. } \} , initializations in { \{ uniform, Gaussian, Bernoulli } \} , and batch sizes 1 ≤ B ≤ 1024 1\leq B\leq 1024 , SGD on 𝒜 \mathcal{A} solves the ( n , k ) (n,k) -sparse parity problem (w.p. ≥ 0.2 \geq 0.2 ) within at most c ⋅ n α ​ k c\cdot n^{\alpha k} steps, for small architecture-dependent constants c , α c,\alpha . 
+
+ For a subset of these architectures, we performed more extensive training, to show scaling behaviors of the computation time; 3 3 
+ 3 
+
+ While our focus is on the performance as a function of training time , we also performed some experiments on performance as a function of model size , see Section 5 . see Figure 1 (right) and Figure 10 in the appendix.
+
+ The above results indicate that SGD succeeds at solving parities much faster than the 2 Ω ⁡ ( n ) 2^{\Omega(n)} steps that would be required by random search without a sparse prior. This suggests that despite flat loss and accuracy curves before the phase transition, SGD makes progress “under the hood”. We show that this is indeed the case by coming up with a progress measure that continuously improves throughout training. We can explain the loss and accuracy curves using this progress measure, by showing that they typically rise sharply once the measure passes a certain threshold.
+
+ Theoretical Analysis.
+
+ Our empirical results suggest that, in a number of computational steps matching the SQ limit, SGD is able to solve the parity problem and identify the influential coordinates, without an explicit sparse prior. We give a theoretical analysis which validates this claim.
+
+ Informal Theorem 2 . 
+
+ On 2-layer MLPs of width 2 Θ ⁡ ( k ) 2^{\Theta(k)} , and with batch size n O ⁡ ( k ) n^{O(k)} , SGD converges with high probability to a solution with at most ϵ \epsilon error on the ( n , k ) (n,k) -parity problem in at most 2 O ⁡ ( k ) ⋅ poly ⁡ ( 1 / ϵ ) 2^{O(k)}\cdot\mathrm{poly}(1/\epsilon) iterations. 
+
+ We also present a stronger analysis for an idealized architecture (which we call the disjoint-PolyNet ), which allows for any batch size, and captures the phase transitions observed in the error curves.
+
+ Informal Theorem 3 . 
+
+ On disjoint-PolyNets, SGD (with any batch size B ≥ 1 B\geq 1 ) converges with high probability to a solution with at most ϵ \epsilon error on the ( n , k ) (n,k) -parity problem in at most n O ⁡ ( k ) ⋅ log ⁡ ( 1 / ϵ ) n^{O(k)}\cdot\log(1/\epsilon) iterations. Continuous-time gradient flow exhibits a phase transition: it spends a 1 − o ⁡ ( 1 ) 1-o(1) fraction of its time before convergence with error ≥ 49 % \geq 49\% . 
+
+ In addition to refuting the alternative “random search” hypothesis, our work also poses a counterexample to other models for the computational mechanisms of deep learning; for instance, it provides a setting where deep neural nets successfully learn a concept to 100% accuracy while the corresponding Neural Tangent Kernel (NTK) only achieves trivial performance, hence showing the importance of feature learning .
+We also construct a counterexample to the “deep only works if shallow is good” principle of Malach and Shalev-Shwartz (2019) , demonstrating a case where a deep network can get near-perfect accuracy even when greedy layerwise training (e.g. Belilovsky et al. (2019) ) cannot beat trivial performance.
+By providing positive theory and empirics which elude these simplified explanations of SGD, we hope to point the way to a more complete understanding of learning dynamics in the challenging cases where no apparent progress is made for extended periods of time.
+
+ 1.2 Related work
+
+ We present the most directly related work below, on feature learning, learning parities with neural nets, and the statistical mechanics of machine learning. A broader discussion of related work can be found in Appendix A.3 .
+
+ SGD and feature learning.
+
+ Theoretical analysis of gradient descent over neural networks is notoriously hard, due to the non-convex nature of the optimization problem. That said, it has been established that in some settings, the dynamics of GD keep the weights close to their initialization, thus behaving like convex optimization over the Neural Tangent Kernel (see, for example, Jacot et al. (2018) , Allen-Zhu et al. (2019) , Du et al. (2018) ). In contrast, it has been shown that in various tasks, moving away from the fixed features of the NTK is essential for the success of neural networks trained with GD (for example Yehudai and Shamir (2019) , Allen-Zhu and Li (2019) , Wei et al. (2019) and the review in Malach et al. (2021) ). These results demonstrate that feature learning is an important part of the GD optimization process. Our work also focuses on a setting where feature learning is essential for the target task. In our theoretical analysis, we show that the initial population gradient encodes the relevant features for the problem. The importance of the first gradient step for feature learning has been recently studied in ( Ba et al., 2022 ) .
+
+ Learning parities with neural networks.
+
+ The problem of learning parities using neural networks has been investigated in prior works from various perspectives. It has been demonstrated that parities are hard for gradient-based algorithms, using similar arguments as in the SQ analysis ( Shalev-Shwartz et al., 2017 , Abbe and Sandon, 2020 ) . One possible approach for overcoming the computational hardness is to make favorable assumptions on the input distribution. Indeed, recent works show that under various assumptions on the input distribution, neural networks can be efficiently trained to learn parities (XORs) ( Daniely and Malach, 2020 , Shi et al., 2021 , Frei et al., 2022 , Malach et al., 2021 ) . In contrast to these results, this work takes the approach of intentionally focusing on a hard benchmark task, without assuming that the distribution has some favorable (namely, non-uniform) structure. This setting allows us to probe the performance of deep learning at a known computational limit. Notably, the work of Andoni et al. (2014) provides analysis for learning polynomials (and in particular, parities) under the uniform distribution. However, their main results require a network of size n O ⁡ ( k ) n^{O(k)} (i.e., extremely overparameterized network), and provides only partial theoretical and empirical evidence for the success of smaller networks.
+Studying a related subject, some works have shown that neural networks display a spectral bias, learning to fit low-frequency coefficients before high-frequency ones ( Rahaman et al., 2019 , Cao et al., 2019 ) .
+
+ Statistical mechanics of machine learning.
+
+ An extensive body of work originating in the statistical physics community has studied phase transitions in the learning curves of neural networks ( Gardner and Derrida, 1989 , Watkin et al., 1993 , Engel and Van den Broeck, 2001 ) . These works typically focus on student-teacher learning in the “thermodynamic limit”, in which the number of training examples is α \alpha times larger than the input dimension and both are taken to infinity. One of the classic toy architectures analyzed in this literature is the parity machine ( Mitchison and Durbin, 1989 , Hansel et al., 1992 , Opper, 1994 , Kabashima, 1994 , Simonetti and Caticha, 1996 ) . In our work, we introduce PolyNets, a variant of parity machines in which the output is real-valued rather than ± 1 \pm 1 ; and we theoretically analyze disjoint-Polynets, which are the real-output analogue of the oft-considered parity machines with tree architecture. While much of the statistical mechanics of ML literature focuses on an idealized training limit in which the weights reach a Gibbs distribution equilibrium, there is a strand of the literature that aims to characterize the trajectory of SGD training in the high-dimensional limit with constant-sized sets of ordinary differential equations ( Saad and Solla, 1995b , Saad and Solla, 1995a , Goldt et al., 2019 ) . These papers discuss cases, including problems that share aspects with 2-sparse parities Refinetti et al. (2021) , where the network gets stuck in (and then escapes from) a plateau of suboptimal generalization error. Recently, Arous et al. (2021) studied (for rank-one parameter estimation problems) the relative amount of time spent by SGD in an initial high-error “search” phase versus a final “descent” phase, which is reminiscent of the framing of Theorem 7 . However, to our knowledge prior work has not shown k k -sparse parities can be learned with a number of iterations that nearly matches known lower bounds, nor has it specifically studied phase transitions in k k -sparse parity learning during gradient descent.
+
+ 2 Preliminaries
+
+ We define necessary notation here; see Appendix A for more background and technical ingredients.
+
+ Sparse parities.
+
+ For integer n ≥ 1 n\geq 1 and non-empty S ⊆ [ n ] S\subseteq[n] , the ( n , S ) (n,S) - parity function χ S : { ± 1 } n → { ± 1 } \chi_{S}:\{\pm 1\}^{n}\rightarrow\{\pm 1\} is defined as χ S ​ ( x ) = ∏ i ∈ S x i \chi_{S}(x)=\prod_{i\in S}x_{i} . We define the ( n , S ) (n,S) - parity distribution 𝒟 S \mathcal{D}_{S} as the distribution over ( x , y = χ S ​ ( x ) ) (x,y=\chi_{S}(x)) 4 4 
+ 4 
+
+ Our theoretical analyses and experiments can tolerate noisy parities, that is, random flipping of the label. For ease of presentation, we state the non-noisy setting. where x x is drawn from the uniform distribution over { ± 1 } n \{\pm 1\}^{n} , which we denote by Unif ⁡ ( { ± 1 } n ) \mathrm{Unif}(\{\pm 1\}^{n}) . We define the ( n , k ) (n,k) - parity learning problem as the task of recovering S S using samples from 𝒟 S \mathcal{D}_{S} , where S S is chosen at random in ( [ n ] k ) \binom{[n]}{k} . Statistically, it is possible to do so using Θ ⁡ ( log ⁡ ( n k ) ) ≈ k ​ log ⁡ n \Theta(\log\binom{n}{k})\approx k\log n samples.
+However, in the statistical query (SQ) model ( Kearns, 1998 ) , (which has been shown to encapsulate gradient-based methods such as GD or SGD ( Abbe et al., 2021 ) ), this task requires Ω ⁡ ( n k ) \Omega(n^{k}) queries (assuming constant level of noise).
+While learning noiseless parities can be solved by Gaussian elimination using O ⁡ ( n ) O(n) samples, learning sparse noisy parities, even at a very small noise level (i.e., o ⁡ ( 1 ) o(1) or n − δ n^{-\delta} ) is believed to inherently require n Ω ⁡ ( k ) n^{\Omega(k)} computational steps and samples, or exponential computation with n o ⁡ ( k ) n^{o(k)} samples. This was first explicitly conjectured by Alekhnovich (2003) , and has been the basis for several cryptographic schemes (e.g., ( Ishai et al., 2008 , Applebaum et al., 2009 , Applebaum et al., 2010 , Bogdanov et al., 2019 ) ).
+
+ Notation for neural networks and training.
+
+ Our main results are presented in the online learning setting, with a stream of i.i.d. batches of examples. At each iteration t = 1 , … , T t=1,\ldots,T , a learning algorithm receives a batch of B B examples { ( x t , i , y t , i ) } i = 1 B \{(x_{t,i},y_{t,i})\}_{i=1}^{B} drawn i.i.d. from 𝒟 S \mathcal{D}_{S} , then outputs a classifier y ^ t : { ± 1 } n → { ± 1 } \widehat{y}_{t}:\{\pm 1\}^{n}\rightarrow\{\pm 1\} . We say that the algorithm solves the parity task in t t steps with ϵ \epsilon error, if with probability at least 1 − ϵ 1-\epsilon over both training and internal randomness, as well as ( x , y ) ∼ 𝒟 S (x,y)\sim\mathcal{D}_{S} , y ^ t ​ ( x ) = y \widehat{y}_{t}(x)=y . We will focus on the case that y ^ t = sign ( f ⁡ ( x , θ t ) ) \widehat{y}_{t}=\mathop{\mathrm{sign}}(f(x;\theta_{t})) for some parameters θ t \theta_{t} in a continuous domain Θ \Theta and for a continuous function f : { ± 1 } n × Θ → ℝ f:\{\pm 1\}^{n}\times\Theta\rightarrow\mathbb{R} . 5 5 
+ 5 
+
+ When f ⁡ ( x , θ ) = 0 f(x;\theta)=0 in practice (e.g. with sign initialization), we break the tie arbitrarily. We ensure in the theoretical analysis that this does not happen. 
+A ubiquitous online learning algorithm is gradient descent (GD). For a choice of loss function ℓ : { ± 1 } × ℝ → ℝ \ell:\{\pm 1\}\times\mathbb{R}\rightarrow\mathbb{R} , initialization θ 0 \theta_{0} (that are chosen from some distribution), learning rate schedule { η t } t = 1 T ⊆ ℝ \{\eta_{t}\}_{t=1}^{T}\subseteq\mathbb{R} and weight-decay schedule { λ t } t = 1 T ⊆ ℝ \{\lambda_{t}\}_{t=1}^{T}\subseteq\mathbb{R} , GD refers the standard iterative update rule using the regularized, empirical loss function, which is a function of architecture f f .
+The learning rate η t \eta_{t} can also be a vector (e.g., allowing different rate schedules for different layers).
+
+ 3 Empirical findings
+
+ Figure 2: Black-box observations about the training dynamics. Left: Histograms of convergence times over 10 6 10^{6} random trials, with heavy upper tails but no observed successes near t = 0 t=0 (unlike random search). Center: Optimization path (and convergence time) depend heavily on initialization, not the randomness of SGD; B = 128 , η = 0.01 B=128,\eta=0.01 shown here. Right: The power-law exponent ( α \alpha such that t c ∝ n α t_{c}\propto n^{\alpha} ) eventually degrades on larger problem instances. 
+
+ 3.1 SGD on neural networks learns sparse parities
+
+ The central phenomenon of study in this work is the empirical observation that neural networks, with standard initialization and training, can solve the ( n , k ) (n,k) -parity problem in a number of iterations scaling as n O ⁡ ( k ) n^{O(k)} on small instances. We observed robust positive results for randomly-initialized SGD on the following architectures, indexed by Roman numerals:
+
+ • 
+ 
+ 2-layer MLPs: ReLU ( σ ⁡ ( z ) = ( z ) + ) (\sigma(z)=(z)_{+}) or polynomial ( σ ⁡ ( z ) = z k \sigma(z)=z^{k} ) activation, in a wide variety of width regimes r ≥ k r\geq k . Settings (i), (ii), (iii) (resp. (iv), (v), (vi)) use r = { 10,100 , 1000 } r=\{10,100,1000\} ReLU (resp. polynomial) activations. We also consider r = k r=k (exceptional settings (*i), (*ii) ), the minimum width for representing a k k -wise parity for both activations.
+
+ • 
+ 
+ Single neurons: Next, we consider non-standard activation functions σ \sigma which allow a one-neuron architecture f ⁡ ( x , w ) = σ ⁡ ( w ⊤ ​ x ) f(x;w)=\sigma(w^{\top}x) to realize k k -wise parities. The constructions stem from letting w ∗ = ∑ i ∈ S e i w^{*}=\sum_{i\in S}e_{i} , and constructing σ ⁡ ( ⋅ ) \sigma(\cdot) to interpolate (the appropriate scaling of) k − w ∗ ⊤ ​ x 2 ​ mod ​ 2 \frac{k-{w^{*}}^{\top}x}{2}\text{ mod }2 with a piecewise linear k k -zigzag activation (vii), or a degree- k k polynomial (viii). Going a step further, a single ∞ \infty -zigzag (ix) or sinusoidal (x) neuron can represent all k k -wise parities. We also removed the second trainable layer (setting u = 1 u=1 ), obtaining settings (xi), (xii), (xiii), (xiv). We found that wider architectures with these activations also trained successfully.
+
+ • 
+ 
+ Transformers: Motivated by recent theoretical and empirical work on the ability of self-attention to learn sparse functions and parities ( Lu et al., 2021 , Edelman et al., 2021 , Hahn, 2020 ) , we consider a simplified specialization of the Transformer architecture to this sequence classification problem.
+This is the less-robust setting (*iii); the architecture and optimizer are described in Appendix D.1.3 .
+
+ • 
+ 
+ PolyNets: Our final setting (xv) is the PolyNet, a slightly modified version of the parity machine architecture. Parity machines have been studied extensively in the statistical mechanics of ML literature (see the related work section) as well as in a line of work on ‘neural cryptography’ ( Rosen-Zvi et al., 2002 ) . A parity machine outputs the sign of the product of k k linear functions of the input. A PolyNet simply outputs the product itself. Both architectures can clearly realize k k -sparse parities. The PolyNet architecture was originally motivated by the search for an idealized setting where an end-to-end optimization trajectory analysis is tractable (see Section 4.1 ); we found in these experiments that this architecture trains very stably and sample-efficiently.
+
+ Robust space of positive results.
+
+ All of the networks listed above were observed to successfully learn sparse parities in a variety of settings. We summarize our findings as follows:
+for all combinations of n ∈ { 10 , 20 , 30 } n\in\{10,20,30\} , k ∈ { 2 , 3 , 4 } k\in\{2,3,4\} , batch sizes B ∈ { 1 , 2 , 4 , … , 1024 } B\in\{1,2,4,\ldots,1024\} , initializations { \{ uniform, Gaussian, Bernoulli } \} , loss functions { \{ hinge, square, cross entropy } \} , and architecture configurations { (i) , (ii) , … , (xv) } \{\text{(i)},\text{(ii)},\ldots,\text{(xv)}\} , SGD solved the parity problem (with 100 % 100\% accuracy, validated on a batch of 2 13 2^{13} samples) in at least 20 % 20\% of 25 25 random trials, for at least one choice of learning rate η ∈ { 0.001 , 0.01 , 0.1 , 1 } \eta\in\{0.001,0.01,0.1,1\} . The models converged in t c ≤ c ⋅ n α ​ k ≤ 10 5 t_{c}\leq c\cdot n^{\alpha k}\leq 10^{5} steps, for small architecture-dependent constants c , α c,\alpha , shown in Appendix C . Figure 1 (left) shows some representative training curves.
+
+ Less robust configurations.
+
+ Settings (*i) and (*ii), where the MLP just barely represents a k k -sparse parity, and the Transformer setting (*iii), are less robust to small batch sizes. In these settings, the same positive results as above only held for sufficiently large batch sizes: B ≥ 16 B\geq 16 . Also, setting (*iii) used the Adam optimizer; see Appendix D.1.3 for details.
+
+ Phase transitions in training curves.
+
+ For almost all of the architectures, we find that that the training curves exhibit phase transitions in terms of running time (and thus, in the online learning setting, dataset size as well): long durations of seemingly no progress, followed by periods of rapid decrease in the validation error. Strikingly, for architectures (v) and (vi), this plateau is absent: the error in the initial phase appears to decrease with a linear slope. See Appendix C.8 for more plots.
+
+ Figure 3: Hidden progress when learning parities with neural networks. Left, center: Black-box losses and accuracies exhibit a long plateau and sharp phase transition (top), hiding gradual progress in the SGD iterates (bottom). Right: A hidden progress measure which distinguishes gradual feature amplification (top) from training on noise (bottom). 
+
+ 3.2 Random search or hidden progress?
+
+ The remainder of this paper seeks to answer the question:
+ “By what mechanism does deep learning solve these emblematic computationally-hard optimization problems?” 
+
+ A natural hypothesis would be that SGD somehow implicitly performs Monte Carlo random search, “bouncing around” the loss landscape in the absence of a useful gradient signal. Upon closer inspection, several empirical observations clash with this hypothesis:
+
+ • 
+ 
+ Scaling of convergence times: Without an explicit sparsity prior in the architecture or initialization, it is unclear how to account for the n Θ ⁡ ( k ) n^{\Theta(k)} runtimes observed in experiments. The initializations, which certainly do not prefer sparse functions 6 6 
+ 6 
+
+ Indeed, under all standard architectures and initialization, the probability that a random network is Ω ⁡ ( 1 ) \Omega(1) -correlated with a sparse parity would be 2 − Ω ⁡ ( n ) 2^{-\Omega(n)} , since with that probability 1 − o ⁡ ( 1 ) 1-o(1) of the total influence would be accounted by the n − k n-k irrelevant features. , are close to the correct solutions with probability 2 − Ω ⁡ ( n ) ≪ n − k 2^{-\Omega(n)}\ll n^{-k} . On larger instances ( n , k ) (n,k) , the power-law exponents worsen; see Figure 2 (right) , and the discussion in Appendix C.2 .
+
+ • 
+ 
+ No early convergence: Over a large number of random trials, no copies of this randomized algorithm get “lucky” (i.e. solve the problem in significantly fewer than the median number of iterations); see Figure 2 (left) . The success times of random exhaustive search would be distributed as Geom ⁡ ( 1 / ( n k ) ) \mathrm{Geom}(1/\binom{n}{k}) , whose probability mass is highest at t = 0 t=0 and decreases monotonically with t t .
+
+ • 
+ 
+ Sensitivity to initialization, not stochastic batches: Running these training setups over multiple stochastic batches from a common initialization, we find that loss curves and convergence times are highly correlated with the architecture’s random initialization; see Figure 2 (center) .
+
+ Even these observations, which do not probe the internal state of the algorithm, suggest that
+exhaustive search is an insufficient picture of the training dynamics, and a different mechanism is at play.
+
+ 4 Theoretical analyses
+
+ 4.1 Provable emergence of the parity indices in high-precision gradients
+
+ We now provide a theoretical account for the success of SGD in solving the ( n , k ) (n,k) -parity problem. Our main theoretical observation is that, in many cases, the population gradient of the weights at initialization contains enough “information” for solving the parity problem. That is, given an accurate enough estimate of the initial gradient (by e.g. computing the gradient over a large enough batch size), the relevant subset S S can be found.
+
+ As a warm-up example, consider training a single ReLU neuron f ⁡ ( x , w ) = σ ⁡ ( w ⊤ ​ x ) f(x;w)=\sigma(w^{\top}x) w.r.t. the correlation loss ℓ ⁡ ( y , y ^ ) = − y ​ y ^ \ell(y,\widehat{y})=-y\widehat{y} , from the initialization w = [ 1 , … , 1 ] w=[1,\dots,1] . While a single neuron cannot express the parity, we observe that the population gradient can indicate what the correct subset is:
+ 𝔼 ( x , y ) ∼ 𝒟 S [ ∇ w i ℓ ​ ( y , f ⁡ ( x , w ) ) ] = 𝔼 ( x , y ) ∼ 𝒟 S [ − y ​ x i ​ σ ′ ​ ( w ⊤ ​ x ) ] \mathop{\mathbb{E}}_{(x,y)\sim\mathcal{D}_{S}}\left[\nabla_{w_{i}}\ell(y,f(x;w))\right]=\mathop{\mathbb{E}}_{(x,y)\sim\mathcal{D}_{S}}\left[-yx_{i}\,\sigma^{\prime}(w^{\top}x)\right] which corresponds to either the order-( k − 1 k-1 ) Fourier coefficient S ∖ { i } S\setminus\{i\} of the function x ↦ σ ′ ​ ( w ⊤ ​ x ) x\mapsto\sigma^{\prime}(w^{\top}x) (if i ∈ S i\in S is a relevant coordinate) or the order- ( k + 1 ) (k+1) coefficient S ∪ { i } S\cup\{i\} (if i ∉ S i\not\in S is irrelevant). When σ \sigma is the ReLU function and w = [ 1 , … , 1 ] w=[1,\dots,1] , σ ′ ​ ( w ⊤ ​ x ) = sign ( ∑ i x i ) + 1 2 \sigma^{\prime}(w^{\top}x)=\frac{\mathop{\mathrm{sign}}\left(\sum_{i}x_{i}\right)+1}{2} is just a shifted majority function of x x . The Fourier spectrum of majority is well-understood: for even k k , there is a gap between these Fourier coefficients that is detectable using n O ⁡ ( k ) n^{O(k)} samples.
+
+ This analysis can be further extended to a ReLU neuron initialized with weights w ∈ { ± 1 } n w\in\{\pm 1\}^{n} and a small bias. In fact, we can show that taking a single gradient step with large enough batch size on a ReLU network trained with the hinge-loss ℓ ⁡ ( y , y ^ ) = max ⁡ { 1 − y ​ y ^ , 0 } \ell(y,\widehat{y})=\max\{1-y\widehat{y},0\} , already finds features that can solve the parity problem. Using this, we show that training a ReLU MLP with SGD solves the parity problem:
+
+ Theorem 4 . 
+
+ Fix some ϵ ∈ ( 0 , 1 ) \epsilon\in(0,1) , let k k be some even number, and assume that n n is some odd number satisfying n ≥ Ω ⁡ ( k 4 ​ log ⁡ ( n ​ k / ϵ ) ) n\geq\Omega(k^{4}\log(nk/\epsilon)) . There exist a symmetric random initialization scheme and learning rate and weight decay schedules s.t. for every S ⊆ [ n ] S\subseteq[n] of size k k , training a ReLU MLP of size r = O ⁡ ( 2 k ​ k ​ log ⁡ ( k / ϵ ) ) r=O(2^{k}k\log(k/\epsilon)) with batch size B = n O ⁡ ( k ) ​ log 2 ⁡ ( r / ϵ ) B=n^{O(k)}\log^{2}(r/\epsilon) for T = poly ⁡ ( k , r , 1 / ϵ ) T=\mathrm{poly}(k,r,1/\epsilon) iterations on 𝒟 S \mathcal{D}_{S} w.r.t. the hinge loss, finds a network f ⁡ ( x , θ t ) f(x;\theta_{t}) with expected loss:
+ 𝔼 [ ℓ ⁡ ( f ⁡ ( x , θ t ) , y ) ] ≤ ϵ \mathop{\mathbb{E}}\left[\ell(f(x;\theta_{t}),y)\right]\leq\epsilon ,
+where the expectation is over the randomness of initialization, training and sampling ( x , y ) ∼ 𝒟 S (x,y)\sim\mathcal{D}_{S} . 
+
+ The analysis presented above shows that when the batch size scales with n O ⁡ ( k ) n^{O(k)} , SGD over MLP solves the parity problem. However, in our experimental setting, the number of steps , and not the batch size, scales with n O ⁡ ( k ) n^{O(k)} .
+While we believe that running SGD with small batch size and small learning rate essentially amplifies the signal in the population gradient, behaving similarly to performing a large step over a large batch size, we do not have a complete analysis for training MLPs with SGD in the small batch size regime.
+To complement the above result, in Section 4.2 we analyze the trajectory for a variant of the PolyNet architecture trained with gradient flow.
+
+ We note that, while the above analysis applies for ReLU MLPs with a specific initialization scheme, a similar feature emergence phenomenon can be observed in a broader set of architectures and setting. Indeed, for feature emergence to occur, we only require that there is a “gap” between the relevant and irrelevant Fourier coefficients. Formally, denote f ^ ​ ( S ) := 𝔼 [ f ⁡ ( x ) ​ χ S ​ ( x ) ] \widehat{f}(S):=\mathop{\mathbb{E}}\left[f(x)\chi_{S}(x)\right] the Fourier coefficient of f f at S S , and observe the following definition:
+
+ Definition 1 (Fourier gap) . 
+
+ For some function f : { ± 1 } n → ℝ f:\{\pm 1\}^{n}\to\mathbb{R} and some subset S S of size k k , we say that f f has a γ \gamma - Fourier gap at S S if (1) for every ( k − 1 ) (k-1) -element subset S ′ ⊆ S S^{\prime}\subseteq S , it holds that | f ^ ​ ( S ′ ) | ≥ γ |\widehat{f}(S^{\prime})|\geq\gamma , and (2) for every subset S ′ ⊆ [ n ] S^{\prime}\subseteq[n] of size k + 1 k+1 it holds that | f ^ ​ ( S ′ ) | ≤ γ / 2 |\widehat{f}(S^{\prime})|\leq\gamma/2 . 
+
+ Now, given a network architecture where some neuron has a γ \gamma -Fourier gap with respect to the target subset S S , we can generalize the result of the ReLU neuron. That is, we show that the subset S S can be determined by observing an estimate of the population gradient at initialization:
+
+ Proposition 5 . 
+
+ Let σ \sigma be some activation function and let ℓ \ell be some loss function. Denote f ⁡ ( x , w ) = σ ⁡ ( w ⊤ ​ x ) f(x;w)=\sigma(w^{\top}x) . Fix some subset S ⊆ [ n ] S\subseteq[n] .
+Let g ∈ ℝ n g\in\mathbb{R}^{n} be an estimate of the population gradient such that
+ ‖ g − 𝔼 ( x , y ) ∼ 𝒟 S [ ∇ w ℓ ​ ( y , f ⁡ ( x , w ) ) ] ‖ ∞ ≤ γ / 4 . \left\|g-\mathop{\mathbb{E}}_{(x,y)\sim\mathcal{D}_{S}}\left[\nabla_{w}\ell(y,f(x;w))\right]\right\|_{\infty}\leq\gamma/4. 
+Then, for every w w s.t. σ ′ ​ ( w ⊤ ​ x ) \sigma^{\prime}(w^{\top}x) has a γ \gamma -Fourier gap w.r.t. to S S and ℓ ′ ​ ( f ⁡ ( x , w ) , y ) = − y \ell^{\prime}(f(x;w),y)=-y for all x x ,
+the target subset S S is detected by g g , namely S = { i ∈ [ n ] : | g i | ≥ 3 ​ γ / 4 } S=\{i\in[n]~:~|g_{i}|\geq 3\gamma/4\} . 
+
+ Comparison with NTK analysis.
+
+ In recent years, many theoretical works have studied the behavior of SGD on neural networks through the lens of the neural tangent kernel (NTK) ( Jacot et al., 2018 ) . It is therefore important to highlight the fact that the NTK (or, in fact, any kernel) cannot solve the sparse parity problem. The following result shows that no kernel can achieve small error on the sparse parity problem, unless the size of the kernel is n Ω ⁡ ( k ) n^{\Omega(k)} :
+
+ Theorem 6 . 
+
+ Let Ψ : { ± 1 } n → ℝ D \Psi:\{\pm 1\}^{n}\to\mathbb{R}^{D} be some D D -dimensional embedding with sup x ‖ Ψ ⁡ ( x ) ‖ 2 ≤ 1 \sup_{x}\|\Psi(x)\|_{2}\leq 1 , and let R > 0 R>0 be some number. If D ​ R 2 < ϵ 2 ⋅ ( n k ) DR^{2}<\epsilon^{2}\cdot\binom{n}{k} , then there exists some ( n , k ) (n,k) -parity distribution 𝒟 S \mathcal{D}_{S} s.t. 
+
+ inf ‖ w ‖ ≤ R 𝔼 ( x , y ) ∼ 𝒟 S [ ℓ ⁡ ( Ψ ​ ( x ) ⊤ ​ w , y ) ] > 1 − ϵ . \inf_{\|w\|\leq R}\mathop{\mathbb{E}}_{(x,y)\sim\mathcal{D}_{S}}\left[\ell(\Psi(x)^{\top}w,y)\right]>1-\epsilon. 
+
+ The above is a corollary of the results in ( Kamath et al., 2020 , Malach and Shalev-Shwartz, 2022 ) .
+
+ 4.2 Disjoint-PolyNet: an idealized architecture for trajectory analyses
+
+ In this section, we present an idealized architecture (a version of PolyNets (xv)) that exhibits similar behavior to MLPs (experimentally) and is technically easier to analyze. More specifically, we consider the disjoint-PolyNet which takes a product over k k linear functions where the linear functions are computed on k k disjoint partitions of the input P 1 , … , P k P_{1},\ldots,P_{k} with each P i = { ( i − 1 ) ​ n ′ + 1 , … , i ​ n ′ } P_{i}=\{(i-1)n^{\prime}+1,\ldots,in^{\prime}\} with n ′ = n / k n^{\prime}=n/k 7 7 
+ 7 
+
+ We assume for simplicity that n n is divisible by k k . , that is, f ( x ; w 1 : k ) := ∏ i = 1 k w i ⊤ x P i . f(x;w_{1:k}):=\prod_{i=1}^{k}w_{i}^{\top}x_{P_{i}}. As noted in the related work section, this is equivalent to a tree parity machine but with real-valued rather than ± 1 \pm 1 output.
+
+ In order for the disjoint-PolyNet to be able to express the class of parity problems, we assume that the set S S of size k k in the ( n , k ) (n,k) -parity problem is selected such that exactly one index belongs to each disjoint partition, that is, for all i ∈ [ k ] i\in[k] , S ∩ P i = 1 S\cap P_{i}=1 . We refer to this problem as the ( n , k ) (n,k) -disjoint parity problem. Note that there are still ( n ′ ) k = ( n / k ) k (n^{\prime})^{k}=(n/k)^{k} different possibilities for set S S under this restriction. For fixed k k , these represent a constant portion of the ( n k ) ≈ ( n ​ e / k ) k \binom{n}{k}\approx(ne/k)^{k} (by Stirling’s approximation) possibilities for S S in the general non-disjoint case.
+
+ Consider training a disjoint-PolyNet w.r.t. the correlation loss. WLOG, let S = { 1 , n ′ + 1 , … , ( k − 1 ) ​ n ′ + 1 } S=\{1,n^{\prime}+1,\ldots,(k-1)n^{\prime}+1\} and e 1 = ( 1 , 0 , ..0 ) e_{1}=(1,0,..0) . The population gradient is non-zero at i i iff i ∈ S i\in S : g i ( w 1 : k ) = 𝔼 [ ∇ w i ℓ ( f ( x ; w 1 : k ) , y ) ] = − 𝔼 [ y ( ∏ j ≠ i w j ⊤ x P j ) x P i ] = − ( ∏ j ≠ i w j , 1 ) e 1 g_{i}(w_{1:k})=\mathop{\mathbb{E}}\left[\nabla_{w_{i}}\ell(f(x;w_{1:k}),y)\right]=-\mathop{\mathbb{E}}\left[y\left(\prod_{j\neq i}w_{j}^{\top}x_{P_{j}}\right)x_{P_{i}}\right]=-\left(\prod_{j\neq i}w_{j,1}\right)e_{1} .
+
+ Now we consider the gradient flow dynamics of disjoint-PolyNet, which provide a mathematically tractable case study for the trajectory of sparse parity learning. For each i ∈ [ k ] i\in[k] , in this section we treat w i w_{i} as a function from ℝ ≥ 0 → ℝ n ′ \mathbb{R}_{\geq 0}\to\mathbb{R}^{n^{\prime}} which satisfies the following differential equation: w i ˙ = − g i ( w 1 : k ( t ) ) \dot{w_{i}}=-g_{i}(w_{1:k}(t)) . For clarity of exposition, assume all-ones initialization. 8 8 
+ 8 
+
+ Results for ± 1 \pm 1 initialization and Gaussian initialization are qualitatively similar and can be found in the Appendix.
+ Then all of the relevant weights { w i , 1 : i ∈ [ k ] } \{w_{i,1}:i\in[k]\} follow the same trajectory, which we denote by v : ℝ ≥ 0 → ℝ v:\mathbb{R}_{\geq 0}\to\mathbb{R} .
+
+ By analyzing the resulting differential equations, we can formally exhibit “phase transition”-like behavior in the fully deterministic gradient flow setting.
+
+ Theorem 7 (Gradient flow on disjoint-PolyNets) . 
+
+ Suppose k ≥ 3 k\geq 3 . Let T ⁡ ( .49 ) T(.49) be the time it takes for error to fall below .49 .49 , and let T ⁡ ( 0 ) T(0) be the time it takes to reach zero error. Then 
+
+ T ⁡ ( .49 ) T ⁡ ( 0 ) = 1 − O ⁡ ( ( n ′ ) 1 − k / 2 ) . \frac{T(.49)}{T(0)}=1-O\left((n^{\prime})^{1-k/2}\right). 
+
+ In other words, the network takes much longer to reach slightly better than trivial accuracy than it takes to go from slightly better than trivial to perfect accuracy.
+
+ We can also analyze the trajectory of disjoint-PolyNets trained with online SGD, confirming that a neural network trained with batch size 1 SGD can learn k k -sparse parities within n O ⁡ ( k ) n^{O(k)} iterations.
+
+ Theorem 8 (SGD on disjoint-PolyNets) . 
+
+ Suppose we train the disjoint-PolyNet, initialized as above, with online SGD with any batch size B ≥ 1 B\geq 1 . Then there exists an adaptive learning rate schedule such that for any ϵ > 0 \epsilon>0 , with probability .99, the error falls below ϵ \epsilon within 
+
+ O ~ ​ ( ( n ′ ) ( 2 ​ k − 1 ) ​ log ⁡ ( 1 / ϵ ) ) \tilde{O}\left((n^{\prime})^{(2k-1)}\log(1/\epsilon)\right) 
+
+ steps. 
+
+ Extended versions of these theorems, along with proofs, can be found in Appendix B.3 .
+
+ 5 Hidden progress: discussion and additional experiments
+
+ Figure 4: Parity as a sandbox for understanding the effects of model size and dataset size. Left: Success times vs. network width r r on a fixed ( 40 , 3 ) (40,3) -parity task: in accordance with the theory, parallelization experiences diminishing returns (unlike expected success times for random search, shown in green). Underparameterized models ( r = 1 , 2 r=1,2 ) were considered successful upon reaching 55 % 55\% accuracy. Right: Training curves for an identical setup ( ( 50 , 3 ) (50,3) -parity task, architecture, and training algorithm), varying only the sample size m m . The two center panels display “grokking” : a large gap between the time to zero train error vs. zero test error. 
+
+ In this section, we advocate for sparse parities as an idealized testbed for understanding algorithms and phenomena in modern deep learning.
+These are accompanied by experimental vignettes which are auxiliary to the core results from Section 3 , with more systematic studies deferred to future work.
+Details are given in Appendix D .
+
+ A progress measure for parity.
+
+ To begin, the black-box experiments in Section 3 suggest that random search is the incorrect model of SGD’s behavior in this setting. Using the theoretical insight that amplifying a precise initial population gradient suffices for learning parities, we construct one possible progress measure, which is a function of the sequence of weights w 0 , … ​ w t ∈ ℝ n w_{0},\ldots w_{t}\in\mathbb{R}^{n} so far: ρ ( w 0 : t ) := ‖ w t − w 0 ‖ ∞ \rho(w_{0:t}):=\left\lVert w_{t}-w_{0}\right\rVert_{\infty} , using the fact that w t − w 0 w_{t}-w_{0} is an estimate for the initial population gradient in the linearized setting. Figure 3 shows how gradual weight movement (and thus, progress) can be hidden behind plateauing losses.
+
+ Roles of overparameterization vs. oversampling .
+
+ An interesting consequence of our analysis is that it illuminates scaling behaviors with respect to a third fundamental resource parameter: model size , which we study in terms of network width r r .
+If SGD operated by a “random search” mechanism, one would expect width to provide a parallel speedup. Instead, we SGD sequentially amplifies progress. The sharp lower tails in Figure 2 (left) imply that running r r identical copies of SGD does not give ( 1 / r ) × (1/r)\times speedups; more directly, in Figure 4 (left) , convergence times for sparse parities empirically plateau at large model sizes.
+
+ It is a significant challenge to understand the interactions between network depth and computation, and largely outside the scope of this work. However, in Appendix C.7 , we provide a brief note on using parities and polynomial-activation MLPs to construct a simple counterexample to the “deep only works if shallow is good” principle of Malach and Shalev-Shwartz (2019) , demonstrating a case where a deep network can get near-perfect accuracy even when greedy layerwise training (e.g. ( Belilovsky et al., 2019 ) ) cannot beat trivial performance.
+
+ Learning and grokking in the finite-sample multi-pass setting.
+
+ The main theoretical and empirical results in this work consider online learning algorithms which couple the resources of training time and independent samples. However, due to the computational-statistical gap in parity learning, these positive results are suboptimal in terms of sample efficiency.
+We find that minibatch SGD (with weight decay) can empirically solve sparse parities, even from a sample of size m ≪ n k m\ll n^{k} . For small values of m m , we reliably observe the grokking phenomenon ( Power et al., 2022 ) : overfitting for a long time, then a delayed phase transition for the generalization error; see the two center panels of Figure 4 (right) .
+
+ 6 Conclusion
+
+ This work puts forward parity learning as a stylized test case to explore some of the puzzling features of the role of computational (as opposed to statistical) resources in deep learning. These include discontinuous improvements (a.k.a. emergent capabilities ), feature learning, and universality of architectures. In particular, we show that deep learning on parities exhibits a phase transition behavior, that it is successfully learned by a variety of deep-net architectures, and that this success cannot be explained as a “random exhaustive search”, nor through frameworks such as the neural tangent kernel or layer-by-layer learning.
+
+ However, there are more experimental and theoretical questions, even for this simplified case of parity learning. Our focus in this work was on the online learning case, where training time and samples arise in tandem. However, we believe it would be instructive to investigate parity learning when three resources of samples, time, and model size are scaled separately. Some very preliminary findings along these lines are presented in Section 3 .
+
+ Extending our theoretical results to the small-batch setting, as well as to more architectures, is an open problem. Resolving it would require a better understanding of anti-concentration (lower bound on deviation from mean) of Fourier coefficients, a phenomenon that is much less studied than the concentration of these coefficients. We would also want to extend the analysis beyond parities to tasks that are not aligned with the elementary basis such as low-rank tensor recovery.
+
+ Another important follow-up direction is understanding the extent that these insights extend from parity learning to real-world problems, as well as the extent into which non-synthetic tasks (in, e.g., natural language processing and program synthesis) embed within them parity-like subtasks of exhaustive combinatorial search.
+
+ Broader impact.
+
+ This work seeks to contribute to the foundational understanding of computational scaling behaviors in deep learning. Our theoretical and empirical analyses are in a heavily-idealized synthetic problem setting. Hence, we see no direct societal impacts of the results in this study.
+
+ Acknowledgements.
+
+ We would like to thank Lenka Zdeborová for providing us with references to the statistical physics literature on phase transitions in the learning curves of neural networks.
+
+ References
+
+ Abbe and Sandon (2020) 
+ 
+Emmanuel Abbe and Colin Sandon.
+
+ Poly-time universality and limitations of deep learning.
+
+ arXiv preprint arXiv:2001.02992 , 2020.
+
+ Abbe et al. (2021) 
+ 
+Emmanuel Abbe, Pritish Kamath, Eran Malach, Colin Sandon, and Nathan Srebro.
+
+ On the power of differentiable learning versus pac and sq learning.
+
+ Advances in Neural Information Processing Systems , 34, 2021.
+
+ Abbe et al. (2022) 
+ 
+Emmanuel Abbe, Elisabetta Cornacchia, Jan Hązła, and Christopher
+Marquis.
+
+ An initial alignment between neural network and target is needed for
+gradient descent to learn.
+
+ arXiv preprint arXiv:2202.12846 , 2022.
+
+ Agarwal et al. (2020) 
+ 
+Naman Agarwal, Rohan Anil, Elad Hazan, Tomer Koren, and Cyril Zhang.
+
+ Disentangling adaptive gradient methods from learning rates.
+
+ arXiv preprint arXiv:2002.11803 , 2020.
+
+ Alekhnovich (2003) 
+ 
+Michael Alekhnovich.
+
+ More on average case vs approximation complexity.
+
+ In 44th Annual IEEE Symposium on Foundations of Computer
+Science, 2003. Proceedings. , pages 298–307. IEEE, 2003.
+
+ Allen-Zhu and Li (2019) 
+ 
+Zeyuan Allen-Zhu and Yuanzhi Li.
+
+ What can resnet learn efficiently, going beyond kernels?
+
+ Advances in Neural Information Processing Systems , 32, 2019.
+
+ Allen-Zhu et al. (2019) 
+ 
+Zeyuan Allen-Zhu, Yuanzhi Li, and Zhao Song.
+
+ A convergence theory for deep learning via over-parameterization.
+
+ In International Conference on Machine Learning , pages
+242–252. PMLR, 2019.
+
+ Andoni et al. (2014) 
+ 
+Alexandr Andoni, Rina Panigrahy, Gregory Valiant, and Li Zhang.
+
+ Learning polynomials with neural networks.
+
+ In International conference on machine learning , pages
+1908–1916. PMLR, 2014.
+
+ Applebaum et al. (2009) 
+ 
+Benny Applebaum, David Cash, Chris Peikert, and Amit Sahai.
+
+ Fast cryptographic primitives and circular-secure encryption based on
+hard learning problems.
+
+ In Annual International Cryptology Conference , pages 595–618.
+Springer, 2009.
+
+ Applebaum et al. (2010) 
+ 
+Benny Applebaum, Boaz Barak, and Avi Wigderson.
+
+ Public-key cryptography from different assumptions.
+
+ In Proceedings of the forty-second ACM symposium on Theory of
+computing , pages 171–180, 2010.
+
+ Arous et al. (2021) 
+ 
+Gerard Ben Arous, Reza Gheissari, and Aukosh Jagannath.
+
+ Online stochastic gradient descent on non-convex losses from
+high-dimensional inference.
+
+ J. Mach. Learn. Res. , 22:106–1, 2021.
+
+ Ba et al. (2022) 
+ 
+Jimmy Ba, Murat A Erdogdu, Taiji Suzuki, Zhichao Wang, Denny Wu, and Greg Yang.
+
+ High-dimensional asymptotics of feature learning: How one gradient
+step improves the representation.
+
+ arXiv preprint arXiv:2205.01445 , 2022.
+
+ Belilovsky et al. (2019) 
+ 
+Eugene Belilovsky, Michael Eickenberg, and Edouard Oyallon.
+
+ Greedy layerwise learning can scale to imagenet.
+
+ In International conference on machine learning , pages
+583–593. PMLR, 2019.
+
+ Berry (1941) 
+ 
+Andrew C Berry.
+
+ The accuracy of the gaussian approximation to the sum of independent
+variates.
+
+ Transactions of the american mathematical society , 49(1):122–136, 1941.
+
+ Bogdanov et al. (2019) 
+ 
+Andrej Bogdanov, Manuel Sabin, and Prashant Nalini Vasudevan.
+
+ Xor codes and sparse learning parity with noise.
+
+ Proceedings of the Thirtieth Annual ACM-SIAM Symposium on
+Discrete Algorithms , pages 986–1004, 2019.
+
+ Brown et al. (2020) 
+ 
+Tom B Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared Kaplan, Prafulla
+Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell,
+et al.
+
+ Language models are few-shot learners.
+
+ arXiv preprint arXiv:2005.14165 , 2020.
+
+ Cao et al. (2019) 
+ 
+Yuan Cao, Zhiying Fang, Yue Wu, Ding-Xuan Zhou, and Quanquan Gu.
+
+ Towards understanding the spectral bias of deep learning.
+
+ arXiv preprint arXiv:1912.01198 , 2019.
+
+ Chowdhery et al. (2022) 
+ 
+Aakanksha Chowdhery, Sharan Narang, Jacob Devlin, Maarten Bosma, Gaurav Mishra,
+Adam Roberts, Paul Barham, Hyung Won Chung, Charles Sutton, Sebastian
+Gehrmann, et al.
+
+ Palm: Scaling language modeling with pathways.
+
+ arXiv preprint arXiv:2204.02311 , 2022.
+
+ Damian et al. (2022) 
+ 
+Alexandru Damian, Jason Lee, and Mahdi Soltanolkotabi.
+
+ Neural networks can learn representations with gradient descent.
+
+ In Conference on Learning Theory , pages 5413–5452. PMLR,
+2022.
+
+ Daniely and Malach (2020) 
+ 
+Amit Daniely and Eran Malach.
+
+ Learning parities with neural networks.
+
+ Advances in Neural Information Processing Systems ,
+33:20356–20365, 2020.
+
+ Diakonikolas et al. (2020) 
+ 
+Ilias Diakonikolas, Surbhi Goel, Sushrut Karmalkar, Adam R Klivans, and Mahdi
+Soltanolkotabi.
+
+ Approximation schemes for relu regression.
+
+ In Conference on Learning Theory , pages 1452–1485. PMLR,
+2020.
+
+ Du et al. (2018) 
+ 
+Simon S Du, Xiyu Zhai, Barnabas Poczos, and Aarti Singh.
+
+ Gradient descent provably optimizes over-parameterized neural
+networks.
+
+ arXiv preprint arXiv:1810.02054 , 2018.
+
+ Edelman et al. (2021) 
+ 
+Benjamin L Edelman, Surbhi Goel, Sham Kakade, and Cyril Zhang.
+
+ Inductive biases and variable creation in self-attention mechanisms.
+
+ arXiv preprint arXiv:2110.10090 , 2021.
+
+ Engel and Van den Broeck (2001) 
+ 
+Andreas Engel and Christian Van den Broeck.
+
+ Statistical mechanics of learning .
+
+ Cambridge University Press, 2001.
+
+ Esseen (1942) 
+ 
+Carl-Gustav Esseen.
+
+ On the liapunov limit error in the theory of probability.
+
+ Ark. Mat. Astr. Fys. , 28:1–19, 1942.
+
+ Frei et al. (2020) 
+ 
+Spencer Frei, Yuan Cao, and Quanquan Gu.
+
+ Agnostic learning of a single neuron with gradient descent.
+
+ Advances in Neural Information Processing Systems ,
+33:5417–5428, 2020.
+
+ Frei et al. (2022) 
+ 
+Spencer Frei, Niladri S Chatterji, and Peter L Bartlett.
+
+ Random feature amplification: Feature learning and generalization in
+neural networks.
+
+ arXiv preprint arXiv:2202.07626 , 2022.
+
+ Gardner and Derrida (1989) 
+ 
+Elizabeth Gardner and Bernard Derrida.
+
+ Three unfinished works on the optimal storage capacity of networks.
+
+ Journal of Physics A: Mathematical and General , 22(12):1983, 1989.
+
+ Glorot and Bengio (2010) 
+ 
+Xavier Glorot and Yoshua Bengio.
+
+ Understanding the difficulty of training deep feedforward neural
+networks.
+
+ In Proceedings of the thirteenth international conference on
+artificial intelligence and statistics , pages 249–256. JMLR Workshop and
+Conference Proceedings, 2010.
+
+ Goldreich and Levin (1989) 
+ 
+Oded Goldreich and Leonid A Levin.
+
+ A hard-core predicate for all one-way functions.
+
+ In Proceedings of the twenty-first annual ACM symposium on
+Theory of computing , pages 25–32, 1989.
+
+ Goldt et al. (2019) 
+ 
+Sebastian Goldt, Madhu Advani, Andrew M Saxe, Florent Krzakala, and Lenka
+Zdeborová.
+
+ Dynamics of stochastic gradient descent for two-layer neural networks
+in the teacher-student setup.
+
+ Advances in neural information processing systems , 32, 2019.
+
+ Hahn (2020) 
+ 
+Michael Hahn.
+
+ Theoretical limitations of self-attention in neural sequence models.
+
+ Transactions of the Association for Computational Linguistics ,
+8:156–171, 2020.
+
+ Hansel et al. (1992) 
+ 
+D Hansel, G Mato, and C Meunier.
+
+ Memorization without generalization in a multilayered neural network.
+
+ EPL (Europhysics Letters) , 20(5):471,
+1992.
+
+ Hardy et al. (1952) 
+ 
+Godfrey Harold Hardy, John Edensor Littlewood, George Pólya, György
+Pólya, et al.
+
+ Inequalities .
+
+ Cambridge university press, 1952.
+
+ He et al. (2015) 
+ 
+Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun.
+
+ Delving deep into rectifiers: Surpassing human-level performance on
+imagenet classification.
+
+ In Proceedings of the IEEE international conference on computer
+vision , pages 1026–1034, 2015.
+
+ Hoffmann et al. (2022) 
+ 
+Jordan Hoffmann, Sebastian Borgeaud, Arthur Mensch, Elena Buchatskaya, Trevor
+Cai, Eliza Rutherford, Diego de Las Casas, Lisa Anne Hendricks, Johannes
+Welbl, Aidan Clark, et al.
+
+ Training compute-optimal large language models.
+
+ arXiv preprint arXiv:2203.15556 , 2022.
+
+ Ishai et al. (2008) 
+ 
+Yuval Ishai, Eyal Kushilevitz, Rafail Ostrovsky, and Amit Sahai.
+
+ Cryptography with constant computational overhead.
+
+ In Proceedings of the fortieth annual ACM symposium on Theory
+of computing , pages 433–442, 2008.
+
+ Jacot et al. (2018) 
+ 
+Arthur Jacot, Franck Gabriel, and Clément Hongler.
+
+ Neural tangent kernel: Convergence and generalization in neural
+networks.
+
+ Advances in neural information processing systems , 31, 2018.
+
+ Kabashima (1994) 
+ 
+Y Kabashima.
+
+ Perfect loss of generalization due to noise in k= 2 parity machines.
+
+ Journal of Physics A: Mathematical and General , 27(6):1917, 1994.
+
+ Kamath et al. (2020) 
+ 
+Pritish Kamath, Omar Montasser, and Nathan Srebro.
+
+ Approximate is good enough: Probabilistic variants of dimensional and
+margin complexity.
+
+ In Conference on Learning Theory , pages 2236–2262. PMLR,
+2020.
+
+ Kearns (1998) 
+ 
+Michael Kearns.
+
+ Efficient noise-tolerant learning from statistical queries.
+
+ Journal of the ACM (JACM) , 45(6):983–1006, 1998.
+
+ Kingma and Ba (2014) 
+ 
+Diederik P Kingma and Jimmy Ba.
+
+ Adam: A method for stochastic optimization.
+
+ arXiv preprint arXiv:1412.6980 , 2014.
+
+ Klivans et al. (2004) 
+ 
+Adam R Klivans, Ryan O’Donnell, and Rocco A Servedio.
+
+ Learning intersections and thresholds of halfspaces.
+
+ Journal of Computer and System Sciences , 68(4):808–840, 2004.
+
+ Kol et al. (2017) 
+ 
+Gillat Kol, Ran Raz, and Avishay Tal.
+
+ Time-space hardness of learning sparse parities.
+
+ In Proceedings of the 49th Annual ACM SIGACT Symposium on
+Theory of Computing , pages 1067–1080, 2017.
+
+ Kushilevitz and Mansour (1993) 
+ 
+Eyal Kushilevitz and Yishay Mansour.
+
+ Learning decision trees using the fourier spectrum.
+
+ SIAM Journal on Computing , 22(6):1331–1348, 1993.
+
+ Laurent and Massart (2000) 
+ 
+Beatrice Laurent and Pascal Massart.
+
+ Adaptive estimation of a quadratic functional by model selection.
+
+ Annals of Statistics , pages 1302–1338, 2000.
+
+ Lu et al. (2021) 
+ 
+Kevin Lu, Aditya Grover, Pieter Abbeel, and Igor Mordatch.
+
+ Pretrained transformers as universal computation engines.
+
+ arXiv preprint arXiv:2103.05247 , 2021.
+
+ Malach and Shalev-Shwartz (2019) 
+ 
+Eran Malach and Shai Shalev-Shwartz.
+
+ Is deeper better only when shallow is good?
+
+ Advances in Neural Information Processing Systems , 32, 2019.
+
+ Malach and Shalev-Shwartz (2022) 
+ 
+Eran Malach and Shai Shalev-Shwartz.
+
+ When hardness of approximation meets hardness of learning.
+
+ Journal of Machine Learning Research , 23(91):1–24, 2022.
+
+ Malach et al. (2021) 
+ 
+Eran Malach, Pritish Kamath, Emmanuel Abbe, and Nathan Srebro.
+
+ Quantifying the benefit of using differentiable learning over tangent
+kernels.
+
+ In International Conference on Machine Learning , pages
+7379–7389. PMLR, 2021.
+
+ Mitchison and Durbin (1989) 
+ 
+GJ Mitchison and RM Durbin.
+
+ Bounds on the learning capacity of some multi-layer networks.
+
+ Biological Cybernetics , 60(5):345–365,
+1989.
+
+ O’Donnell (2014) 
+ 
+Ryan O’Donnell.
+
+ Analysis of boolean functions .
+
+ Cambridge University Press, 2014.
+
+ Opper (1994) 
+ 
+Manfred Opper.
+
+ Learning and generalization in a two-layer neural network: The role
+of the vapnik-chervonvenkis dimension.
+
+ Physical review letters , 72(13):2113,
+1994.
+
+ Paszke et al. (2019) 
+ 
+Adam Paszke, Sam Gross, Francisco Massa, Adam Lerer, James Bradbury, Gregory
+Chanan, Trevor Killeen, Zeming Lin, Natalia Gimelshein, Luca Antiga, Alban
+Desmaison, Andreas Kopf, Edward Yang, Zachary DeVito, Martin Raison, Alykhan
+Tejani, Sasank Chilamkurthy, Benoit Steiner, Lu Fang, Junjie Bai, and Soumith
+Chintala.
+
+ Pytorch: An imperative style, high-performance deep learning library.
+
+ In H. Wallach, H. Larochelle, A. Beygelzimer, F. d'Alché-Buc, E. Fox, and R. Garnett, editors, Advances in Neural
+Information Processing Systems 32 , pages 8024–8035. Curran Associates,
+Inc., 2019.
+
+ URL
+ http://papers.neurips.cc/paper/9015-pytorch-an-imperative-style-high-performance-deep-learning-library.pdf .
+
+ Power et al. (2022) 
+ 
+Alethea Power, Yuri Burda, Harri Edwards, Igor Babuschkin, and Vedant Misra.
+
+ Grokking: Generalization beyond overfitting on small algorithmic
+datasets.
+
+ arXiv preprint arXiv:2201.02177 , 2022.
+
+ Radford et al. (2019) 
+ 
+Alec Radford, Jeffrey Wu, Rewon Child, David Luan, Dario Amodei, Ilya
+Sutskever, et al.
+
+ Language models are unsupervised multitask learners.
+
+ OpenAI blog , 1(8):9, 2019.
+
+ Rahaman et al. (2019) 
+ 
+Nasim Rahaman, Aristide Baratin, Devansh Arpit, Felix Draxler, Min Lin, Fred
+Hamprecht, Yoshua Bengio, and Aaron Courville.
+
+ On the spectral bias of neural networks.
+
+ In International Conference on Machine Learning , pages
+5301–5310. PMLR, 2019.
+
+ Refinetti et al. (2021) 
+ 
+Maria Refinetti, Sebastian Goldt, Florent Krzakala, and Lenka Zdeborová.
+
+ Classifying high-dimensional gaussian mixtures: Where kernel methods
+fail and neural networks succeed.
+
+ In International Conference on Machine Learning , pages
+8936–8947. PMLR, 2021.
+
+ Rosen-Zvi et al. (2002) 
+ 
+Michal Rosen-Zvi, Einat Klein, Ido Kanter, and Wolfgang Kinzel.
+
+ Mutual learning in a tree parity machine and its application to
+cryptography.
+
+ Physical Review E , 66(6):066135, 2002.
+
+ Saad and Solla (1995a) 
+ 
+David Saad and Sara Solla.
+
+ Dynamics of on-line gradient descent learning for multilayer neural
+networks.
+
+ Advances in neural information processing systems , 8,
+1995a.
+
+ Saad and Solla (1995b) 
+ 
+David Saad and Sara A Solla.
+
+ On-line learning in soft committee machines.
+
+ Physical Review E , 52(4):4225,
+1995b.
+
+ Shalev-Shwartz and Ben-David (2014) 
+ 
+Shai Shalev-Shwartz and Shai Ben-David.
+
+ Understanding machine learning: From theory to algorithms .
+
+ Cambridge university press, 2014.
+
+ Shalev-Shwartz et al. (2017) 
+ 
+Shai Shalev-Shwartz, Ohad Shamir, and Shaked Shammah.
+
+ Failures of gradient-based deep learning.
+
+ In International Conference on Machine Learning , pages
+3067–3075. PMLR, 2017.
+
+ Shi et al. (2021) 
+ 
+Zhenmei Shi, Junyi Wei, and Yingyu Liang.
+
+ A theoretical analysis on feature learning in neural networks:
+Emergence from inputs and advantage over fixed features.
+
+ In International Conference on Learning Representations , 2021.
+
+ Simonetti and Caticha (1996) 
+ 
+Roberta Simonetti and Nestor Caticha.
+
+ On-line learning in parity machines.
+
+ Journal of Physics A: Mathematical and General , 29(16):4859, 1996.
+
+ Vaswani et al. (2017) 
+ 
+Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones,
+Aidan N Gomez, Łukasz Kaiser, and Illia Polosukhin.
+
+ Attention is all you need.
+
+ Advances in neural information processing systems , 30, 2017.
+
+ Wainwright (2019) 
+ 
+Martin J Wainwright.
+
+ High-dimensional statistics: A non-asymptotic viewpoint ,
+volume 48.
+
+ Cambridge University Press, 2019.
+
+ Watkin et al. (1993) 
+ 
+Timothy LH Watkin, Albrecht Rau, and Michael Biehl.
+
+ The statistical mechanics of learning a rule.
+
+ Reviews of Modern Physics , 65(2):499,
+1993.
+
+ Wei et al. (2019) 
+ 
+Colin Wei, Jason D Lee, Qiang Liu, and Tengyu Ma.
+
+ Regularization matters: Generalization and optimization of neural
+nets vs their induced kernel.
+
+ Advances in Neural Information Processing Systems , 32, 2019.
+
+ Yehudai and Ohad (2020) 
+ 
+Gilad Yehudai and Shamir Ohad.
+
+ Learning a single neuron with gradient methods.
+
+ In Conference on Learning Theory , pages 3756–3786. PMLR,
+2020.
+
+ Yehudai and Shamir (2019) 
+ 
+Gilad Yehudai and Ohad Shamir.
+
+ On the power and limitations of random features for understanding
+neural networks.
+
+ Advances in Neural Information Processing Systems , 32, 2019.
+
+ Zhang et al. (2020) 
+ 
+Jingzhao Zhang, Sai Praneeth Karimireddy, Andreas Veit, Seungyeon Kim, Sashank
+Reddi, Sanjiv Kumar, and Suvrit Sra.
+
+ Why are adaptive methods good for attention models?
+
+ Advances in Neural Information Processing Systems ,
+33:15383–15393, 2020.
+
+ Appendix A Additional background, preliminaries, and related work
+
+ A.1 Parities, orthogonality, and hardness
+
+ For each integer n ≥ 1 n\geq 1 and nonempty subset of indices S ⊆ [ n ] S\subseteq[n] , define the ( n , S ) (n,S) - parity function χ S ​ ( x ) = ∏ i ∈ S x i \chi_{S}(x)=\prod_{i\in S}x_{i} , i.e. the parity of the bits at the indices in S S . We define the ( n , S ) (n,S) - parity distribution 𝒟 S \mathcal{D}_{S} over examples ( x , y ) (x,y) as follows: the features x ∼ Unif ⁡ ( { ± 1 } n ) x\sim\mathrm{Unif}(\{\pm 1\}^{n}) are uniform random bits, with labels y ∈ { ± 1 } y\in\{\pm 1\} given by the parity function y = χ S ​ ( x ) y=\chi_{S}(x) . For 0 ≤ k ≤ n 0\leq k\leq n , the corresponding ( n , k ) (n,k) - parity learning problem is the task of identifying an unknown size- k k set S S (chosen at random), using samples from 𝒟 S \mathcal{D}_{S} . With knowledge of k k but not S S , a learner must use the labels to distinguish between ( n k ) \binom{n}{k} possible “relevant feature sets”; thus, the statistical limit for this problem is log ⁡ ( n k ) = Θ ⁡ ( k ​ log ⁡ n ) \log\binom{n}{k}=\Theta(k\log n) samples.
+
+ This work leverages the parity problem as a “computationally hard case” for identifying the features S S which are relevant to the label. Observe that for any S ′ ∈ [ n ] S^{\prime}\in[n] , it holds that
+
+ 𝔼 x ∼ Unif ⁡ ( { ± 1 } n ) [ χ S ​ ( x ) ​ χ S ′ ​ ( x ) ] = 𝔼 ( x , y ) ∼ 𝒟 S [ χ S ′ ​ ( x ) ​ y ] = { 1 S ′ = S 0 otherwise . \mathop{\mathbb{E}}_{x\sim\mathrm{Unif}(\{\pm 1\}^{n})}\left[\chi_{S}(x)\chi_{S^{\prime}}(x)\right]=\mathop{\mathbb{E}}_{(x,y)\sim\mathcal{D}_{S}}\left[\chi_{S^{\prime}}(x)\,y\right]=\begin{cases}1&S^{\prime}=S\\
+0&\text{otherwise}\end{cases}. 
+ 
+ (1) 
+
+ That is, a learner who guesses indices S ′ S^{\prime} cannot use correlations as feedback to reveal which (or how many) indices in S ′ S^{\prime} are correct, unless S ′ S^{\prime} is exactly the correct subset. In this sense, for the ( n , k ) (n,k) -parity problem, the ( n k ) − 1 \binom{n}{k}-1 wrong answers are indistinguishable from each other. Thus, the structure of this problem forces this form of learner (but not necessarily all learning algorithms) to perform exhaustive search over subsets.
+
+ Property 1 (a.k.a. the orthogonality of parities under the correlation inner product) implies that any function f : { ± 1 } n → ℝ f:\{\pm 1\}^{n}\rightarrow\mathbb{R} has a unique Fourier expansion (see, e.g. ( O’Donnell, 2014 ) ):
+
+ f ⁡ ( x ) = ∑ S ⊆ [ n ] f ^ ​ ( S ) ​ χ S ​ ( x ) , f ^ S = 𝔼 x ∼ Unif ⁡ ( { ± 1 } n ) [ f ⁡ ( x ) ​ χ S ​ ( x ) ] . f(x)=\sum_{S\subseteq[n]}\widehat{f}(S)\chi_{S}(x),\qquad\widehat{f}_{S}=\mathop{\mathbb{E}}_{x\sim\mathrm{Unif}(\{\pm 1\}^{n})}\left[f(x)\chi_{S}(x)\right]. 
+ 
+ (2) 
+
+ In the statistical query (SQ) model ( Kearns, 1998 ) , Property ( 1 ) implies computational lower bounds. In this model, a learner, rather than having access to examples drawn from the distribution, can query an oracle, which responds with noisy estimates of the query over the distribution. Namely, each iteration the learner outputs a query q i : { ± 1 } n → [ − 1 , 1 ] q_{i}:\{\pm 1\}^{n}\to[-1,1] , and the oracle returns some value v i v_{i} satisfying | v i − 𝔼 ( x , y ) ∼ 𝒟 [ q i ​ ( x , y ) ] | ≤ τ |v_{i}-\mathop{\mathbb{E}}_{(x,y)\sim\mathcal{D}}\left[q_{i}(x,y)\right]|\leq\tau , for some tolerance parameter τ > 0 \tau>0 . It can be shown that Equation 1 implies that each query will have a non-trivial correlation only with a small fraction (namely, 1 / τ 2 1/\tau^{2} ) of the possible parities, which then implies that an SQ algorithm which solves the ( n , k ) (n,k) -parity problem using T T queries of tolerance τ \tau must satisfy T / τ 2 ≥ Ω ⁡ ( n k ) T/\tau^{2}\geq\Omega(n^{k}) . This constitutes a lower bound on the number of queries (and/or on the tolerance), which indicates that essentially, SQ algorithms cannot do much better than exhaustive search (going over all the possible choices of size- k k subsets).
+
+ It should be mentioned that the ( n , k ) (n,k) -parity problem can be solved efficiently by a learning algorithm that has access to examples (i.e., an algorithm that does not operate in the SQ framework). Specifically, this problem can be solved by the Gaussian elimination algorithm. Moreover, it has been shown that the (Stochastic) Gradient Descent algorithm, discussed in the next section, can also be utilized for solving parities, given accurate enough estimates of the gradient and a very particular choice of neural network architecture Abbe and Sandon (2020) . That said, when the accuracy of the gradients is not sufficient, GD suffers from the same SQ lower bound mentioned above (i.e., GD is essentially an SQ algorithm Abbe et al. (2021) ).
+
+ Learning sparse noisy parities, even at a very small noise level (i.e., o ⁡ ( 1 ) o(1) or n − δ n^{-\delta} ) is believed to be computationally hard. This was first explicitly conjectured by Alekhnovich (2003) , and has been the basis for several cryptographic schemes (e.g., ( Ishai et al., 2008 , Applebaum et al., 2009 , Applebaum et al., 2010 ) ). For noiseless sparse parities, Kol et al. (2017) show time-space hardness in the setting where k = ω ⁡ ( 1 ) k=\omega(1) . We present some experiments with noisy parities in Appendix C.6 , finding that our empirical results (and theoretical analysis) are robust to Θ ⁡ ( 1 ) \Theta(1) noise.
+
+ A.2 Neural networks and standard training
+
+ Next, we establish notation for the standard neural network training pipeline. Our main results are presented in the online learning setting, with a stream of i.i.d. batches of examples. At each iteration t = 1 , … , T t=1,\ldots,T , a learning algorithm receives a batch of B B examples { ( x t , i , y t , i ) } i = 1 B \{(x_{t,i},y_{t,i})\}_{i=1}^{B} drawn i.i.d. from 𝒟 S \mathcal{D}_{S} , then outputs a classifier y ^ t : { ± 1 } n → { ± 1 } \widehat{y}_{t}:\{\pm 1\}^{n}\rightarrow\{\pm 1\} . If 𝔼 ( x , y ) ∼ 𝒟 S [ 𝟙 [ y ^ t ( x ) ≠ y ] ] ≤ ϵ \mathop{\mathbb{E}}_{(x,y)\sim\mathcal{D}_{S}}[\mathbbm{1}[\widehat{y}_{t}(x)\neq y]]\leq\epsilon (i.e. y ^ t \widehat{y}_{t} agrees with the correct parity on at least a ( 1 − ϵ ) (1-\epsilon) fraction of inputs), the learner is said to have solved the parity problem with error ϵ \epsilon in t t iterations ( t ​ B tB samples); the smallest t t for which this is true is the convergence time t c t_{c} . A learner may also output an initial classifier y ^ 0 \widehat{y}_{0} before observing any data.
+
+ This formulation permits improper function classes (i.e. other than parities over subsets S ′ S^{\prime} ) for the parity learning problem. In particular, we will focus on hypothesis classes of continuous functions f : { ± 1 } n × Θ → ℝ f:\{\pm 1\}^{n}\times\Theta\rightarrow\mathbb{R} , which map to classifiers y ^ ​ ( x ) = sign ( f ​ ( x , θ ) ) \widehat{y}(x)=\mathop{\mathrm{sign}}(f(x;\theta)) 9 9 
+ 9 
+
+ When f ⁡ ( x , θ ) = 0 f(x;\theta)=0 in practice (e.g. with sign initialization), we break the tie arbitrarily. We ensure in the theoretical analysis that this does not happen. . When Θ \Theta is a vector space over ℝ \mathbb{R} , a ubiquitous online learning algorithm is gradient descent (GD). For a choice of loss function ℓ : { ± 1 } × ℝ → ℝ \ell:\{\pm 1\}\times\mathbb{R}\rightarrow\mathbb{R} , initialization θ 0 \theta_{0} ,
+learning rate schedule { η t } t = 1 T ⊆ ℝ \{\eta_{t}\}_{t=1}^{T}\subseteq\mathbb{R} and weight-decay schedule { λ t } t = 1 T ⊆ ℝ \{\lambda_{t}\}_{t=1}^{T}\subseteq\mathbb{R} , GD defines iterative updates
+
+ θ t + 1 ← ( 1 − λ t ) ​ θ t − η t ​ ∇ θ ( 1 B ​ ∑ i = 1 B ℓ ⁡ ( y t , i , f ⁡ ( x t , i , θ t ) ) ) , \theta_{t+1}\leftarrow(1-\lambda_{t})\theta_{t}-\eta_{t}\nabla_{\theta}\left(\frac{1}{B}\sum_{i=1}^{B}\ell(y_{t,i},f(x_{t,i};\theta_{t}))\right), 
+ 
+ (3) 
+
+ where f f (the architecture ) and ℓ \ell are assumed to be such that this gradient (more generally, subgradient) is well-defined.
+In this context, online and stochastic gradient descent (OGD/SGD) are equivalent names for the update rule ( 3 ).
+
+ A fundamental object of study in deep learning is the multi-layer perceptron (MLP). In this setting, a 2-layer MLP with width h h and activation function σ : ℝ → ℝ \sigma:\mathbb{R}\rightarrow\mathbb{R} , parameterized by W ∈ ℝ r × n , b ∈ ℝ r , u ∈ ℝ r W\in\mathbb{R}^{r\times n},b\in\mathbb{R}^{r},u\in\mathbb{R}^{r} , specifies the function
+
+ f ⁡ ( x , W , b , u ) = u ⊤ ​ σ ​ ( W ​ x + b ) , f(x;W,b,u)=u^{\top}\sigma(Wx+b), 
+
+ where σ ⁡ ( ⋅ ) \sigma(\cdot) is applied entrywise. It is standard to use GD to jointly update the network’s parameters.
+Our results include positive results about “single neurons”: MLPs with width r = 1 r=1 . We note that for our theoretical analysis, when training MLPs with GD, we allow for different learning rate and weight decay schedule for the different layers.
+
+ Finally, we will analyze randomized learning algorithms, such as GD with random initialization θ 0 \theta_{0} , whose iterates θ t \theta_{t} (and thus classifiers y ^ \widehat{y} ) are random variables even when the samples are not. A learning algorithm has permutation symmetry if, for all sequences of data { ( x t , i , y t , i ) } \{(x_{t,i},y_{t,i})\} , the classifiers y ^ t ∘ π \widehat{y}_{t}\circ\pi resulting from feeding { ( π ⁡ ( x t , i ) , y t , i ) } \{(\pi(x_{t,i}),y_{t,i})\} to the learner have identical distributions as π \pi ranges over all permutations of indices. The neural architectures and initializations (and thus, SGD) considered in this work are permutation-symmetric; for this reason, it is convenient for notation to choose S = [ k ] S=[k] as the canonical ( n , k ) (n,k) -parity learning problem, without loss of generality.
+
+ A.3 Additional related work
+
+ Feature learning using GD on neural networks.
+
+ A line of recent work has focused on understanding the feature learning ability of gradient descent dynamics on neural networks. These analyses go beyond the Neural Tangent Kernel (NTK) regime, where they show a separation between learning with fixed features versus GD on neural networks, for these problems. Several of these works assume structure (often "sparse") in the input data which is useful for the prediction task, and helps avoid computational hardness. In contrast, our work focuses on studying hard problems at their computational limit. Here we discuss the most relevant works in detail:
+
+ A line of work ( Diakonikolas et al. (2020) , Yehudai and Ohad (2020) , Frei et al. (2020) ) focuses on learning a single non-linearity y = σ ⁡ ( w ⊤ ​ x ) y=\sigma(w^{\top}x) (typically σ ⁡ ( ⋅ ) \sigma(\cdot) is the ReLU or sigmoid) using gradient-based methods. These works obtain polynomial-time convergence guarantees when the distribution satisfies a spread condition. These results do not extend to the Boolean hypercube.
+
+ Daniely and Malach (2020) also study the problem of learning sparse parities using neural networks. One key difference from our work is that they assume a modified version of the problem, where the input distribution is not uniform over the hypercube, but instead leaks information about the label. In particular, the distribution ensures that the relevant parity bits always have the same value. Shi et al. (2021) generalize this setting by considering a setting where labels are generated based on certain class specific patterns and the data itself is generated using these patterns with some extra background patterns. This also embeds information in the data itself regarding the label, unlike our setting, where the labels are uncorrelated with the input features. Under these structural assumption, the papers study how GD on a two-layer network can learn useful features in polynomial time. Both these analysis also exploits the first gradient step to find useful features. Shi et al. (2021) additionally require a second step to refine the features.
+
+ Ba et al. (2022) show how the first gradient step is important for feature leaning. In particular, they show that first update is essentially rank-1 and aligns with the linear component of the underlying function. The functions we consider (parity) do not have a linear component.
+
+ Abbe et al. (2022) define a notion of initial alignment between the network at initialization and the target function and show that it is essential to get polynomial time learnability with noisy gradients on a fully connected network. Our MLP results also exploit the correlation between the gradient and the label to ensure that the gradient update gives us signal.
+
+ Frei et al. (2022) also study learnability of a parity-like function with k = 2 k=2 under noisy labels. The paper analyzes early stopping GD for learning the underlying labeling function. Our setup is quite different from theirs and can handle k > 2 k>2 .
+
+ In concurrent work, Damian et al. (2022) consider the problem of learning polynomials which depend on few relevant directions using gradient descent on a two-layer network. They assume that the distributional Hessian of the ground truth function spans exactly the subspace of the relevant direction. Using this, they show that gradient descent can learn the relevant subspace with sample complexity scaling as d 2 d^{2} and not d p d^{p} where p p is the degree of the underlying polynomial as long as the number of relevant directions is much less than d d . Their proof technique is similar to our two-layer MLP result which also exploits correlation in the first gradient step. However, for our setting, the distributional Hessian has rank 0 and does not satisfy their assumptions.
+
+ Appendix B Proofs
+
+ B.1 Global convergence for MLPs
+
+ For some even number r r , consider a ReLU MLP of size r r :
+
+ f ⁡ ( x , θ ) = ∑ i = 1 r u i ​ σ ​ ( w i ⊤ ​ x + b i ) f(x;\theta)=\sum_{i=1}^{r}u_{i}\sigma(w_{i}^{\top}x+b_{i}) 
+
+ Where σ \sigma is the ReLU activation σ ⁡ ( x ) = max ⁡ { x , 0 } \sigma(x)=\max\{x,0\} , w 1 , … , w r ∈ ℝ r × n , b ∈ ℝ r , u ∈ ℝ r w_{1},\dots,w_{r}\in\mathbb{R}^{r\times n},b\in\mathbb{R}^{r},u\in\mathbb{R}^{r} and we denote the set of parameters by θ = { w 1 , … , w r , b , u } \theta=\{w_{1},\dots,w_{r},b,u\} . We denote by u i ( t ) , w i ( t ) , b ( t ) u_{i}^{(t)},w_{i}^{(t)},b^{(t)} and θ t \theta_{t} the value of the relevant parameters at iteration t t of gradient-descent. For brevity, we sometimes denote w i = w i ( 0 ) , b i = b i ( 0 ) , u i = u i ( 0 ) w_{i}=w_{i}^{(0)},b_{i}=b_{i}^{(0)},u_{i}=u_{i}^{(0)} .
+W.l.o.g., we assume that S = [ k ] S=[k] , and so y = χ [ k ] ​ ( x ) = ∏ i = 1 k x i y=\chi_{[k]}(x)=\prod_{i=1}^{k}x_{i} . Indeed, since the weights’ initialization we consider is permutation symmetric, this does not limit the generality of the results. We take ℓ \ell to be the hinge loss : ℓ ⁡ ( y , y ^ ) = max ⁡ { 1 − y ​ y ^ , 0 } \ell(y,\widehat{y})=\max\{1-y\widehat{y},0\} . We use the following unbiased initialization:
+
+ • 
+ 
+ For all 1 ≤ i ≤ r / 2 1\leq i\leq r/2 , randomly initialize
+
+ w i ( 0 ) ∼ Unif ⁡ ( { ± 1 } n ) , u i ( 0 ) ∼ Unif ⁡ ( { ± 1 } ) , b i ( 0 ) ∼ Unif ⁡ ( { − 1 + 1 / k , … , 1 − 1 / k } ) w^{(0)}_{i}\sim\mathrm{Unif}\left(\{\pm 1\}^{n}\right),u_{i}^{(0)}\sim\mathrm{Unif}\left(\{\pm 1\}\right),b_{i}^{(0)}\sim\mathrm{Unif}(\left\{-1+1/k,\dots,1-1/k\right\}) 
+
+ • 
+ 
+ For all r / 2 < i ≤ r r/2<i\leq r , initialize
+
+ w i ( 0 ) = w i − r / 2 ( 0 ) , b i ( 0 ) = b i − r / 2 ( 0 ) , u i ( 0 ) = − u i − r / 2 ( 0 ) w^{(0)}_{i}=w^{(0)}_{i-r/2},b_{i}^{(0)}=b_{i-r/2}^{(0)},u^{(0)}_{i}=-u^{(0)}_{i-r/2} 
+
+ We start by computing the population gradient at initialization. Using the fact that ℓ ′ ​ ( 0 , y ) = − y \ell^{\prime}(0,y)=-y we get the following:
+
+ 𝔼 [ ∇ w i , j ℓ ​ ( f ⁡ ( x , θ 0 ) , y ) ] = 𝔼 [ − y ​ ∇ w i , j f ​ ( x , θ 0 ) ] \mathop{\mathbb{E}}\left[\nabla_{w_{i,j}}\ell(f(x;\theta_{0}),y)\right]=\mathop{\mathbb{E}}\left[-y\nabla_{w_{i,j}}f(x;\theta_{0})\right] 
+ 
+ (4) 
+
+ = 𝔼 [ − y u i 1 { w i ⋅ x + b i > 0 } x j ] . =\mathop{\mathbb{E}}\left[-yu_{i}1\left\{{w_{i}\cdot x+b_{i}>0}\right\}x_{j}\right]. 
+
+ For j ∈ [ k ] j\in[k] we have:
+
+ 𝔼 [ ∇ w i , j ℓ ( f ( x ; θ 0 ) , y ) ] = − u i 𝔼 [ ( ∏ j ′ ∈ [ k ] ∖ { j } x j ′ ) 1 { w i ⋅ x + b i > 0 } ] \mathop{\mathbb{E}}\left[\nabla_{w_{i,j}}\ell(f(x;\theta_{0}),y)\right]=-u_{i}\mathop{\mathbb{E}}\left[\left(\prod_{j^{\prime}\in[k]\setminus\{j\}}x_{j^{\prime}}\right)1\left\{{w_{i}\cdot x+b_{i}>0}\right\}\right] 
+
+ For j ∉ [ k ] j\notin[k] we have:
+
+ 𝔼 [ ∇ w i , j ℓ ( f ( x ; θ 0 ) , y ) ] = − u i 𝔼 [ ( ∏ j ′ ∈ [ k ] ∪ { j } x j ′ ) 1 { w i ⋅ x + b i > 0 } ] \mathop{\mathbb{E}}\left[\nabla_{w_{i,j}}\ell(f(x;\theta_{0}),y)\right]=-u_{i}\mathop{\mathbb{E}}\left[\left(\prod_{j^{\prime}\in[k]\cup\{j\}}x_{j^{\prime}}\right)1\left\{{w_{i}\cdot x+b_{i}>0}\right\}\right] 
+
+ Finally, we have:
+
+ 𝔼 [ ∇ b i ℓ ( f ( x ; θ 0 ) , y ) ] = − u i 𝔼 [ ( ∏ j ′ ∈ [ k ] x j ′ ) 1 { w i ⋅ x + b i > 0 } ] \mathop{\mathbb{E}}\left[\nabla_{b_{i}}\ell(f(x;\theta_{0}),y)\right]=-u_{i}\mathop{\mathbb{E}}\left[\left(\prod_{j^{\prime}\in[k]}x_{j^{\prime}}\right)1\left\{{w_{i}\cdot x+b_{i}>0}\right\}\right] 
+
+ Denote
+
+ g i , j = 𝔼 ⁡ [ ∇ w i , j ℓ ​ ( f ⁡ ( x , θ 0 ) , y ) ] , γ i = 𝔼 ⁡ [ ∇ b i ℓ ​ ( f ⁡ ( x , θ 0 ) , y ) ] g_{i,j}=\mathbb{E}\left[\nabla_{w_{i,j}}\ell(f(x;\theta_{0}),y)\right],~\gamma_{i}=\mathbb{E}\left[\nabla_{b_{i}}\ell(f(x;\theta_{0}),y)\right] 
+
+ For some function f f and some subset S ⊆ [ n ] S\subseteq[n] , denote f ^ ​ ( S ) = 𝔼 [ f ⁡ ( x ) ​ χ S ​ ( x ) ] \widehat{f}(S)=\mathop{\mathbb{E}}[f(x)\chi_{S}(x)] .
+
+ Denote LTF w , b ( x ) = 1 { w ⋅ x + b > 0 } \mathrm{LTF}_{w,b}(x)=1\{w\cdot x+b>0\} and
+let MAJ ⁡ ( x ) = sign ( ∑ i = 1 n x i ) \mathrm{MAJ}(x)=\mathop{\mathrm{sign}}\left(\sum_{i=1}^{n}x_{i}\right) and observe that, if | b | < 1 |b|<1 ,
+
+ LTF w , b ​ ( x ) = 1 2 + 1 2 ​ MAJ ​ ( w ⊙ x ) \mathrm{LTF}_{w,b}(x)=\frac{1}{2}+\frac{1}{2}\mathrm{MAJ}(w\odot x) 
+
+ where w ⊙ x = ( w 1 ​ x 1 , … , w n ​ x n ) ∈ { ± 1 } w\odot x=(w_{1}x_{1},\dots,w_{n}x_{n})\in\{\pm 1\} .
+Since { χ S } S ⊆ [ n ] \{\chi_{S}\}_{S\subseteq[n]} is a Fourier Basis, we can write MAJ = ∑ S ⊆ [ n ] MAJ ^ ​ ( S ) ​ χ S \mathrm{MAJ}=\sum_{S\subseteq[n]}\widehat{\mathrm{MAJ}}(S)\chi_{S} and therefore:
+
+ LTF w , b ​ ( x ) \displaystyle\mathrm{LTF}_{w,b}(x) 
+ = 1 2 + 1 2 ​ MAJ ​ ( w ⊙ x ) = 1 2 + 1 2 ​ ∑ S ⊆ [ n ] MAJ ^ ​ ( S ) ​ χ S ​ ( w ⊙ x ) \displaystyle=\frac{1}{2}+\frac{1}{2}\mathrm{MAJ}(w\odot x)=\frac{1}{2}+\frac{1}{2}\sum_{S\subseteq[n]}\widehat{\mathrm{MAJ}}(S)\chi_{S}(w\odot x) 
+
+ = 1 2 + 1 2 ​ ∑ S ⊆ [ n ] MAJ ^ ​ ( S ) ​ χ S ​ ( w ) ​ χ S ​ ( x ) \displaystyle=\frac{1}{2}+\frac{1}{2}\sum_{S\subseteq[n]}\widehat{\mathrm{MAJ}}(S)\chi_{S}(w)\chi_{S}(x) 
+
+ So, for every S ⊆ [ n ] S\subseteq[n] with | S | ≥ 1 |S|\geq 1 we have LTF ^ w , b ​ ( S ) = 1 2 ​ MAJ ^ ​ ( S ) ​ χ S ​ ( w ) \widehat{\mathrm{LTF}}_{w,b}(S)=\frac{1}{2}\widehat{\mathrm{MAJ}}(S)\chi_{S}(w) and so | LTF ^ w , b ​ ( S ) | = 1 2 ​ | MAJ ^ ​ ( S ) | |\widehat{\mathrm{LTF}}_{w,b}(S)|=\frac{1}{2}|\widehat{\mathrm{MAJ}}(S)| .
+
+ Lemma 1 . 
+
+ Fix some k k , and assume that n ≥ 2 ​ k 2 n\geq 2k^{2} . Then, for every S ⊆ [ n ] S\subseteq[n] s.t. | S | = k |S|=k it holds that: 
+
+ • 
+ 
+ If k k is even: MAJ ^ ​ ( S ) = 0 \widehat{\mathrm{MAJ}}(S)=0 . 
+
+ • 
+ 
+ If k k is odd: 
+
+ c 1 2 k − 2 / 3 ≤ ( n k ) MAJ ^ ( S ) 2 ≤ c 2 2 k − 2 / 3 c_{1}^{2}k^{-2/3}\leq\binom{n}{k}\widehat{\mathrm{MAJ}}(S)^{2}\leq c^{2}_{2}k^{-2/3} 
+
+ for some universal constants c 1 , c 2 c_{1},c_{2} . 
+
+ Proof.
+
+ See O’Donnell (2014) .
+∎ 
+
+ Observe that for all S ⊆ [ n ] S\subseteq[n] s.t. | S | = k |S|=k it holds that MAJ ^ ​ ( S ) = MAJ ^ ​ ( [ k ] ) \widehat{\mathrm{MAJ}}(S)=\widehat{\mathrm{MAJ}}([k]) and denote ξ k := MAJ ^ ​ ( [ k ] ) \xi_{k}:=\widehat{\mathrm{MAJ}}([k]) .
+
+ Therefore, by the previous lemma we get that
+for every even k k the following holds:
+
+ ξ k + 1 2 ξ k − 1 2 ≤ c 2 2 ​ ( k − 1 ) 2 / 3 ​ ( n k − 1 ) c 1 2 ​ ( k + 1 ) 2 / 3 ​ ( n k + 1 ) ≤ c 2 c 1 ​ ( k + 1 ) ​ k ( n − k ) ​ ( n − k + 1 ) ≤ 8 ​ c 2 c 1 ​ k 2 n 2 \frac{\xi_{k+1}^{2}}{\xi_{k-1}^{2}}\leq\frac{c^{2}_{2}(k-1)^{2/3}\binom{n}{k-1}}{c^{2}_{1}(k+1)^{2/3}\binom{n}{k+1}}\leq\frac{c_{2}}{c_{1}}\frac{(k+1)k}{(n-k)(n-k+1)}\leq\frac{8c_{2}}{c_{1}}\frac{k^{2}}{n^{2}} 
+ 
+ (5) 
+
+ Lemma 2 . 
+
+ Assume that k k is even and that n ≥ 2 ​ ( k + 1 ) 2 n\geq 2(k+1)^{2} .
+Then, the following hold: 
+
+ 1. 
+ 
+ If j ∈ { 1 , … , k } j\in\{1,\dots,k\} then: 
+
+ g i , j = − 1 2 u i ξ k − 1 ⋅ χ [ k ] ∖ { j } ( w i ) g_{i,j}=-\frac{1}{2}u_{i}\xi_{k-1}\cdot\chi_{[k]\setminus\{j\}}(w_{i}) 
+
+ 2. 
+ 
+ If j ∈ { k + 1 , … , n } j\in\{k+1,\dots,n\} then: 
+
+ g i , j = − 1 2 u i ξ k + 1 ⋅ χ [ k ] ∪ { j } ( w i ) g_{i,j}=-\frac{1}{2}u_{i}\xi_{k+1}\cdot\chi_{[k]\cup\{j\}}(w_{i}) 
+
+ 3. 
+ 
+ γ i = 0 \gamma_{i}=0 . 
+
+ Proof.
+
+ If j ∈ [ k ] j\in[k] then: 
+
+ g i , j \displaystyle g_{i,j} 
+ = − u i 𝔼 [ χ [ k ] ∖ { j } ( x ) LTF w i , b i ( x ) ] = − u i LTF ^ w i , b i ( [ k ] ∖ { j } ) \displaystyle=-u_{i}\mathop{\mathbb{E}}\left[\chi_{[k]\setminus\{j\}}(x)\mathrm{LTF}_{w_{i},b_{i}}(x)\right]=-u_{i}\widehat{\mathrm{LTF}}_{w_{i},b_{i}}([k]\setminus\{j\}) 
+
+ = − 1 2 u i MAJ ^ ( [ k ] ∖ { j } ) χ [ k ] ∖ { j } ( w i ) = − 1 2 u i ξ k − 1 ⋅ χ [ k ] ∖ { j } ( w i ) \displaystyle=-\frac{1}{2}u_{i}\widehat{\mathrm{MAJ}}([k]\setminus\{j\})\chi_{[k]\setminus\{j\}}(w_{i})=-\frac{1}{2}u_{i}\xi_{k-1}\cdot\chi_{[k]\setminus\{j\}}(w_{i}) 
+
+ Similarly, if j ∉ [ k ] j\notin[k] we have: 
+
+ g i , j \displaystyle g_{i,j} 
+ = − u i 𝔼 [ χ [ k ] ∪ { j } ( x ) LTF w i , b i ( x ) ] = − u i LTF ^ w i , b i ( [ k ] ∪ { j } ) \displaystyle=-u_{i}\mathop{\mathbb{E}}\left[\chi_{[k]\cup\{j\}}(x)\mathrm{LTF}_{w_{i},b_{i}}(x)\right]=-u_{i}\widehat{\mathrm{LTF}}_{w_{i},b_{i}}([k]\cup\{j\}) 
+
+ = − 1 2 u i MAJ ^ ( [ k ] ∪ { j } ) χ [ k ] ∪ { j } ( w i ) = − 1 2 u i ξ k + 1 ⋅ χ [ k ] ∪ { j } ( w i ) \displaystyle=-\frac{1}{2}u_{i}\widehat{\mathrm{MAJ}}([k]\cup\{j\})\chi_{[k]\cup\{j\}}(w_{i})=-\frac{1}{2}u_{i}\xi_{k+1}\cdot\chi_{[k]\cup\{j\}}(w_{i}) 
+
+ Finally, we have: 
+
+ γ i = − u i ​ LTF ^ w i , b i ​ ( [ k ] ) = − u i ​ MAJ ^ ​ ( [ k ] ) = 0 \gamma_{i}=-u_{i}\widehat{\mathrm{LTF}}_{w_{i},b_{i}}([k])=-u_{i}\widehat{\mathrm{MAJ}}([k])=0 
+
+ ∎ 
+
+ Lemma 3 . 
+
+ Let τ > 0 \tau>0 be some tolerance parameter, fix ϵ ∈ ( 0 , 1 ) \epsilon\in(0,1) and let η = 1 k ​ | ξ k − 1 | \eta=\frac{1}{k|\xi_{k-1}|} . Assume that k k is an even number.
+Fix some w 1 , … , w k ∈ { ± 1 } n w_{1},\dots,w_{k}\in\{\pm 1\}^{n} , b 1 , … , b r ∈ ( − 1 , 1 ) b_{1},\dots,b_{r}\in(-1,1) and u 1 , … , u k ∈ { ± 1 } u_{1},\dots,u_{k}\in\{\pm 1\} .
+Let w ^ i = − η ​ g ^ i \widehat{w}_{i}=-\eta\widehat{g}_{i} and b ^ i = b i − η ​ γ ^ i \widehat{b}_{i}=b_{i}-\eta\widehat{\gamma}_{i} s.t. ‖ g ^ i − g i ‖ ∞ ≤ τ \|\widehat{g}_{i}-g_{i}\|_{\infty}\leq\tau and ‖ γ ^ i − γ i ‖ ≤ τ \|\widehat{\gamma}_{i}-\gamma_{i}\|\leq\tau . Assume the following holds: 
+
+ • 
+ 
+ For all i , j ∈ [ k ] i,j\in[k] it holds that w i , j = u i ⋅ sign ξ k − 1 w_{i,j}=u_{i}\cdot\mathop{\mathrm{sign}}\xi_{k-1} . 
+
+ • 
+ 
+ b i = − 1 2 + i + 1 k b_{i}=-\frac{1}{2}+\frac{i+1}{k} 
+
+ Then, if τ ≤ | ξ k − 1 | 16 ​ k ​ 2 ​ n ​ log ⁡ ( 2 ​ k / ϵ ) \tau\leq\frac{|\xi_{k-1}|}{16k\sqrt{2n\log(2k/\epsilon)}} and n ≥ 2 11 ​ k 4 ​ c 2 2 ​ log ⁡ ( 2 ​ k / ϵ ) c 1 2 n\geq\frac{2^{11}k^{4}c_{2}^{2}\log(2k/\epsilon)}{c_{1}^{2}} there exists some u ^ ∈ ℝ k \widehat{u}\in\mathbb{R}^{k} with ‖ u ^ ‖ ∞ ≤ 8 ​ k \|\widehat{u}\|_{\infty}\leq 8k s.t.
+ f ⁡ ( x ) = ∑ i = 1 k u ^ i ​ σ ​ ( w ^ i ⋅ x + b ^ i ) f(x)=\sum_{i=1}^{k}\widehat{u}_{i}\sigma(\widehat{w}_{i}\cdot x+\widehat{b}_{i}) 
+satisfies 
+
+ 𝔼 x [ ℓ ⁡ ( f ⁡ ( x ) , χ [ k ] ​ ( x ) ) ] ≤ 16 ​ ϵ ​ k 2 ​ n \mathop{\mathbb{E}}_{x}[\ell(f(x),\chi_{[k]}(x))]\leq 16\epsilon k^{2}n 
+
+ Additionally, for all i i and all x x it holds that | σ ⁡ ( w ^ i ⋅ x + b ^ i ) | ≤ n + 1 |\sigma(\widehat{w}_{i}\cdot x+\widehat{b}_{i})|\leq n+1 . 
+
+ Proof.
+
+ We start with the following claim. 
+
+ Claim 1 : For all i i and for all j ∈ [ k ] j\in[k] it holds that | w ^ i , j − 1 2 ​ k | ≤ τ | ξ k − 1 | \left|\widehat{w}_{i,j}-\frac{1}{2k}\right|\leq\frac{\tau}{|\xi_{k-1}|} . 
+
+ Proof : First, observe that by the assumption it holds that for all i , j ∈ [ k ] i,j\in[k] , 
+
+ u i ⋅ χ [ k ] ∖ { j } ​ ( w i ) = u i ⋅ ∏ j ′ ∈ [ k ] ∖ { j } k w i , j = u i ⋅ ( u i ⋅ sign ξ k − 1 ) k − 1 = sign ξ k − 1 u_{i}\cdot\chi_{[k]\setminus\{j\}}(w_{i})=u_{i}\cdot\prod_{j^{\prime}\in[k]\setminus\{j\}}^{k}w_{i,j}=u_{i}\cdot(u_{i}\cdot\mathop{\mathrm{sign}}\xi_{k-1})^{k-1}=\mathop{\mathrm{sign}}\xi_{k-1} 
+
+ Now, from Lemma 2 we have: 
+
+ g i , j = − 1 2 u i ξ k − 1 ⋅ χ [ k ] ∖ { j } ( w i ) = − 1 2 | ξ k − 1 | g_{i,j}=-\frac{1}{2}u_{i}\xi_{k-1}\cdot\chi_{[k]\setminus\{j\}}(w_{i})=-\frac{1}{2}|\xi_{k-1}| 
+
+ and so 
+
+ | w i , j − 1 2 ​ k | = | − η ​ g ^ i , j − 1 2 ​ k | = 1 k ​ | − k ​ η ​ g ^ i , j + g i , j | ξ k − 1 | | = 1 k ​ | ξ k − 1 | ​ | g i , j − g ^ i , j | ≤ τ | ξ k − 1 | \left|w_{i,j}-\frac{1}{2k}\right|=\left|-\eta\widehat{g}_{i,j}-\frac{1}{2k}\right|=\frac{1}{k}\left|-k\eta\widehat{g}_{i,j}+\frac{g_{i,j}}{|\xi_{k-1}|}\right|=\frac{1}{k|\xi_{k-1}|}\left|g_{i,j}-\widehat{g}_{i,j}\right|\leq\frac{\tau}{|\xi_{k-1}|} 
+
+ Claim 2 : For all i i 
+and for all j > k j>k it holds that | w ^ i , j | ≤ | ξ k + 1 | + 2 ​ τ 2 ​ k ​ | ξ k − 1 | |\widehat{w}_{i,j}|\leq\frac{|\xi_{k+1}|+2\tau}{2k|\xi_{k-1}|} 
+
+ Proof : Using Lemma 2 we have: 
+
+ | w ^ i , j | = η ​ | g ^ i , j | ≤ η ⁡ ( | g i , j | + | g i , j − g ^ i , j | ) ≤ η ⁡ ( | ξ k + 1 | 2 + τ ) = | ξ k + 1 | + 2 ​ τ 2 ​ k ​ | ξ k − 1 | |\widehat{w}_{i,j}|=\eta|\widehat{g}_{i,j}|\leq\eta(|g_{i,j}|+|g_{i,j}-\widehat{g}_{i,j}|)\leq\eta\left(\frac{|\xi_{k+1}|}{2}+\tau\right)=\frac{|\xi_{k+1}|+2\tau}{2k|\xi_{k-1}|} 
+
+ Claim 3 : For all i i 
+it holds that | b ^ i − b i | ≤ τ k ​ | ξ k − 1 | |\widehat{b}_{i}-b_{i}|\leq\frac{\tau}{k|\xi_{k-1}|} 
+
+ Proof : Using Lemma 2 we have: 
+
+ | b ^ i − b i | = η ​ | g ^ i , 0 | = η ​ | g i , j − g ^ i , j | ≤ η ​ τ = τ k ​ | ξ k − 1 | |\widehat{b}_{i}-b_{i}|=\eta|\widehat{g}_{i,0}|=\eta|g_{i,j}-\widehat{g}_{i,j}|\leq\eta\tau=\frac{\tau}{k|\xi_{k-1}|} 
+
+ Claim 4 : Fix δ > 0 \delta>0 . Let h i h_{i} be a function s.t. h i ​ ( x ) = σ ⁡ ( 1 2 ​ k ​ ∑ j = 1 k x j + b i ) h_{i}(x)=\sigma(\frac{1}{2k}\sum_{j=1}^{k}x_{j}+b_{i}) and h ^ i \widehat{h}_{i} a function s.t. h ^ i ​ ( x ) = σ ⁡ ( w ^ i , j ⋅ x + b ^ i ) \widehat{h}_{i}(x)=\sigma(\widehat{w}_{i,j}\cdot x+\widehat{b}_{i}) . Then, if τ ≤ δ 2 ​ k ​ | ξ k − 1 | 2 ​ n ​ log ⁡ ( 2 ​ k / ϵ ) \tau\leq\frac{\delta}{2}\frac{k|\xi_{k-1}|}{\sqrt{2n\log(2k/\epsilon)}} and n ≥ 32 ​ c 2 2 ​ log ⁡ ( 2 ​ k / ϵ ) c 1 2 ​ δ 2 n\geq\frac{32c_{2}^{2}\log(2k/\epsilon)}{c_{1}^{2}\delta^{2}} , the following holds: 
+
+ 1. 
+ 
+ ℙ x ∼ { ± 1 } n [ | h i ( x ) − h ^ i ( x ) | ≥ δ ] ≤ ϵ k \mathbb{P}_{x\sim\{\pm 1\}^{n}}\left[|h_{i}(x)-\widehat{h}_{i}(x)|\geq\delta\right]\leq\frac{\epsilon}{k} 
+
+ 2. 
+ 
+ | h ^ i ​ ( x ) | ≤ n + 1 |\widehat{h}_{i}(x)|\leq n+1 
+
+ Proof : Let x ∼ { ± 1 } n x\sim\{\pm 1\}^{n} , and denote x ~ j = w ^ i , j ​ x j \tilde{x}_{j}=\widehat{w}_{i,j}x_{j} . Denote Δ = | ξ k + 1 | + 2 ​ τ 2 ​ k ​ | ξ k − 1 | \Delta=\frac{|\xi_{k+1}|+2\tau}{2k|\xi_{k-1}|} . So, for j > k j>k , x ~ j \tilde{x}_{j} is a random variable satisfying | x ~ j | ≤ Δ |\tilde{x}_{j}|\leq\Delta . Furthermore, it holds that 𝔼 [ ∑ j > k x ~ j ] = 0 \mathop{\mathbb{E}}\left[\sum_{j>k}\tilde{x}_{j}\right]=0 . Therefore, from Hoeffding’s inequality: 
+
+ ℙ [ | ∑ j > k x ~ j | ≥ Δ n ​ log ⁡ ( 2 ​ k / ϵ ) 2 ] ≤ 2 exp ( − 2 ​ ( Δ ​ n ​ log ⁡ ( 2 ​ k / ϵ ) 2 ) 2 n ​ Δ 2 ) ≤ ϵ k \mathbb{P}\left[\left|\sum_{j>k}\tilde{x}_{j}\right|\geq\Delta\sqrt{\frac{n\log(2k/\epsilon)}{2}}\right]\leq 2\exp\left(-\frac{2\left(\Delta\sqrt{\frac{n\log(2k/\epsilon)}{2}}\right)^{2}}{n\Delta^{2}}\right)\leq\frac{\epsilon}{k} 
+
+ Now, fix some x x s.t. | ∑ j > k x ~ j | ≤ Δ ​ n ​ log ⁡ ( 2 ​ k / ϵ ) 2 \left|\sum_{j>k}\tilde{x}_{j}\right|\leq\Delta\sqrt{\frac{n\log(2k/\epsilon)}{2}} . In this case we have: 
+
+ | h i ​ ( x ) − h ^ i ​ ( x ) | \displaystyle|h_{i}(x)-\widehat{h}_{i}(x)| 
+ ≤ | 1 2 ​ k ​ ∑ j = 1 k x j + b i − w ^ i ⋅ x + b ^ i | \displaystyle\leq\left|\frac{1}{2k}\sum_{j=1}^{k}x_{j}+b_{i}-\widehat{w}_{i}\cdot x+\widehat{b}_{i}\right| 
+
+ ≤ ∑ j = 1 k | 1 2 ​ k ​ x j − w ^ i , j ​ x j | + | ∑ j > k w ^ i , j ​ x j | + | b i − b ^ i | \displaystyle\leq\sum_{j=1}^{k}\left|\frac{1}{2k}x_{j}-\widehat{w}_{i,j}x_{j}\right|+\left|\sum_{j>k}\widehat{w}_{i,j}x_{j}\right|+\left|b_{i}-\widehat{b}_{i}\right| 
+
+ ≤ k ​ τ | ξ k − 1 | + Δ ​ n ​ log ⁡ ( 2 ​ k / ϵ ) 2 + τ k ​ | ξ k − 1 | \displaystyle\leq\frac{k\tau}{|\xi_{k-1}|}+\Delta\sqrt{\frac{n\log(2k/\epsilon)}{2}}+\frac{\tau}{k|\xi_{k-1}|} 
+
+ = τ ⁡ ( k 2 + 1 ) k ​ | ξ k − 1 | + | ξ k + 1 | + 2 ​ τ 2 ​ k ​ | ξ k − 1 | ⋅ n ​ log ⁡ ( 2 ​ k / ϵ ) 2 \displaystyle=\frac{\tau(k^{2}+1)}{k|\xi_{k-1}|}+\frac{|\xi_{k+1}|+2\tau}{2k|\xi_{k-1}|}\cdot\sqrt{\frac{n\log(2k/\epsilon)}{2}} 
+
+ = τ ⁡ ( 2 ​ ( k 2 + 1 ) + n ​ log ⁡ ( 2 ​ k / ϵ ) ) 2 ​ k ​ | ξ k − 1 | + | ξ k + 1 | ​ n ​ log ⁡ ( 2 ​ k / ϵ ) 2 ​ 2 ​ k ​ | ξ k − 1 | \displaystyle=\frac{\tau\left(\sqrt{2}(k^{2}+1)+\sqrt{n\log(2k/\epsilon)}\right)}{\sqrt{2}k|\xi_{k-1}|}+\frac{|\xi_{k+1}|\sqrt{n\log(2k/\epsilon)}}{2\sqrt{2}k|\xi_{k-1}|} 
+
+ ≤ τ ​ 2 ​ n ​ log ⁡ ( 2 ​ k / ϵ ) k ​ | ξ k − 1 | + 2 ​ 2 ​ c 2 ​ log ⁡ ( 2 ​ k / ϵ ) c 1 ​ n \displaystyle\leq\frac{\tau\sqrt{2n\log(2k/\epsilon)}}{k|\xi_{k-1}|}+\frac{2\sqrt{2}c_{2}\sqrt{\log(2k/\epsilon)}}{c_{1}\sqrt{n}} 
+
+ where in the last inequality we use Eq. ( 5 ).
+So, choosing τ ≤ δ 2 ​ k ​ | ξ k − 1 | 2 ​ n ​ log ⁡ ( 2 ​ k / ϵ ) \tau\leq\frac{\delta}{2}\frac{k|\xi_{k-1}|}{\sqrt{2n\log(2k/\epsilon)}} and n ≥ 32 ​ c 2 2 ​ log ⁡ ( 2 ​ k / ϵ ) c 1 2 ​ δ 2 n\geq\frac{32c_{2}^{2}\log(2k/\epsilon)}{c_{1}^{2}\delta^{2}} gives the required. 
+
+ Claim 5: Let h 1 , … , h k h_{1},\dots,h_{k} be the functions defined in the previous claim. Then, there exists weights u ∗ u^{*} with ‖ u ∗ ‖ ∞ ≤ 8 ​ k \|u^{*}\|_{\infty}\leq 8k s.t. for
+ f ∗ ​ ( x ) = ∑ i = 1 k u i ∗ ​ h i ​ ( x ) f^{*}(x)=\sum_{i=1}^{k}u^{*}_{i}h_{i}(x) 
+it holds that f ∗ ​ ( x ) = 2 ​ χ [ k ] ​ ( x ) f^{*}(x)=2\chi_{[k]}(x) for all x ∈ { ± 1 } n x\in\{\pm 1\}^{n} . 
+
+ Proof: For i ≤ k − 2 i\leq k-2 define u i ∗ = 8 ​ k ​ ( − 1 ) i + 1 u^{*}_{i}=8k(-1)^{i+1} and u k − 1 ∗ = 6 ​ k u^{*}_{k-1}=6k , u k ∗ = − 2 ​ k u^{*}_{k}=-2k . 
+
+ Proof of Lemma 3 : 
+Choose u ^ = u ∗ \widehat{u}=u^{*} . Using Claim 4 and the union bound, w.p. 1 − ϵ 1-\epsilon over x ∼ { ± 1 } n x\sim\{\pm 1\}^{n} it holds that for all i ∈ [ k ] i\in[k] , | h i ​ ( x ) − h ^ i ​ ( x ) | ≤ δ |h_{i}(x)-\widehat{h}_{i}(x)|\leq\delta . Therefore, w.p. ≥ 1 − ϵ \geq 1-\epsilon 
+
+ | f ⁡ ( x ) − f ∗ ​ ( x ) | = | ∑ i = 1 k u i ∗ ​ ( h i ​ ( x ) − h ^ i ​ ( x ) ) | ≤ ∑ i = 1 k | u i ∗ | ​ | h i ​ ( x ) − h ^ i ​ ( x ) | ≤ 8 ​ k 2 ​ δ |f(x)-f^{*}(x)|=\left|\sum_{i=1}^{k}u_{i}^{*}(h_{i}(x)-\widehat{h}_{i}(x))\right|\leq\sum_{i=1}^{k}\left|u_{i}^{*}\right|\left|h_{i}(x)-\widehat{h}_{i}(x)\right|\leq 8k^{2}\delta 
+
+ so, choosing δ = 1 8 ​ k 2 \delta=\frac{1}{8k^{2}} we get that, w.p. at least 1 − ϵ 1-\epsilon over the choice of x x it holds that f ⁡ ( x ) ​ χ [ k ] ​ ( x ) ≥ 1 f(x)\chi_{[k]}(x)\geq 1 .
+Additionally, for every x x it holds that 
+
+ | f ⁡ ( x ) | ≤ ∑ i = 1 k | u i ∗ | ​ | h ^ i ​ ( x ) | ≤ 8 ​ k 2 ​ ( n + 1 ) ≤ 16 ​ k 2 ​ n |f(x)|\leq\sum_{i=1}^{k}\left|u_{i}^{*}\right|\left|\widehat{h}_{i}(x)\right|\leq 8k^{2}(n+1)\leq 16k^{2}n 
+
+ Therefore, we get: 
+
+ 𝔼 x [ ℓ ⁡ ( f ⁡ ( x ) , χ [ k ] ​ ( x ) ) ] \displaystyle\mathop{\mathbb{E}}_{x}\left[\ell(f(x),\chi_{[k]}(x))\right] 
+ ≤ ϵ ​ 𝔼 x [ ℓ ⁡ ( f ⁡ ( x ) , χ [ k ] ​ ( x ) ) | f ⁡ ( x ) ​ χ [ k ] ​ ( x ) < 1 ] \displaystyle\leq\epsilon\mathop{\mathbb{E}}_{x}\left[\ell(f(x),\chi_{[k]}(x))|f(x)\chi_{[k]}(x)<1\right] 
+
+ ≤ ϵ ​ 𝔼 x [ | f ⁡ ( x ) | | f ⁡ ( x ) ​ χ [ k ] ​ ( x ) < 1 ] ≤ 16 ​ ϵ ​ k 2 ​ n \displaystyle\leq\epsilon\mathop{\mathbb{E}}_{x}\left[|f(x)||f(x)\chi_{[k]}(x)<1\right]\leq 16\epsilon k^{2}n 
+
+ ∎ 
+
+ Lemma 4 . 
+
+ Assume we randomly initialize an MLP using the unbiased initialization defined previously. Consider the following update: 
+
+ w i ( 1 ) = ( 1 − λ 0 ) ​ w i ( 1 ) − η 0 ​ g ^ i , b i ( 1 ) = b i ( 1 ) − η 0 ​ γ ^ i w_{i}^{(1)}=(1-\lambda_{0})w_{i}^{(1)}-\eta_{0}\widehat{g}_{i},~b_{i}^{(1)}=b_{i}^{(1)}-\eta_{0}\widehat{\gamma}_{i} 
+
+ where 
+
+ g ^ i = 1 B ​ ∑ l = 1 B ∇ w i ℓ ​ ( f ⁡ ( x 0 , l , θ 0 ) , y 0 , l ) , γ ^ i = 1 B ​ ∑ l = 1 B ∇ b i ℓ ​ ( f ⁡ ( x 0 , l , θ 0 ) , y 0 , l ) \widehat{g}_{i}=\frac{1}{B}\sum_{l=1}^{B}\nabla_{w_{i}}\ell(f(x_{0,l};\theta_{0}),y_{0,l}),~\widehat{\gamma}_{i}=\frac{1}{B}\sum_{l=1}^{B}\nabla_{b_{i}}\ell(f(x_{0,l};\theta_{0}),y_{0,l}) 
+
+ Let k k be even number. Then, for every ϵ , δ ∈ ( 0 , 1 / 2 ) \epsilon,\delta\in(0,1/2) , denoting τ = | ξ k − 1 | 16 ​ k ​ 2 ​ n ​ log ⁡ ( 2 ​ k / ϵ ) \tau=\frac{|\xi_{k-1}|}{16k\sqrt{2n\log(2k/\epsilon)}} , if η = 1 k ​ | ξ k − 1 | \eta=\frac{1}{k|\xi_{k-1}|} , λ 0 = 1 \lambda_{0}=1 , r ≥ k ⋅ 2 k ​ log ⁡ ( k / δ ) r\geq k\cdot 2^{k}\log(k/\delta) , B ≥ 2 τ 2 ​ log ⁡ ( 4 ​ n ​ r / δ ) B\geq\frac{2}{\tau^{2}}\log(4nr/\delta) and n ≥ 2 11 ​ k 4 ​ c 2 2 ​ log ⁡ ( 2 ​ k / ϵ ) c 1 2 n\geq\frac{2^{11}k^{4}c_{2}^{2}\log(2k/\epsilon)}{c_{1}^{2}} , w.p. at least 1 − 2 ​ δ 1-2\delta over the initialization and the sample, there exists u ^ ∈ ℝ r \widehat{u}\in\mathbb{R}^{r} with ‖ u ^ ‖ ∞ ≤ 8 ​ k \|\widehat{u}\|_{\infty}\leq 8k and ‖ u ^ ‖ 2 ≤ 8 ​ k ​ k \|\widehat{u}\|_{2}\leq 8k\sqrt{k} s.t. f ⁡ ( x ) = ∑ i = 1 r u ^ i ​ σ ​ ( w i ( 1 ) ⋅ x + b i ( 1 ) ) f(x)=\sum_{i=1}^{r}\widehat{u}_{i}\sigma\left(w_{i}^{(1)}\cdot x+b^{(1)}_{i}\right) satisfies 
+
+ 𝔼 x [ ℓ ⁡ ( f ⁡ ( x ) , χ [ n ] ​ ( x ) ) ] ≤ 16 ​ ϵ ​ k 2 ​ n \mathop{\mathbb{E}}_{x}[\ell(f(x),\chi_{[n]}(x))]\leq 16\epsilon k^{2}n 
+
+ Additionally, it holds that ‖ σ ⁡ ( W ( 1 ) ⋅ x + b ( 1 ) ) ‖ ∞ ≤ n + 1 \|\sigma(W^{(1)}\cdot x+b^{(1)})\|_{\infty}\leq n+1 . 
+
+ Proof.
+
+ Note that by the choice of initialization it holds that f ⁡ ( x , W ( 0 ) ) = 0 f(x;W^{(0)})=0 , and by the assumption on the loss function ℓ ′ ​ ( f ⁡ ( x , W ( 0 ) ) , y ) = − y \ell^{\prime}(f(x;W^{(0)}),y)=-y . Therefore, we get that 𝔼 [ ∇ w i ℓ ​ ( f ⁡ ( x , W ( 0 ) ) , y ) ] = g i \mathop{\mathbb{E}}\left[\nabla_{w_{i}}\ell(f(x;W^{(0)}),y)\right]=g_{i} and 𝔼 [ ∇ b i ℓ ​ ( f ⁡ ( x , W ( 0 ) ) , y ) ] = γ i \mathop{\mathbb{E}}\left[\nabla_{b_{i}}\ell(f(x;W^{(0)}),y)\right]=\gamma_{i} . 
+
+ Claim: with probability at least 1 − δ 1-\delta , 
+
+ for ​ all ​ i , j : ‖ g ^ i − 𝔼 [ ∇ w i ℓ ​ ( f ⁡ ( x , W ( 0 ) ) , y ) ] ‖ ∞ ≤ τ ​ and ​ | γ ^ i − 𝔼 [ ∇ b i ℓ ​ ( f ⁡ ( x , W ( 0 ) ) , y ) ] | ≤ τ \mathrm{for~all~}i,j:~\left\lVert\widehat{g}_{i}-\mathop{\mathbb{E}}\left[\nabla_{w_{i}}\ell(f(x;W^{(0)}),y)\right]\right\rVert_{\infty}\leq\tau~\mathrm{and}~\left\lvert\widehat{\gamma}_{i}-\mathop{\mathbb{E}}\left[\nabla_{b_{i}}\ell(f(x;W^{(0)}),y)\right]\right\rvert\leq\tau 
+ 
+ (6) 
+
+ Proof: Fix some i , j i,j and note that by Hoeffding’s inequality, 
+
+ Pr [ | g ^ i , j − 𝔼 g ^ i , j | ≥ τ ] ≤ 2 exp ( − B τ 2 / 2 ) ≤ δ n ​ r + r \Pr\left[|\widehat{g}_{i,j}-\mathop{\mathbb{E}}\widehat{g}_{i,j}|\geq\tau\right]\leq 2\exp\left(-B\tau^{2}/2\right)\leq\frac{\delta}{nr+r} 
+
+ and similarly we get Pr [ | γ ^ i − 𝔼 γ ^ i | ≥ τ ] ≤ δ n ​ r + r \Pr\left[|\widehat{\gamma}_{i}-\mathop{\mathbb{E}}\widehat{\gamma}_{i}|\geq\tau\right]\leq\frac{\delta}{nr+r} . The required follows from the union bound. 
+
+ Now, assume that Eq. ( 6 ) holds.
+For some random w i ∼ { ± 1 } n w_{i}\sim\{\pm 1\}^{n} , the probability that w i , j = w i , j ′ w_{i,j}=w_{i,j^{\prime}} for all j , j ′ ∈ [ k ] j,j^{\prime}\in[k] is 2 − k + 1 2^{-k+1} . Additionally, for some fixed i ′ ∈ [ k ] i^{\prime}\in[k] , the probability that b i = − 1 2 + i ′ k b_{i}=-\frac{1}{2}+\frac{i^{\prime}}{k} is 1 2 ​ k \frac{1}{2k} . Therefore, for some fixed i ∈ [ r / 2 ] i\in[r/2] and i ′ ∈ [ k ] i^{\prime}\in[k] , with probability 1 k ⋅ 2 k − 1 \frac{1}{k\cdot 2^{k-1}} , b i = b i + r / 2 = − 1 2 + i ′ k b_{i}=b_{i+r/2}=-\frac{1}{2}+\frac{i^{\prime}}{k} and either w i , j = u i ​ sign ξ k − 1 w_{i,j}=u_{i}\mathop{\mathrm{sign}}\xi_{k-1} or w i + r / 2 , j = u i + r / 2 , j ​ sign ξ k − 1 w_{i+r/2,j}=u_{i+r/2,j}\mathop{\mathrm{sign}}\xi_{k-1} . Taking r ≥ k ⋅ 2 k ​ log ⁡ ( k / δ ) r\geq k\cdot 2^{k}\log(k/\delta) , we get that the probability that there is no i ∈ [ r / 2 ] i\in[r/2] that satisfies the above condition (for fixed i ′ i^{\prime} ) is: 
+
+ ( 1 − 1 k ​ 2 k − 1 ) r / 2 ≤ exp ⁡ ( − r 2 ​ k ​ 2 k − 1 ) ≤ δ k \left(1-\frac{1}{k2^{k-1}}\right)^{r/2}\leq\exp\left(-\frac{r}{2k2^{k-1}}\right)\leq\frac{\delta}{k} 
+
+ Using the union bound, with probability at least 1 − δ 1-\delta , there exists a set of k k neurons satisfying the conditions of Lemma 3 , and therefore the required follows from the Lemma.
+∎ 
+
+ We use the following well-known result on convergence of SGD (see for example Shalev-Shwartz and Ben-David (2014) ):
+
+ Theorem 9 . 
+
+ Let M , ρ > 0 M,\rho>0 . Fix T T and let η = M ρ ​ T \eta=\frac{M}{\rho\sqrt{T}} Let F F be a convex function and u ∗ ∈ arg ⁡ min ‖ u ‖ 2 ≤ M ⁡ f ⁡ ( u ) u^{*}\in\arg\min_{\|u\|_{2}\leq M}f(u) . Let u ( 0 ) = 0 u^{(0)}=0 and for every t t , let v t v_{t} be some random variable s.t. 𝔼 [ v t | u ( t ) ] = ∇ u ( t ) F ​ ( u ( t ) ) \mathop{\mathbb{E}}\left[v_{t}|u^{(t)}\right]=\nabla_{u^{(t)}}F(u^{(t)}) and let u ( t + 1 ) = u ( t ) − η ​ v ( t ) u^{(t+1)}=u^{(t)}-\eta v^{(t)} . Assume that ‖ v t ‖ 2 ≤ ρ \|v_{t}\|_{2}\leq\rho w.p. 1 1 . Then, 
+
+ 1 T ​ ∑ t = 1 T F ⁡ ( u ( t ) ) ≤ F ⁡ ( u ∗ ) + M ​ ρ T \frac{1}{T}\sum_{t=1}^{T}F(u^{(t)})\leq F(u^{*})+\frac{M\rho}{\sqrt{T}} 
+
+ We prove the following theorem:
+
+ Theorem 10 . 
+
+ Let k k be an even number.
+Assume we randomly initialize an MLP using the unbiased initialization defined previously. Fix ϵ ∈ ( 0 , 1 / 2 ) \epsilon\in(0,1/2) and let
+let T ≥ 2 9 ​ k 3 ​ r ​ n 2 ϵ 2 , r ≥ k ⋅ 2 k ​ log ⁡ ( 8 ​ k / ϵ ) , B ≥ c 1 − 1 ​ 2 8 ​ k 7 / 6 ​ n ​ ( n k − 1 ) ​ log ⁡ ( 128 ​ k 3 ​ n / ϵ ) ​ log ⁡ ( 32 ​ n ​ r / ϵ ) , n ≥ 2 11 ​ k 4 ​ c 2 2 ​ log ⁡ ( 128 ​ k 3 ​ n / ϵ ) c 1 2 T\geq\frac{2^{9}k^{3}rn^{2}}{\epsilon^{2}},r\geq k\cdot 2^{k}\log(8k/\epsilon),B\geq c_{1}^{-1}2^{8}k^{7/6}n\binom{n}{k-1}\log(128k^{3}n/\epsilon)\log(32nr/\epsilon),n\geq\frac{2^{11}k^{4}c_{2}^{2}\log(128k^{3}n/\epsilon)}{c_{1}^{2}} . Choose the following learning rate and weight decay schedule: 
+
+ • 
+ 
+ At the first step, use η 0 = 1 k ​ | ξ k − 1 | \eta_{0}=\frac{1}{k|\xi_{k-1}|} , λ 0 = 1 \lambda_{0}=1 for all weights. 
+
+ • 
+ 
+ After the first step, use η t = 0 \eta_{t}=0 for the first layers weights and biases and η t = 4 ​ k 1.5 n ​ r ⁡ ( T − 1 ) \eta_{t}=\frac{4k^{1.5}}{n\sqrt{r(T-1)}} for the second layer weights, with λ t = 0 \lambda_{t}=0 for both layers. 
+
+ • 
+ 
+ Bias terms are never regularized. 
+
+ Then, the following holds, with expectation over the randomness of the initialization and the sampling of the batches: 
+
+ 𝔼 [ min t ∈ [ T ] ⁡ ℓ ⁡ ( f ⁡ ( x , θ t ) , y ) ] ≤ ϵ \mathop{\mathbb{E}}\left[\min_{t\in[T]}\ell(f(x;\theta_{t}),y)\right]\leq\epsilon 
+
+ Proof.
+
+ Let F ⁡ ( u ) = 𝔼 x [ ℓ ⁡ ( u ⊤ ​ σ ​ ( W ( 1 ) ​ x + b ( 1 ) ) , y ) ] F(u)=\mathop{\mathbb{E}}_{x}\left[\ell(u^{\top}\sigma(W^{(1)}x+b^{(1)}),y)\right] and notice that F F is a convex function. For every t t , denote 
+
+ v t = 1 B ​ ∑ l = 1 B ∇ u ( t ) ℓ ​ ( f ⁡ ( x t , l , θ t ) , y ) = 1 B ​ ∑ l = 1 B ∇ u ( t ) ℓ ​ ( ( u ( t ) ) ⊤ ​ σ ​ ( W ( 1 ) ​ x l , t + b ( 1 ) ) , y l , t ) v_{t}=\frac{1}{B}\sum_{l=1}^{B}\nabla_{u^{(t)}}\ell(f(x_{t,l};\theta_{t}),y)=\frac{1}{B}\sum_{l=1}^{B}\nabla_{u^{(t)}}\ell\left(\left(u^{(t)}\right)^{\top}\sigma(W^{(1)}x_{l,t}+b^{(1)}),y_{l,t}\right) 
+
+ where we use the fact that we don’t update the weights of the first layer after the first step.
+From the above we get 𝔼 [ v t | u ( t ) ] = ∇ u ( t ) F ​ ( u ( t ) ) \mathop{\mathbb{E}}[v_{t}|u^{(t)}]=\nabla_{u^{(t)}}F(u^{(t)}) . 
+
+ Now, we will show that w.h.p. there exists u ∗ u^{*} with good loss. Let ϵ ′ = ϵ 64 ​ k 2 ​ n , δ ′ = ϵ 8 \epsilon^{\prime}=\frac{\epsilon}{64k^{2}n},\delta^{\prime}=\frac{\epsilon}{8} .
+Denote τ = | ξ k − 1 | 16 ​ k ​ 2 ​ n ​ log ⁡ ( 128 ​ k 3 ​ n / ϵ ) = | ξ k − 1 | 16 ​ k ​ 2 ​ n ​ log ⁡ ( 2 ​ k / ϵ ′ ) \tau=\frac{|\xi_{k-1}|}{16k\sqrt{2n\log(128k^{3}n/\epsilon)}}=\frac{|\xi_{k-1}|}{16k\sqrt{2n\log(2k/\epsilon^{\prime})}} . Observe that r ≥ k ⋅ 2 k ​ log ⁡ ( k / δ ′ ) r\geq k\cdot 2^{k}\log(k/\delta^{\prime}) , and using the fact that | ξ k − 1 | ≥ c 1 ( k − 1 ) − 1 / 3 ( n k − 1 ) − 1 |\xi_{k-1}|\geq c_{1}(k-1)^{-1/3}\binom{n}{k-1}^{-1} we get 
+
+ B ≥ 2 8 ​ k 2 ⋅ n ​ log ⁡ ( 128 ​ k 3 ​ n / ϵ ) | ξ k − 1 | ​ log ⁡ ( 32 ​ n ​ r / δ ) = 2 τ 2 ​ log ⁡ ( 4 ​ n ​ r / δ ′ ) B\geq\frac{2^{8}k^{2}\cdot n\log(128k^{3}n/\epsilon)}{|\xi_{k-1}|}\log(32nr/\delta)=\frac{2}{\tau^{2}}\log(4nr/\delta^{\prime}) 
+
+ and additionally
+ n ≥ 2 11 ​ k 4 ​ c 2 2 ​ log ⁡ ( 2 ​ k / ϵ ′ ) c 1 2 n\geq\frac{2^{11}k^{4}c_{2}^{2}\log(2k/\epsilon^{\prime})}{c_{1}^{2}} . 
+
+ From the above, applying Lemma 4 with ϵ ′ , δ ′ \epsilon^{\prime},\delta^{\prime} we get that w.p. 1 − ϵ / 4 1-\epsilon/4 there exists u ∗ ∈ ℝ r u^{*}\in\mathbb{R}^{r} with ‖ u ∗ ‖ 2 ≤ 8 ​ k ​ k \|u^{*}\|_{2}\leq 8k\sqrt{k} s.t.
+ F ⁡ ( u ∗ ) ≤ ϵ / 4 F(u^{*})\leq\epsilon/4 
+and for all i i and all x x it holds that ‖ σ ⁡ ( W ( 1 ) ⋅ x + b ( 1 ) ) ‖ ∞ ≤ n + 1 \|\sigma(W^{(1)}\cdot x+b^{(1)})\|_{\infty}\leq n+1 . Using this, we get: 
+
+ ∥ v t ∥ 2 ≤ 1 B ∑ l = 1 B ∥ σ ( W ( 1 ) x l , t + b ( 1 ) ) , y l , t ∥ 2 ≤ r ( n + 1 ) \|v_{t}\|_{2}\leq\frac{1}{B}\sum_{l=1}^{B}\|\sigma(W^{(1)}x_{l,t}+b^{(1)}),y_{l,t}\|_{2}\leq\sqrt{r}(n+1) 
+
+ So, we can apply Theorem 9 with M = 8 ​ k ​ k M=8k\sqrt{k} and ρ = 2 ​ r ​ n \rho=2\sqrt{r}n and get that, w.p. 1 − ϵ / 4 1-\epsilon/4 over the initialization and the first step, it holds that 
+
+ 𝔼 steps ​ 2 ​ … ​ T [ min t ∈ { 2 , … , T } ⁡ ℓ ⁡ ( f ⁡ ( x , θ t ) , y ) ] \displaystyle\mathop{\mathbb{E}}_{\mathrm{steps~2\dots T}}\left[\min_{t\in\{2,\dots,T\}}\ell(f(x;\theta_{t}),y)\right] 
+ ≤ 𝔼 [ 1 T − 1 ​ ∑ t = 2 T ℓ ⁡ ( f ⁡ ( x , θ t ) , y ) ] \displaystyle\leq\mathop{\mathbb{E}}\left[\frac{1}{T-1}\sum_{t=2}^{T}\ell(f(x;\theta_{t}),y)\right] 
+
+ = 𝔼 [ 1 T − 1 ​ ∑ t = 2 T F ⁡ ( u ( t ) ) ] ≤ ϵ / 4 + 16 ​ k 1.5 ​ r ​ n T − 1 ≤ ϵ / 2 \displaystyle=\mathop{\mathbb{E}}\left[\frac{1}{T-1}\sum_{t=2}^{T}F(u^{(t)})\right]\leq\epsilon/4+\frac{16k^{1.5}\sqrt{r}n}{\sqrt{T-1}}\leq\epsilon/2 
+
+ Now, that after the first step we have u ( 1 ) = 0 u^{(1)}=0 and therefore ℓ ⁡ ( f ⁡ ( x , θ 1 ) , y ) = 1 \ell(f(x;\theta_{1}),y)=1 , and so we always have min t ∈ [ T ] ⁡ ℓ ⁡ ( f ⁡ ( x , θ t ) , y ) ≤ 1 \min_{t\in[T]}\ell(f(x;\theta_{t}),y)\leq 1 . Therefore, taking expecation over all steps we get: 
+
+ 𝔼 steps ​ 1 ​ … ​ T [ min t ∈ [ T ] ⁡ ℓ ⁡ ( f ⁡ ( x , θ t ) , y ) ] ≤ ϵ / 2 + ϵ / 2 = ϵ \mathop{\mathbb{E}}_{\mathrm{steps~1\dots T}}\left[\min_{t\in[T]}\ell(f(x;\theta_{t}),y)\right]\leq\epsilon/2+\epsilon/2=\epsilon 
+
+ ∎ 
+
+ B.2 Proof of Proposition 5 
+
+ Proof.
+
+ Denote h ⁡ ( x ) = σ ′ ​ ( w ⊤ ​ x ) h(x)=\sigma^{\prime}(w^{\top}x) . Observe the gradient w.r.t. w i w_{i} : 
+
+ g i ∗ = 𝔼 ( x , y ) ∼ 𝒟 S [ ∇ w i ℓ ​ ( y , f ⁡ ( x , w ) ) ] \displaystyle g^{*}_{i}=\mathop{\mathbb{E}}_{(x,y)\sim\mathcal{D}_{S}}\left[\nabla_{w_{i}}\ell(y,f(x;w))\right] 
+ = − 𝔼 ( x , y ) ∼ 𝒟 S [ σ ′ ( w ⊤ x ) y x i ] \displaystyle=-\mathop{\mathbb{E}}_{(x,y)\sim\mathcal{D}_{S}}\left[\sigma^{\prime}(w^{\top}x)yx_{i}\right] 
+
+ = { 𝔼 [ σ ′ ​ ( w ⊤ ​ x ) ​ ∏ j ∈ S ∖ { i } x i ] i ∈ S 𝔼 [ σ ′ ​ ( w ⊤ ​ x ) ​ ∏ j ∈ S ∪ { i } x i ] i ∉ S \displaystyle=\begin{cases}\mathop{\mathbb{E}}\left[\sigma^{\prime}(w^{\top}x)\prod_{j\in S\setminus\{i\}}x_{i}\right]&i\in S\\
+\mathop{\mathbb{E}}\left[\sigma^{\prime}(w^{\top}x)\prod_{j\in S\cup\{i\}}x_{i}\right]&i\notin S\\
+\end{cases} 
+
+ = { h ^ ​ ( S ∖ { i } ) i ∈ S h ^ ​ ( S ∪ { i } ) i ∉ S \displaystyle=\begin{cases}\widehat{h}(S\setminus\{i\})&i\in S\\
+\widehat{h}(S\cup\{i\})&i\notin S\\
+\end{cases} 
+
+ So, from the Fourier gap property, it holds that for all i ∈ S i\in S we have | g i ∗ | ≥ γ |g^{*}_{i}|\geq\gamma and for all i ∉ S i\notin S we have | g i ∗ | ≤ γ / 2 |g^{*}_{i}|\leq\gamma/2 . From this, the required follows.
+∎ 
+
+ B.3 Global convergence for disjoint-PolyNets
+
+ In this section we will develop theory for disjoint-PolyNets trained with correlation loss, as illustrated in Figure 5 . Section B.3.1 will consider optimization with gradient flow, and section B.3.2 will consider optimization with batch size 1 SGD.
+
+ B.3.1 Gradient flow analysis
+
+ Figure 5: Example training curves for the disjoint-PolyNet trained with correlation loss, which is the setting of Appendix B.3 . The left plot shows validation error under population gradient descent with small step size, approximating the setting of Section B.3.1 , and the right plot shows a run of SGD with batch size 1, as in Section B.3.2 , though with a constant learning rate schedule. Initialization is i.i.d. standard Gaussian.
+
+ For i i , 𝔼 [ ∇ w i ℓ ( f ( x ; w 1 : k ) , y ) ] = 0 \mathop{\mathbb{E}}\left[\nabla_{w_{i}}\ell(f(x;w_{1:k}),y)\right]=0 , so the irrelevant weights remain fixed at initialization. For each i ∈ [ k ] i\in[k] , let v i ( t ) v_{i}^{(t)} be the relevant weight in the k k th partition.
+
+ In gradient flow, the relevant weights evolve according to the following differential equations:
+
+ ∀ i ∈ [ n ] : v i ˙ = ∏ j ≠ i v j \forall i\in[n]:\quad\dot{v_{i}}=\prod_{j\neq i}v_{j} 
+
+ Lemma 5 . 
+
+ Suppose disjoint-PolyNet for k > 2 k>2 is initialized such that ∏ i v i ​ ( 0 ) > 0 \prod_{i}v_{i}(0)>0 , and optimized with gradient flow. Let v ¯ a := 1 k ​ ∑ i = 1 k ( v i ​ ( 0 ) ) 2 \bar{v}_{a}:=\frac{1}{k}\sum_{i=1}^{k}(v_{i}(0))^{2} , and v ¯ g := ( ∏ i = 1 k ( v i ​ ( 0 ) ) 2 ) 1 / k \bar{v}_{g}:=\left(\prod_{i=1}^{k}(v_{i}(0))^{2}\right)^{1/k} . For any b ≥ 0 b\geq 0 and i ∈ [ k ] i\in[k] , let T i ( b ) := arg sup t ≥ 0 ( | v i ( t ) | ≤ b ) T_{i}(b):=\arg\sup_{t\geq 0}(|v_{i}(t)|\leq b) . Then 
+
+ T i ​ ( b ) ≥ 1 k − 2 ​ ( v ¯ a 1 − k / 2 − ( v ¯ a + b 2 − v i ​ ( 0 ) 2 ) 1 − k / 2 ) . T_{i}(b)\geq\frac{1}{k-2}\left(\bar{v}_{a}^{1-k/2}-(\bar{v}_{a}+b^{2}-v_{i}(0)^{2})^{1-k/2}\right). 
+
+ Let T i ( ∞ ) := arg sup t ≥ 0 ( | v i ( t ) | < ∞ ) T_{i}(\infty):=\arg\sup_{t\geq 0}(|v_{i}(t)|<\infty) . Then 
+
+ T i ​ ( ∞ ) − T i ​ ( b ) ≤ 1 k − 2 ​ ( v ¯ g + b 2 − v i ​ ( 0 ) 2 ) 1 − k / 2 . T_{i}(\infty)-T_{i}(b)\leq\frac{1}{k-2}(\bar{v}_{g}+b^{2}-v_{i}(0)^{2})^{1-k/2}. 
+
+ Proof.
+
+ First, observe that the product of the relevant weights is non-decreasing during gradient flow. 
+
+ d ⁡ ( ∏ i = 1 k v i ​ ( t ) ) d ​ t = ∑ i = 1 k ∂ ( ∏ i = 1 k v i ) ∂ v i ⋅ v ˙ i = ∑ i = 1 k ( ∏ j ≠ i v i ) 2 > 0 \frac{d\left(\prod_{i=1}^{k}v_{i}(t)\right)}{dt}=\sum_{i=1}^{k}\frac{\partial\left(\prod_{i=1}^{k}v_{i}\right)}{\partial v_{i}}\cdot\dot{v}_{i}=\sum_{i=1}^{k}\left(\prod_{j\neq i}v_{i}\right)^{2}>0 
+
+ Thus, ∏ i v i ​ ( 0 ) > 0 \prod_{i}v_{i}(0)>0 implies that ∏ i v i ​ ( t ) > 0 \prod_{i}v_{i}(t)>0 for all t t . 
+
+ Observe that 
+
+ d ​ v i 2 d ​ t = 2 ​ v i ​ v i ˙ = 2 ​ ∏ j = 1 k v j = 2 ​ ∏ j = 1 k | v j | . \frac{dv_{i}^{2}}{dt}=2v_{i}\dot{v_{i}}=2\prod_{j=1}^{k}v_{j}=2\prod_{j=1}^{k}|v_{j}|. 
+
+ This implies that for all i , l ∈ [ t ] i,l\in[t] , 
+
+ d ​ v i 2 d ​ t = d ​ v l 2 d ​ t . \frac{dv_{i}^{2}}{dt}=\frac{dv_{l}^{2}}{dt}. 
+ 
+ (7) 
+
+ In other words, the squares of the relevant weights each follow the same trajectory, shifted according to their initializations. Let q ⁡ ( t ) := ( v i ​ ( t ) ) 2 − ( v i ​ ( 0 ) ) 2 q(t):=({v_{i}(t)})^{2}-({v_{i}(0)})^{2} , for any i i . This quantity evolves as follows: 
+
+ q ˙ = 2 ​ ∏ i = 1 k | v i | = 2 ​ ( ∏ i = 1 k ( q ⁡ ( t ) + ( v i ​ ( 0 ) ) 2 ) ) 1 / 2 \dot{q}=2\prod_{i=1}^{k}|v_{i}|=2\left(\prod_{i=1}^{k}(q(t)+(v_{i}(0))^{2})\right)^{1/2} 
+
+ Since q ⁡ ( t ) q(t) is strictly increasing, its inverse q − 1 q^{-1} is well-defined, and we can use the inverse function theorem to characterize q − 1 q^{-1} for all t ≥ 0 t\geq 0 : 
+
+ q − 1 ( c ) = ∫ 0 c 1 2 ( ∏ i = 1 k ( γ + ( v i ( 0 ) ) 2 ) ) − 1 / 2 d γ . q^{-1}(c)=\int_{0}^{c}\frac{1}{2}\left(\prod_{i=1}^{k}(\gamma+(v_{i}(0))^{2})\right)^{-1/2}d\gamma. 
+
+ We can upper- and lower-bound the integrand by applying Maclaurin’s inequality (see page 52 in Hardy et al. (1952) ): 
+
+ ( γ + v ¯ g ) k ≤ ∏ i = 1 k ( γ + ( v i ​ ( 0 ) ) 2 ) ≤ ( γ + v ¯ a ) k . \left(\gamma+\bar{v}_{g}\right)^{k}\leq\prod_{i=1}^{k}(\gamma+(v_{i}(0))^{2})\leq\left(\gamma+\bar{v}_{a}\right)^{k}. 
+
+ The amount of time it takes for q q to reach a value of c c is thus: 
+
+ ∫ 0 c 1 2 ( ∏ i = 1 k ( γ + ( v i ( 0 ) ) 2 ) ) − 1 / 2 d γ ≥ ∫ 0 c 1 2 ( γ + v ¯ a ) − k / 2 d γ = 1 k − 2 ( v ¯ a 1 − k / 2 − ( c + v ¯ a ) 1 − k / 2 ) . \int_{0}^{c}\frac{1}{2}\left(\prod_{i=1}^{k}(\gamma+(v_{i}(0))^{2})\right)^{-1/2}d\gamma\geq\int_{0}^{c}\frac{1}{2}(\gamma+\bar{v}_{a})^{-k/2}d\gamma=\frac{1}{k-2}\left(\bar{v}_{a}^{1-k/2}-(c+\bar{v}_{a})^{1-k/2}\right). 
+
+ Hence, for any b ≥ 0 b\geq 0 , for each i i , | v i ​ ( t ) | ≤ b |v_{i}(t)|\leq b as long as 
+
+ t ≤ 1 k − 2 ​ ( v ¯ a 1 − k / 2 − ( v ¯ a + b 2 − v i ​ ( 0 ) 2 ) 1 − k / 2 ) . t\leq\frac{1}{k-2}\left(\bar{v}_{a}^{1-k/2}-(\bar{v}_{a}+b^{2}-v_{i}(0)^{2})^{1-k/2}\right). 
+
+ Meanwhile, the amount of time after q − 1 ​ ( c ) q^{-1}(c) it takes for q q to explode to infinity is 
+
+ ∫ c ∞ 1 2 ( ∏ i = 1 k ( γ + ( v i ( 0 ) ) 2 ) ) − 1 / 2 d γ ≤ ∫ c ∞ 1 2 ( γ + v ¯ g ) − k / 2 d γ = 1 k − 2 ( c + v ¯ g ) 1 − k / 2 . \int_{c}^{\infty}\frac{1}{2}\left(\prod_{i=1}^{k}(\gamma+(v_{i}(0))^{2})\right)^{-1/2}d\gamma\leq\int_{c}^{\infty}\frac{1}{2}(\gamma+\bar{v}_{g})^{-k/2}d\gamma=\frac{1}{k-2}(c+\bar{v}_{g})^{1-k/2}. 
+
+ Substituting c = b 2 − v i ​ ( 0 ) 2 c=b^{2}-v_{i}(0)^{2} , we obtain that the amount of time it takes for | v i | |v_{i}| to grow from b b to ∞ \infty is 
+
+ 1 k − 2 ​ ( v ¯ g + b 2 − v i ​ ( 0 ) 2 ) 1 − k / 2 . \frac{1}{k-2}(\bar{v}_{g}+b^{2}-v_{i}(0)^{2})^{1-k/2}. 
+
+ We can upper- and lower-bound q ˙ \dot{q} by applying Maclaurin’s inequality (see page 52 in Hardy et al. (1952) ): 
+
+ 2 ​ ( q ⁡ ( t ) + v ¯ g ) k / 2 ≤ q ˙ ≤ 2 ​ ( q ⁡ ( t ) + v ¯ a ) k / 2 . 2\left(q(t)+\bar{v}_{g}\right)^{k/2}\leq\dot{q}\leq 2\left(q(t)+\bar{v}_{a}\right)^{k/2}. 
+
+ When k = 2 k=2 , solving the LHS and RHS differential inequalities yields: 
+
+ v ¯ g ​ ( e 2 ​ t − 1 ) ≤ q ⁡ ( t ) ≤ v ¯ a ​ ( e 2 ​ t − 1 ) . \bar{v}_{g}(e^{2t}-1)\ \leq\ q(t)\ \leq\ \bar{v}_{a}(e^{2t}-1). 
+
+ When k > 2 k>2 , we obtain: 
+
+ ( v ¯ g − ( k / 2 − 1 ) − ( k − 2 ) ​ t ) − 1 k / 2 − 1 − v ¯ g ≤ q ⁡ ( t ) ≤ ( v ¯ a − ( k / 2 − 1 ) − ( k − 2 ) ​ t ) − 1 k / 2 − 1 − v ¯ a (\bar{v}_{g}^{-(k/2-1)}-(k-2)t)^{-\frac{1}{k/2-1}}-\bar{v}_{g}\ \leq\ q(t)\ \leq\ (\bar{v}_{a}^{-(k/2-1)}-(k-2)t)^{-\frac{1}{k/2-1}}-\bar{v}_{a} 
+ 
+ (8) 
+
+ From the lower bound on q ⁡ ( t ) q(t) , we can infer that the relevant weights all explode to infinity by the following time: 
+
+ t = 1 ( k − 2 ) ​ v ¯ g − ( k / 2 − 1 ) = 1 ( k − 2 ) ​ ( ∏ i v i ​ ( 0 ) ) 1 − 2 / k t=\frac{1}{(k-2)}\bar{v}_{g}^{-(k/2-1)}=\frac{1}{(k-2)\left(\prod_{i}v_{i}(0)\right)^{1-2/k}} 
+
+ From the upper bound, we can infer that for any c > 0 c>0 , it is the case that q ⁡ ( t ) ≤ c q(t)\leq c so long as 
+
+ t ≤ 1 k − 2 ​ ( v ¯ a − ( k / 2 − 1 ) − ( v ¯ a + c ) − ( k / 2 − 1 ) ) . t\leq\frac{1}{k-2}\left(\bar{v}_{a}^{-(k/2-1)}-(\bar{v}_{a}+c)^{-(k/2-1)}\right). 
+
+ Hence, for each i i , | v i ​ ( t ) | ≤ b |v_{i}(t)|\leq b for all 
+
+ t ≤ 1 k − 2 ​ ( v ¯ a − ( k / 2 − 1 ) − ( v ¯ a + b 2 − ( v i ​ ( 0 ) ) 2 ) − ( k / 2 − 1 ) ) . t\leq\frac{1}{k-2}\left(\bar{v}_{a}^{-(k/2-1)}-(\bar{v}_{a}+b^{2}-(v_{i}(0))^{2})^{-(k/2-1)}\right). 
+
+ ∎ 
+
+ Now we analyze the relationship between the relevant weights and the accuracy of the disjoint-PolyNet.
+
+ For y ∈ ℝ y\in\mathbb{R} , let
+
+ sign ( y ) = { 1 if ​ y > 0 0 if ​ y = 0 − 1 if ​ y < 0 \mathop{\mathrm{sign}}(y)=\begin{cases}1&\text{if}\ y>0\\
+0&\text{if}\ y=0\\
+-1&\text{if}\ y<0\end{cases} 
+
+ Then define the error of f f with parameters w 1 : k w_{1:k} as
+
+ 𝖾𝗋𝗋 ( w 1 : k ) := Pr x ∼ { ± 1 } n [ sign ( f ( x ; w 1 : k ) ) ≠ χ S ( x ) ] \mathsf{err}(w_{1:k}):=\Pr_{x\sim\{\pm 1\}^{n}}[\mathop{\mathrm{sign}}(f(x;w_{1:k}))\neq\chi_{S}(x)] 
+
+ Lemma 6 . 
+
+ Let w w be any setting of the weights of a disjoint-PolyNet such that ∏ i v i > 0 \prod_{i}v_{i}>0 . For ease of notation, let u i := w i , 2 : n ′ u_{i}:=w_{i,2:n^{\prime}} be the irrelevant portion of w i w_{i} . There is a constant c c such that 
+
+ 1 2 − 1 2 ∏ i = 1 k ( erf ( | v i | ‖ u i ‖ 2 ​ 2 ) + c ​ ‖ u i ‖ ∞ ‖ u i ‖ 2 3 ) ≤ 𝖾𝗋𝗋 ( w 1 : k ) ≤ 2 ∑ i = 1 k exp ( − | v i | 2 ‖ u i ‖ 2 2 ) \frac{1}{2}-\frac{1}{2}\prod_{i=1}^{k}\left(\erf\left(\frac{|v_{i}|}{\|u_{i}\|_{2}\sqrt{2}}\right)+\frac{c\|u_{i}\|_{\infty}}{\|u_{i}\|_{2}^{3}}\right)\leq\mathsf{err}(w_{1:k})\leq 2\sum_{i=1}^{k}\exp\left(-\frac{|v_{i}|^{2}}{\|u_{i}\|_{2}^{2}}\right) 
+
+ where erf \erf is the Gauss error function erf ( y ) := 2 π ​ ∫ 0 y e − τ 2 ​ 𝑑 τ \erf(y):=\frac{2}{\sqrt{\pi}}\int_{0}^{y}e^{-\tau^{2}}\,d\tau . 
+
+ Proof.
+
+ Let z i = x ( i − 1 ) ​ n ′ + 1 z_{i}=x_{(i-1)n^{\prime}+1} be the i i th relevant coordinate of x x , and let z i − = x ( i − 1 ) ​ n ′ + 2 : i ​ n ′ z_{i}^{-}=x_{(i-1)n^{\prime}+2:in^{\prime}} be the irrelevant coordinates in P i P_{i} . 
+
+ Then we have that the error of f f with parameters w 1 : k w_{1:k} is 
+
+ 𝖾𝗋𝗋 ( w 1 : k ) \displaystyle\mathsf{err}(w_{1:k}) 
+ = Pr x [ sign ( ∏ i = 1 k w i ⊤ x P i ) ≠ χ S ( x ) ] \displaystyle=\Pr_{x}\left[\mathop{\mathrm{sign}}\left(\prod_{i=1}^{k}w_{i}^{\top}x_{P_{i}}\right)\neq\chi_{S}(x)\right] 
+
+ = Pr x [ sign ( ∏ i = 1 k w i ⊤ x P i ) = − χ S ( x ) ] + Pr x [ ∏ i = 1 k w i ⊤ x P i = 0 ] \displaystyle=\Pr_{x}\left[\mathop{\mathrm{sign}}\left(\prod_{i=1}^{k}w_{i}^{\top}x_{P_{i}}\right)=-\chi_{S}(x)\right]+\Pr_{x}\left[\prod_{i=1}^{k}w_{i}^{\top}x_{P_{i}}=0\right] 
+
+ = Pr x [ sign ( ∏ i = 1 k w i ⊤ x P i ) = − χ S ( x ) ] + Pr x [ ∏ i = 1 k w i ⊤ x P i = 0 ] \displaystyle=\Pr_{x}\left[\mathop{\mathrm{sign}}\left(\prod_{i=1}^{k}w_{i}^{\top}x_{P_{i}}\right)=-\chi_{S}(x)\right]+\Pr_{x}\left[\prod_{i=1}^{k}w_{i}^{\top}x_{P_{i}}=0\right] 
+
+ = Pr x [ # { i ∈ [ k ] : sign ( v i z i + u i ⊤ z i − ) = − z i } is odd ] + Pr x [ ∏ i = 1 k w i ⊤ x P i = 0 ] \displaystyle=\Pr_{x}\left[\#\{i\in[k]:\mathop{\mathrm{sign}}(v_{i}z_{i}+u_{i}^{\top}z_{i}^{-})=-z_{i}\}\text{ is odd}\right]+\Pr_{x}\left[\prod_{i=1}^{k}w_{i}^{\top}x_{P_{i}}=0\right] 
+
+ = Pr z 1 − , … , z k − ⁡ [ # ⁡ { i ∈ [ k ] : u i ⊤ ​ z i − > v i } ​ is odd ] / 2 \displaystyle=\Pr_{z_{1}^{-},\dots,z_{k}^{-}}\left[\#\{i\in[k]:u_{i}^{\top}z_{i}^{-}>v_{i}\}\text{ is odd}\right]/2 
+
+ + Pr z 1 − , … , z k − [ # { i ∈ [ k ] : u i ⊤ z i − < − v i } is odd ] / 2 + Pr x [ ∏ i = 1 k w i ⊤ x P i = 0 ] \displaystyle+\Pr_{z_{1}^{-},\dots,z_{k}^{-}}\left[\#\{i\in[k]:u_{i}^{\top}z_{i}^{-}<-v_{i}\}\text{ is odd}\right]/2+\Pr_{x}\left[\prod_{i=1}^{k}w_{i}^{\top}x_{P_{i}}=0\right] 
+ 
+ (9) 
+
+ = Pr z 1 − , … , z k − [ # { i ∈ [ k ] : u i ⊤ z i − > v i } is odd ] + Pr x [ ∏ i = 1 k w i ⊤ x P i = 0 ] \displaystyle=\Pr_{z_{1}^{-},\dots,z_{k}^{-}}\left[\#\{i\in[k]:u_{i}^{\top}z_{i}^{-}>v_{i}\}\text{ is odd}\right]+\Pr_{x}\left[\prod_{i=1}^{k}w_{i}^{\top}x_{P_{i}}=0\right] 
+ 
+ (10) 
+
+ = Pr z 1 − , … , z k − [ # { i ∈ [ k ] : u i ⊤ z i − > | v i | } is odd ] + Pr x [ ∏ i = 1 k w i ⊤ x P i = 0 ] \displaystyle=\Pr_{z_{1}^{-},\dots,z_{k}^{-}}\left[\#\{i\in[k]:u_{i}^{\top}z_{i}^{-}>|v_{i}|\}\text{ is odd}\right]+\Pr_{x}\left[\prod_{i=1}^{k}w_{i}^{\top}x_{P_{i}}=0\right] 
+ 
+ (11) 
+
+ Line 9 follows because u i ⊤ ​ z i − u_{i}^{\top}z_{i}^{-} and z i z_{i} are independent. In line 10 we use that u i ⊤ ​ z i − u_{i}^{\top}z_{i}^{-} is symmetric about 0. Finally, line 11 uses the assumption that ∏ i = 1 k v i > 0 \prod_{i=1}^{k}v_{i}>0 . 
+
+ We can bound Pr x [ ∏ i = 1 k w i ⊤ x P i = 0 ] \Pr_{x}\left[\prod_{i=1}^{k}w_{i}^{\top}x_{P_{i}}=0\right] using Hoeffding’s inequality: 
+
+ 0 ≤ Pr x [ ∏ i = 1 k w i ⊤ x P i = 0 ] ≤ ∑ i = 1 k Pr z i [ u i ⊤ z i − = v i ] ≤ ∑ i = 1 k Pr z i [ u i ⊤ z i − ≥ | v i | ] ≤ ∑ i = 1 k exp ( − | v i | 2 ‖ u i ‖ 2 2 ) . 0\leq\Pr_{x}\left[\prod_{i=1}^{k}w_{i}^{\top}x_{P_{i}}=0\right]\leq\sum_{i=1}^{k}\Pr_{z_{i}}[u_{i}^{\top}z_{i}^{-}=v_{i}]\leq\sum_{i=1}^{k}\Pr_{z_{i}}[u_{i}^{\top}z_{i}^{-}\geq|v_{i}|]\leq\sum_{i=1}^{k}\exp\left(-\frac{|v_{i}|^{2}}{\|u_{i}\|_{2}^{2}}\right). 
+
+ The indicator random variables 1 ​ I [ u i ⊤ z i − > | v i | ] \ind[u_{i}^{\top}z_{i}^{-}>|v_{i}|] are independent of each other, so the first term in line 11 can be characterized using the distribution of the parity of a sum of independent Bernoulli random variables. Let X i ∼ Ber ⁡ ( p i ) X_{i}\sim\Ber(p_{i}) for i ∈ [ k ] i\in[k] , and let X = ∑ i = 1 k X i X=\sum_{i=1}^{k}X_{i} . The generating function for X X is f ⁡ ( z ) = ∏ i = 1 k ( ( 1 − p i ) + p i ​ z ) f(z)=\prod_{i=1}^{k}((1-p_{i})+p_{i}z) . The parity of X X then satisfies 
+
+ Pr ⁡ [ X ​ is odd ] = f ⁡ ( 1 ) 2 − f ⁡ ( − 1 ) 2 = 1 2 − 1 2 ​ ∏ i = 1 k ( 1 − 2 ​ p i ) . \Pr[X\text{ is odd}]=\frac{f(1)}{2}-\frac{f(-1)}{2}=\frac{1}{2}-\frac{1}{2}\prod_{i=1}^{k}(1-2p_{i}). 
+
+ First we will prove the upper bound on 𝖾𝗋𝗋 \mathsf{err} . First, observe that 
+
+ 1 2 − 1 2 ​ ∏ i = 1 k ( 1 − 2 ​ p i ) ≤ ∑ i = 1 k p i . \frac{1}{2}-\frac{1}{2}\prod_{i=1}^{k}(1-2p_{i})\leq\sum_{i=1}^{k}p_{i}. 
+
+ Thus, 
+
+ Pr z 1 − , … , z k − ⁡ [ # ⁡ { i ∈ [ k ] : u i ⊤ ​ z i − > | v i | } ​ is odd ] \displaystyle\Pr_{z_{1}^{-},\dots,z_{k}^{-}}\left[\#\{i\in[k]:u_{i}^{\top}z_{i}^{-}>|v_{i}|\}\text{ is odd}\right] 
+ ≤ ∑ i = 1 k Pr z i [ u i ⊤ z i − > | v i | ] \displaystyle\leq\sum_{i=1}^{k}\Pr_{z_{i}}[u_{i}^{\top}z_{i}^{-}>|v_{i}|] 
+
+ ≤ ∑ i = 1 k exp ⁡ ( − | v i | 2 ‖ u i ‖ 2 2 ) \displaystyle\leq\sum_{i=1}^{k}\exp\left(-\frac{|v_{i}|^{2}}{\|u_{i}\|_{2}^{2}}\right) 
+
+ by Hoeffding’s inequality, and we are done. 
+
+ Now we will prove the lower bound on 𝖾𝗋𝗋 \mathsf{err} . We have 
+
+ Pr z 1 − , … , z k − ⁡ [ # ⁡ { i ∈ [ k ] : u i ⊤ ​ z i − > | v i | } ​ is odd ] \displaystyle\Pr_{z_{1}^{-},\dots,z_{k}^{-}}\left[\#\{i\in[k]:u_{i}^{\top}z_{i}^{-}>|v_{i}|\}\text{ is odd}\right] 
+ = 1 2 − 1 2 ∏ i = 1 k ( 1 − 2 Pr z i [ u i ⊤ z i − > | v i | ] ) \displaystyle=\frac{1}{2}-\frac{1}{2}\prod_{i=1}^{k}(1-2\Pr_{z_{i}}[u_{i}^{\top}z_{i}^{-}>|v_{i}|]) 
+
+ = 1 2 − 1 2 ∏ i = 1 k Pr z i [ | u i ⊤ z i − | ≤ | v i | ] . \displaystyle=\frac{1}{2}-\frac{1}{2}\prod_{i=1}^{k}\Pr_{z_{i}}[|u_{i}^{\top}z_{i}^{-}|\leq|v_{i}|]. 
+ 
+ (12) 
+
+ We can bound this expression using the Berry-Esseen theorem ( Berry, 1941 , Esseen, 1942 ) . Let β ∼ N ⁡ ( 0 , ‖ u i ‖ 2 2 ) \beta\sim N(0,\|u_{i}\|_{2}^{2}) . Then, the Berry-Esseen theorem states that there is a constant c c (which in practice can be .56 .56 ) such that for any i ∈ [ k ] i\in[k] , 
+
+ | Pr z i [ | u i ⊤ z i − | ≤ | v i | ] − Pr [ | β | ≤ | v i | ] | ≤ c ​ ‖ u i ‖ ∞ ‖ u i ‖ 2 3 \left|\Pr_{z_{i}}[|u_{i}^{\top}z_{i}^{-}|\leq|v_{i}|]-\Pr[|\beta|\leq|v_{i}|]\right|\leq\frac{c\|u_{i}\|_{\infty}}{\|u_{i}\|_{2}^{3}} 
+
+ and we can use the characterization 
+
+ Pr [ | β | ≤ | v i | ] = erf ( | v i | ‖ u i ‖ 2 ​ 2 ) . \Pr[|\beta|\leq|v_{i}|]=\erf\left(\frac{|v_{i}|}{\|u_{i}\|_{2}\sqrt{2}}\right). 
+
+ Plugging this into equation 12 , we obtain the lower bound on 𝖾𝗋𝗋 \mathsf{err} .
+∎ 
+
+ First, we’ll apply Lemma 5 and Lemma 6 to the situation where the w i w_{i} ’s have ± 1 \pm 1 initialization. This generalizes Theorem 7 .
+
+ Corollary 11 . 
+
+ Suppose all the weights in a disjoint-Polynet are initialized randomly in ± 1 \pm 1 and k ≥ 3 k\geq 3 . 
+
+ Let T ( α ) := arg sup t ≥ 0 ( 𝖾𝗋𝗋 ( w 1 : k ( t ) ) ≥ α T(\alpha):=\arg\sup_{t\geq 0}(\mathsf{err}(w_{1:k}(t))\geq\alpha . Then, for γ ∈ ( 0 , 1 / 2 ) \gamma\in(0,1/2) , if ∏ i v i ​ ( 0 ) > 0 \prod_{i}v_{i}(0)>0 (which happens w.p. 1/2), 
+
+ T ⁡ ( 1 / 2 − γ ) T ⁡ ( 0 ) = 1 − O ⁡ ( ( n ′ ) 1 − k / 2 ⋅ γ 2 / k − 1 ) . \frac{T(1/2-\gamma)}{T(0)}=1-O((n^{\prime})^{1-k/2}\cdot\gamma^{2/k-1}). 
+
+ Thus, even for γ \gamma arbitrarily close to 0 0 , when the input is sufficiently long, the network spends almost all of training with error above 1 / 2 − γ 1/2-\gamma . 
+
+ Proof.
+
+ For ± 1 \pm 1 initialization, 
+
+ ‖ u i ‖ ∞ ‖ u i ‖ 2 3 = ( n ′ ) − 3 / 2 \frac{\|u_{i}\|_{\infty}}{\|u_{i}\|_{2}^{3}}=(n^{\prime})^{-3/2} 
+
+ so by Lemma 6 , 
+
+ 𝖾𝗋𝗋 ( w 1 : k ( t ) ) \displaystyle\mathsf{err}(w_{1:k}(t)) 
+ ≥ 1 2 − 1 2 ∏ i = 1 k ( erf ( | v i ​ ( t ) | 2 ​ n ′ ) + c ( n ′ ) − 3 / 2 ) \displaystyle\geq\frac{1}{2}-\frac{1}{2}\prod_{i=1}^{k}\left(\erf\left(\frac{|v_{i}(t)|}{\sqrt{2n^{\prime}}}\right)+c(n^{\prime})^{-3/2}\right) 
+
+ ≥ 1 2 − 1 2 ∏ i = 1 k ( 2 π ​ n ′ ⋅ | v i ( t ) | + c ( n ′ ) − 3 / 2 ) \displaystyle\geq\frac{1}{2}-\frac{1}{2}\prod_{i=1}^{k}\left(\sqrt{\frac{2}{\pi n^{\prime}}}\cdot|v_{i}(t)|+c(n^{\prime})^{-3/2}\right) 
+
+ for some c > 0 c>0 . 
+
+ By Lemma 5 , | v i ​ ( t ) | ≤ b |v_{i}(t)|\leq b for all i i whenever 
+
+ t ≤ 1 k − 2 ​ ( 1 − b 2 − k ) . t\leq\frac{1}{k-2}\left(1-b^{2-k}\right). 
+
+ Setting 
+
+ b = π ​ n ′ / 2 ( γ 1 / k − c ( n ′ ) − 3 / 2 ) , b=\sqrt{\pi n^{\prime}/2}\left(\gamma^{1/k}-c(n^{\prime})^{-3/2}\right), 
+
+ we obtain that T ⁡ ( 1 / 2 − γ ) = 1 k − 2 ​ ( 1 − O ⁡ ( ( n ′ ) 1 − k / 2 ⋅ γ 2 / k − 1 ) ) T(1/2-\gamma)=\frac{1}{k-2}(1-O((n^{\prime})^{1-k/2}\cdot\gamma^{2/k-1})) . 
+
+ Also by Lemma 5 , using the language of that lemma statement, for all i i 
+
+ T i ​ ( ∞ ) − T i ​ ( b ) ≤ 1 k − 2 ⋅ b 2 − k = 1 k − 2 ⋅ O ⁡ ( ( n ′ ) 1 − k / 2 ⋅ γ 2 / k − 1 ) . T_{i}(\infty)-T_{i}(b)\leq\frac{1}{k-2}\cdot b^{2-k}=\frac{1}{k-2}\cdot O((n^{\prime})^{1-k/2}\cdot\gamma^{2/k-1}). 
+
+ Once all the relevant weights have exploded to infinity, the error of the network will have zero error, so the result follows.
+∎ 
+
+ Now let us apply Lemma 5 and Lemma 6 to the situation where the w i w_{i} ’s have standard normal initialization. Again we find that with high probability, the phase of learning with near-trivial accuracy is much longer than the subsequent period until perfect accuracy, as illustrated by the left-hand plot in Figure 5 .
+
+ Corollary 12 . 
+
+ Suppose all the weights in a disjoint-Polynet are initialized ∼ N ⁡ ( 0 , 1 ) \sim N(0,1) , and k ≥ 3 k\geq 3 . Then, conditioned on ∏ i v i ​ ( 0 ) > 0 \prod_{i}v_{i}(0)>0 , with probability 1 − 1 / poly ⁡ ( n ′ ) 1-1/\mathrm{poly}(n^{\prime}) over the randomness of the initialization, for γ ∈ ( 0 , 1 / 2 ) \gamma\in(0,1/2) , 
+
+ T ⁡ ( 1 / 2 − γ ) T ⁡ ( 0 ) = 1 − O ~ ​ ( ( n ′ ) 1 − k / 2 ⋅ γ 2 / k − 1 ) . \frac{T(1/2-\gamma)}{T(0)}=1-\tilde{O}((n^{\prime})^{1-k/2}\cdot\gamma^{2/k-1}). 
+
+ where T ⁡ ( ⋅ ) T(\cdot) is defined as in Corollary 11 . 
+
+ Proof.
+
+ By a standard application of the generic Chernoff bound ( Wainwright, 2019 ) , for each i ∈ [ k ] , j ∈ [ n ′ − 1 ] i\in[k],j\in[n^{\prime}-1] , we have 
+
+ Pr [ | u i , j | > τ ] ≤ 2 e − τ 2 / 2 for all τ ≥ 0 . \Pr[|u_{i,j}|>\tau]\leq 2e^{-\tau^{2}/2}\quad\text{for all}\ \tau\geq 0. 
+
+ Applying the union bound, we obtain 
+
+ Pr [ ∃ i , j s.t. | u i , j | > τ ] ≤ 2 n ′ k e − τ 2 / 2 for all τ ≥ 0 . \Pr[\exists i,j\text{ s.t. }|u_{i,j}|>\tau]\leq 2n^{\prime}ke^{-\tau^{2}/2}\quad\text{for all}\ \tau\geq 0. 
+
+ This implies that w.p. ≥ 1 − ϵ / 2 \geq 1-\epsilon/2 , 
+
+ ∀ i : ‖ u i ‖ ∞ ≤ 2 ​ log ⁡ ( 4 ​ n ′ ​ k / ϵ ) . \forall i:\quad\|u_{i}\|_{\infty}\leq\sqrt{2\log(4n^{\prime}k/\epsilon)}. 
+ 
+ (13) 
+
+ For each i i , ‖ u i ‖ 2 2 \|u_{i}\|_{2}^{2} follows a chi-squared distribution with n ′ − 1 n^{\prime}-1 degrees of freedom. By Laurent and Massart (2000) , for any τ ≥ 0 \tau\geq 0 , 
+
+ ‖ u i ‖ 2 2 ∈ [ ( n ′ − 1 ) − 2 ​ ( n ′ − 1 ) ​ τ , ( n ′ − 1 ) + 2 ​ ( n ′ − 1 ) ​ τ + 2 ​ τ ] w.p. ≥ 1 − 2 ​ e − τ . \|u_{i}\|_{2}^{2}\in[(n^{\prime}-1)-2\sqrt{(n^{\prime}-1)\tau},(n^{\prime}-1)+2\sqrt{(n^{\prime}-1)\tau}+2\tau]\quad\text{w.p. }\geq 1-2e^{-\tau}. 
+
+ Hence, w.p. ≥ 1 − ϵ / 2 \geq 1-\epsilon/2 , 
+
+ ∀ i : ‖ u i ‖ 2 = n ′ + O ⁡ ( log ⁡ ( k / ϵ ) ) \forall i:\quad\|u_{i}\|_{2}=\sqrt{n^{\prime}}+O(\sqrt{\log(k/\epsilon)}) 
+ 
+ (14) 
+
+ With probability 1 − ϵ 1-\epsilon both ‖ u i ‖ ∞ \|u_{i}\|_{\infty} and ‖ u i ‖ 2 \|u_{i}\|_{2} are bounded as above, in which case we obtain that for ϵ = 1 / poly ⁡ ( n ′ , k ) \epsilon=1/\mathrm{poly}(n^{\prime},k) , and for some c 1 , c 2 > 0 c_{1},c_{2}>0 , 
+
+ ‖ u i ‖ ∞ ‖ u i ‖ 2 3 ≤ c 1 ​ log ⁡ ( n ′ ​ k ) ( n ′ + c 2 ​ log ⁡ ( n ′ ​ k ) ) 3 ≤ O ~ ( ( n ′ ) − 3 / 2 ) . \frac{\|u_{i}\|_{\infty}}{\|u_{i}\|_{2}^{3}}\leq\frac{c_{1}\sqrt{\log(n^{\prime}k)}}{\left(\sqrt{n^{\prime}}+c_{2}\sqrt{\log(n^{\prime}k)}\right)^{3}}\leq\tilde{O}\left((n^{\prime})^{-3/2}\right). 
+
+ Plugging this into Lemma 6 gives us 
+
+ 𝖾𝗋𝗋 ( w 1 : k ( t ) ) \displaystyle\mathsf{err}(w_{1:k}(t)) 
+ = 1 2 − 1 2 ​ ∏ i = 1 k ( erf ( | v i ​ ( t ) | ‖ u i ‖ 2 ​ 2 ) + O ⁡ ( ‖ u i ‖ ∞ ‖ u i ‖ 2 3 ) ) \displaystyle=\frac{1}{2}-\frac{1}{2}\prod_{i=1}^{k}\left(\erf\left(\frac{|v_{i}(t)|}{\|u_{i}\|_{2}\sqrt{2}}\right)+O\left(\frac{\|u_{i}\|_{\infty}}{\|u_{i}\|_{2}^{3}}\right)\right) 
+
+ ≥ 1 2 − 1 2 ∏ i = 1 k ( O ~ ( | v i ​ ( t ) | n ′ ) + O ~ ( ( n ′ ) − 3 / 2 ) ) . \displaystyle\geq\frac{1}{2}-\frac{1}{2}\prod_{i=1}^{k}\left(\tilde{O}\left(\frac{|v_{i}(t)|}{\sqrt{n^{\prime}}}\right)+\tilde{O}\left((n^{\prime})^{-3/2}\right)\right). 
+
+ Thus, we can choose b = Ω ~ ​ ( γ 1 / k ​ n ′ ) b=\tilde{\Omega}(\gamma^{1/k}\sqrt{n^{\prime}}) such that if v i ​ ( t ) ≤ b v_{i}(t)\leq b for all i i , then 𝖾𝗋𝗋 ( w 1 : k ( t ) ) ≥ 1 2 − γ \mathsf{err}(w_{1:k}(t))\geq\frac{1}{2}-\gamma . 
+
+ By Lemma 5 , for all i i , 
+
+ T i ​ ( b ) ≥ 1 k − 2 ​ ( v ¯ a 1 − k / 2 − ( v ¯ a + b 2 − v i ​ ( 0 ) 2 ) 1 − k / 2 ) ≥ 1 k − 2 ​ ( v ¯ a 1 − k / 2 − ( b 2 − O ⁡ ( log ⁡ ( k ) ) ) 1 − k / 2 ) . T_{i}(b)\geq\frac{1}{k-2}\left(\bar{v}_{a}^{1-k/2}-(\bar{v}_{a}+b^{2}-v_{i}(0)^{2})^{1-k/2}\right)\geq\frac{1}{k-2}\left(\bar{v}_{a}^{1-k/2}-(b^{2}-O(\log(k)))^{1-k/2}\right). 
+
+ By the Chernoff bound, max i ⁡ | v i ​ ( 0 ) | ≤ 2 ​ log ⁡ ( 4 ​ k / δ ) \max_{i}|v_{i}(0)|\leq\sqrt{2\log(4k/\delta)} w.p. ≥ 1 − δ / 2 \geq 1-\delta/2 . And, by the same bound we used for ‖ u i ‖ 2 2 \|u_{i}\|_{2}^{2} , we have that v ¯ a = 1 + O ⁡ ( log ⁡ ( 1 / δ ) / k ) \bar{v}_{a}=1+O(\sqrt{\log(1/\delta)/k}) w.p. 1 − δ / 2 1-\delta/2 . Thus, for δ = 1 / poly ⁡ ( k ) \delta=1/\mathrm{poly}(k) , we have that with probability 1 − δ 1-\delta , 
+
+ T i ​ ( b ) ≥ 1 k − 2 ​ ( Ω ~ ​ ( 1 ) − ( b 2 − O ⁡ ( log ⁡ ( k ) ) ) 1 − k / 2 ) = 1 k − 2 ⋅ Ω ~ ​ ( 1 ) . T_{i}(b)\geq\frac{1}{k-2}\left(\tilde{\Omega}(1)-(b^{2}-O(\log(k)))^{1-k/2}\right)=\frac{1}{k-2}\cdot\tilde{\Omega}(1). 
+ 
+ (15) 
+
+ Also by Lemma 5 , 
+
+ T i ​ ( ∞ ) − T i ​ ( b ) ≤ 1 k − 2 ​ ( v ¯ g + b 2 − v i ​ ( 0 ) 2 ) 1 − k / 2 ≤ 1 k − 2 ​ ( b 2 − v i ​ ( 0 ) 2 ) 1 − k / 2 . T_{i}(\infty)-T_{i}(b)\leq\frac{1}{k-2}(\bar{v}_{g}+b^{2}-v_{i}(0)^{2})^{1-k/2}\leq\frac{1}{k-2}(b^{2}-v_{i}(0)^{2})^{1-k/2}. 
+
+ With probability 1 − 1 / poly ⁡ ( k ) 1-1/\mathrm{poly(k)} , 
+
+ T i ​ ( ∞ ) − T i ​ ( b ) ≤ 1 k − 2 ​ ( b 2 − O ⁡ ( log ⁡ ( k ) ) ) 1 − k / 2 = 1 k − 2 ⋅ O ~ ​ ( ( n ′ ) 1 − k / 2 ⋅ γ 2 / k − 1 ) . T_{i}(\infty)-T_{i}(b)\leq\frac{1}{k-2}(b^{2}-O(\log(k)))^{1-k/2}=\frac{1}{k-2}\cdot\tilde{O}\left((n^{\prime})^{1-k/2}\cdot\gamma^{2/k-1}\right). 
+ 
+ (16) 
+
+ Combining Equation 15 and Equation 16 , we obtain the desired statement. 
+
+ ∎ 
+
+ B.3.2 SGD analysis
+
+ In this section we will analyze the training of a disjoint-PolyNet using SGD with online (i.i.d.) batches. We will show a convergence result for the 0-1 error of the learned classifier.
+
+ Theorem 13 . 
+
+ Assume we randomly initialize the disjoint-PolyNet with weights drawn uniformly from { ± 1 } \{\pm 1\} . Fix ϵ ∈ ( 0 , 1 / 2 ) \epsilon\in(0,1/2) and run SGD at any batch size B ≥ 1 B\geq 1 for T ≥ 6 ​ log ⁡ ( 2 ​ n ​ T / δ ) ​ log ⁡ ( 2 ​ k / ϵ ) ​ ( 3 ​ n ′ − 2 ) 2 ​ k − 1 T\geq 6\log(2nT/\delta)\log(2k/\epsilon)(3n^{\prime}-2)^{2k-1} iterations. There exists an adaptive learning rate schedule, such that, with probability 1/2 over the randomness of the initialization and 1 − δ 1-\delta over the sampling of SGD, the following holds: 
+
+ err ( w 1 : k ( T + 1 ) ) ≤ ϵ . \mathrm{err}\left(w_{1:k}^{(T+1)}\right)\leq\epsilon. 
+
+ Proof.
+
+ For simplicity of presentation, we will assume B = 1 B=1 .
+Let the sample at iteration t t be ( x ( t ) , y ( t ) ) (x^{(t)},y^{(t)}) where x ( t ) ∼ 𝖴𝗇𝗂𝖿 ⁡ ( { ± 1 } n ) x^{(t)}\sim\mathsf{Unif}(\{\pm 1\}^{n}) and y ( t ) = χ S ( t ) ​ ( x ( t ) ) y^{(t)}=\chi_{S}^{(t)}(x^{(t)}) . Denote the population and stochastic gradient at time t t as: 
+
+ g ^ i ( t ) \displaystyle\widehat{g}_{i}^{(t)} 
+ = − y ( t ) ​ ( ∏ j ≠ i w j ( t ) ⊤ ​ x j ( t ) ) ​ x i ( t ) \displaystyle=-y^{(t)}\left(\prod_{j\neq i}{w_{j}^{(t)}}^{\top}x_{j}^{(t)}\right)x_{i}^{(t)} 
+
+ g i ( t ) \displaystyle g_{i}^{(t)} 
+ = − ( ∏ j ≠ i w j , 1 ( t ) ) ​ e 1 \displaystyle=-\left(\prod_{j\neq i}w_{j,1}^{(t)}\right)e_{1} 
+
+ Observe that | g ^ i , j ( t ) | , | g i , j ( t ) | ≤ ∏ l ≠ i ‖ w l ( t ) ‖ 1 |\widehat{g}_{i,j}^{(t)}|,|g_{i,j}^{(t)}|\leq\prod_{l\neq i}\|w_{l}^{(t)}\|_{1} ; note that this is also true when B > 1 B>1 . Let the learning rate be η i ( t ) = 1 2 ​ 2 ​ T ​ log ⁡ ( 2 ​ n ​ T / δ ) ⋅ ∏ l ≠ i ‖ w l ( t ) ‖ 1 \eta^{(t)}_{i}=\frac{1}{2\sqrt{2T\log(2nT/\delta)}\cdot\prod_{l\neq i}\|w_{l}^{(t)}\|_{1}} .
+Let Δ i , j ( t ) = η i ( t ) ​ ( g i , j ( t ) − g ^ i , j ( t ) ) \Delta_{i,j}^{(t)}=\eta^{(t)}_{i}(g_{i,j}^{(t)}-\widehat{g}_{i,j}^{(t)}) and s i , j ( t ) = ∑ τ = 1 t Δ i , j ( τ ) s_{i,j}^{(t)}=\sum_{\tau=1}^{t}\Delta^{(\tau)}_{i,j} .
+Observe that 𝔼 Δ i , j ( t ) = 0 \mathop{\mathbb{E}}\Delta^{(t)}_{i,j}=0 and therefore s i , j ( 1 ) , … , s i , j ( t ) s^{(1)}_{i,j},\dots,s^{(t)}_{i,j} form a martingale. Furthermore, observe that 
+
+ | s i , j ( t ) − s i , j ( t − 1 ) | = | Δ i , j ( t ) | ≤ | g i , j ( t ) | + | g ^ i , j ( t ) | T ​ log ⁡ ( 2 ​ n ​ T / δ ) ⋅ ∏ l ≠ i ‖ w l ( t ) ‖ 1 ≤ 1 2 ​ T ​ log ⁡ ( 2 ​ n ​ T / δ ) \displaystyle|s_{i,j}^{(t)}-s^{(t-1)}_{i,j}|=|\Delta^{(t)}_{i,j}|\leq\frac{|g_{i,j}^{(t)}|+|\widehat{g}_{i,j}^{(t)}|}{\sqrt{T\log(2nT/\delta)}\cdot\prod_{l\neq i}\|w_{l}^{(t)}\|_{1}}\leq\frac{1}{\sqrt{2T\log(2nT/\delta)}} 
+
+ Then, for every t < T t<T and i , j i,j , by the Azuma-Hoeffding inequality, with probability 1 − δ n ​ T 1-\frac{\delta}{nT} , | s i , j ( t ) | ≤ 1 / 2 |s^{(t)}_{i,j}|\leq 1/2 .
+By the union bound, w.p. at least 1 − δ 1-\delta , for every t < T t<T and all i , j i,j it holds that | s i , j ( t ) | ≤ 1 / 2 |s^{(t)}_{i,j}|\leq 1/2 . Let us assume this holds. 
+
+ Claim 14 . 
+
+ For all t ≤ T + 1 t\leq T+1 , for j > 1 j>1 , | w i , j ( t ) | ≤ 3 / 2 |w_{i,j}^{(t)}|\leq 3/2 . 
+
+ Proof.
+
+ Note that w i , j ( t + 1 ) = w i , j ( 1 ) + s i , j ( t ) w_{i,j}^{(t+1)}=w_{i,j}^{(1)}+s_{i,j}^{(t)} , therefore, we have, 
+
+ | w i , j ( t + 1 ) | \displaystyle|w_{i,j}^{(t+1)}| 
+ ≤ | w i , j ( 1 ) | + | s i , j ( t ) | ≤ 3 / 2 . \displaystyle\leq|w_{i,j}^{(1)}|+|s_{i,j}^{(t)}|\leq 3/2. 
+
+ since | w i , j ( 1 ) | = 1 |w_{i,j}^{(1)}|=1 and | s i , 1 ( t − 1 ) | ≤ 1 / 2 |s_{i,1}^{(t-1)}|\leq 1/2 .
+∎ 
+
+ Denote ξ i = sign ( w i , 1 ( 1 ) ) \xi_{i}=\mathop{\mathrm{sign}}\left(w_{i,1}^{(1)}\right) and assume that ∏ j = 1 k ξ j > 0 \prod_{j=1}^{k}\xi_{j}>0 , and note that this happens w.p. 1 / 2 1/2 . We will assume this holds for the next lemma. 
+
+ Claim 15 . 
+
+ For all t ≤ T + 1 t\leq T+1 and i ∈ [ k ] i\in[k] it holds that 
+
+ ξ i ​ w i , 1 ( t ) = | w i , 1 ( t ) | ≥ 1 2 + 1 4 ​ 2 ​ ( 1 3 ​ n ′ − 2 ) k − 1 ​ t − 1 log ⁡ ( n ​ T / δ ) . \xi_{i}w_{i,1}^{(t)}=|w_{i,1}^{(t)}|\geq\frac{1}{2}+\frac{1}{4\sqrt{2}}\left(\frac{1}{3n^{\prime}-2}\right)^{k-1}\sqrt{\frac{t-1}{\log(nT/\delta)}}. 
+
+ Proof.
+
+ Observe that the claim holds for t = 1 t=1 since | w i , ` ( 1 ) | = 1 |w_{i,`}^{(1)}|=1 . By induction on t t , assume the claim holds for all τ ≤ t \tau\leq t . Now we will prove it holds for t + 1 t+1 . 
+
+ Observe that for all τ ≤ t \tau\leq t , by the assumption: 
+
+ g i , 1 ( τ ) = − ∏ j ≠ i w j , 1 ( τ ) = − ξ i ∏ j ≠ i ξ j w j , 1 ( τ ) = − ξ i ∏ j ≠ i | w j , 1 ( τ ) | . g_{i,1}^{(\tau)}=-\prod_{j\neq i}w_{j,1}^{(\tau)}=-\xi_{i}\prod_{j\neq i}\xi_{j}w_{j,1}^{(\tau)}=-\xi_{i}\prod_{j\neq i}|w_{j,1}^{(\tau)}|. 
+
+ Note that w i , 1 ( t + 1 ) = w i , 1 ( 1 ) + ∑ τ = 1 t η i ( τ ) ​ ( ∏ j ≠ i w j , 1 ( τ ) ) + s i , 1 ( t ) w_{i,1}^{(t+1)}=w_{i,1}^{(1)}+\sum_{\tau=1}^{t}\eta^{(\tau)}_{i}\left(\prod_{j\neq i}w_{j,1}^{(\tau)}\right)+s_{i,1}^{(t)} , then we have 
+
+ ξ i ​ w i , 1 ( t + 1 ) \displaystyle\xi_{i}w_{i,1}^{(t+1)} 
+ = ξ i ​ w i , 1 ( 1 ) + ξ i ​ ∑ τ = 1 t η i ( τ ) ​ ( ∏ j ≠ i w j , 1 ( τ ) ) + ξ i ​ s i , 1 ( t ) \displaystyle=\xi_{i}w_{i,1}^{(1)}+\xi_{i}\sum_{\tau=1}^{t}\eta^{(\tau)}_{i}\left(\prod_{j\neq i}w_{j,1}^{(\tau)}\right)+\xi_{i}s_{i,1}^{(t)} 
+
+ = 1 + ∑ τ = 1 t ( 1 4 ​ 2 ​ τ ​ log ⁡ ( n ​ T / δ ) ⋅ ∏ j ≠ i ξ j ​ w j , 1 ( τ ) ‖ w j ( τ ) ‖ 1 ) + ξ i ​ s i , 1 ( t ) \displaystyle=1+\sum_{\tau=1}^{t}\left(\frac{1}{4\sqrt{2\tau\log(nT/\delta)}}\cdot\prod_{j\neq i}\frac{\xi_{j}w_{j,1}^{(\tau)}}{\|w_{j}^{(\tau)}\|_{1}}\right)+\xi_{i}s_{i,1}^{(t)} 
+ 
+ (17) 
+
+ ≥ 1 2 + 1 2 ​ 2 ​ T ​ log ⁡ ( 2 ​ n ​ T / δ ) ⋅ ∑ τ = 1 t ( ∏ j ≠ i | w j , 1 ( τ ) | ‖ w j ( τ ) ‖ 1 ) − | s i , 1 ( t ) | \displaystyle\geq\frac{1}{2}+\frac{1}{2\sqrt{2T\log(2nT/\delta)}}\cdot\sum_{\tau=1}^{t}\left(\prod_{j\neq i}\frac{|w_{j,1}^{(\tau)}|}{\|w_{j}^{(\tau)}\|_{1}}\right)-|s_{i,1}^{(t)}| 
+ 
+ (18) 
+
+ ≥ 1 2 + 1 2 ​ 2 ​ T ​ log ⁡ ( 2 ​ n ​ T / δ ) ⋅ ∑ τ = 1 t ( ∏ j ≠ i | w j , 1 ( τ ) | | w j , 1 ( τ ) | + 3 ​ ( n ′ − 1 ) 2 ) \displaystyle\geq\frac{1}{2}+\frac{1}{2\sqrt{2T\log(2nT/\delta)}}\cdot\sum_{\tau=1}^{t}\left(\prod_{j\neq i}\frac{|w_{j,1}^{(\tau)}|}{|w_{j,1}^{(\tau)}|+\frac{3(n^{\prime}-1)}{2}}\right) 
+ 
+ (19) 
+
+ ≥ 1 2 + 1 2 ​ 2 ​ T ​ log ⁡ ( 2 ​ n ​ T / δ ) ⋅ ∑ τ = 1 t ( ∏ j ≠ i 1 1 + 3 ​ ( n ′ − 1 ) ) \displaystyle\geq\frac{1}{2}+\frac{1}{2\sqrt{2T\log(2nT/\delta)}}\cdot\sum_{\tau=1}^{t}\left(\prod_{j\neq i}\frac{1}{1+3(n^{\prime}-1)}\right) 
+ 
+ (20) 
+
+ ≥ 1 2 ​ ( 1 + ( 1 3 ​ n ′ − 2 ) k − 1 ​ t 2 ​ T ​ log ⁡ ( 2 ​ n ​ T / δ ) ) . \displaystyle\geq\frac{1}{2}\left(1+\left(\frac{1}{3n^{\prime}-2}\right)^{k-1}\frac{t}{\sqrt{2T\log(2nT/\delta)}}\right). 
+
+ ( 17 ) follows from observing that ξ i ​ w i , 1 ( 1 ) = | w i , 1 ( 1 ) | = 1 \xi_{i}w_{i,1}^{(1)}=|w_{i,1}^{(1)}|=1 and ∏ j = 1 k ξ j = 1 \prod_{j=1}^{k}\xi_{j}=1 . ( 18 ) follows from the inductive hypothesis ξ j ​ w j , 1 ( τ ) = | ξ j ​ w j , 1 ( τ ) | \xi_{j}w_{j,1}^{(\tau)}=|\xi_{j}w_{j,1}^{(\tau)}| . ( 19 ) follows from our assumption that | s i , 1 ( t ) | ≤ 1 / 2 |s_{i,1}^{(t)}|\leq 1/2 and Claim 14 .( 20 ) follows from the inductive hypothesis | w i , 1 ( τ ) | ≥ 1 / 2 |w_{i,1}^{(\tau)}|\geq 1/2 .
+∎ 
+
+ Setting T T such that T ≥ 2 ​ log ⁡ ( 2 ​ n ​ T / δ ) ​ α 2 ​ ( 3 ​ n ′ − 2 ) 2 ​ k − 2 T\geq 2\log(2nT/\delta)\alpha^{2}(3n^{\prime}-2)^{2k-2} for α = 3 ​ ( n ′ − 1 ) ​ log ⁡ ( 2 ​ k / ϵ ) − 1 \alpha=3\sqrt{(n^{\prime}-1)\log(2k/\epsilon)}-1 , from the above claims, after iteration T T , we have 
+
+ w i , 1 ( T + 1 ) \displaystyle w_{i,1}^{(T+1)} 
+ ≥ α + 1 2 \displaystyle\geq\frac{\alpha+1}{2} 
+
+ w i , j ( T + 1 ) \displaystyle w_{i,j}^{(T+1)} 
+ ≤ 3 / 2 ​ for ​ j > 1 . \displaystyle\leq 3/2\text{ for }j>1. 
+
+ Using Lemma 6 , we have with probability 1 − δ 1-\delta , 
+
+ err ( w 1 : k ( T + 1 ) ) ≤ 2 k exp ( − ( α + 1 ) 2 9 ​ ( n ′ − 1 ) ) = ϵ . \mathrm{err}(w_{1:k}^{(T+1)})\leq 2k\exp\left(-\frac{(\alpha+1)^{2}}{9(n^{\prime}-1)}\right)=\epsilon. 
+
+ ∎ 
+
+ Appendix C Additional figures, experiments, and discussion
+
+ This section contains our unabridged empirical results, visualizations, and accompanying discussion. Additional example training curves (like the assortment in Figure 1 (left) ) are shown in Figure 6 ; more examples can be found in the subsections below.
+
+ Figure 6: Additional training curves (on the ( 50 , 3 ) (50,3) -parity problem, except the first row); full details are in Appendix D.1.6 . 1 st row: The same architecture, initialization, and training algorithm (a width- 100 100 ReLU MLP in this case), without an explicit sparse prior, adapts to the computational difficulty parameters n , k n,k . 2 nd row: Our positive empirical results hold over a wide range of batch sizes B B , all the way down to B = 1 B=1 . Training is unstable (more outliers) at very large and very small batch sizes. 3 rd row: Even the least overparameterized neural networks, which are barely wide enough to represent parity, converge with reasonable probability (sometimes failing to reach a global minimum). 4 th row: Larger models (width- 1000 1000 MLPs and d emb = 1024 d_{\mathrm{emb}}=1024 Transformers) are robust to a wide range of batch sizes. Note the lack of plateaus in setting (vi), which is revisited in Appendix C.8 
+
+ Convergence times, success probabilities, and scaling laws.
+
+ We first present the full empirical results outlined in Section 3 of the main paper. Figure 7 shows convergence times t c t_{c} on small parity instances for all of the architecture configurations enumerated in Section 3.1 . In some of these settings, t c t_{c} exhibits high variance due to unlucky initializations (see Figure 8 ); thus, we report 10 th 10^{\text{th}} percentile convergence times. Figure 9 gives coarse-grained estimates for how t c t_{c} scales with ( n , k ) (n,k) , based on small examples.
+For selected architectures, Figure 10 shows how these convergence times scale with n n and k k more precisely: for small n n , power law relationships t c ∝ n Θ ⁡ ( k ) t_{c}\propto n^{\Theta(k)} are observed for all configurations. Note that for larger n n , the exponent (i.e. the slope in the log-log plot) increases: with a constant learning rate and standard training, the n Θ ⁡ ( k ) n^{\Theta(k)} does not continue indefinitely. All additional details are in Appendix D .
+
+ Figure 7: 10th percentile convergence times t c t_{c} of SGD (with n = 30 n=30 , hinge loss, uniform initialization, and best learning rate η ∈ { 1 , 10 − 1 , 10 − 2 , 10 − 3 } \eta\in\{1,10^{-1},10^{-2},10^{-3}\} ), for various architectures, parity degrees k k , and batch sizes B B . See Appendix D for full details.
+
+ Figure 8: Percentage of converged runs ( t c < 10 5 t_{c}<10^{5} ) out of 25 random trials, with the same architectures and training parameters as Figure 7 . With sufficiently large batch sizes, training is extremely robust in settings (i) through (xv). 
+
+ Figure 9: Coarse scaling estimates for the 10th percentile convergence time of SGD (with hinge loss, uniform initialization, and best learning rate) on every architecture: c , α c,\alpha such that t c ≤ c ⋅ ( n − n 0 ) α t_{c}\leq c\cdot(n-n_{0})^{\alpha} on small parity instances n ∈ { 10 , 20 , 30 } , k ∈ { 2 , 3 , 4 } n\in\{10,20,30\},k\in\{2,3,4\} . Missing entries denote cases where < 10 % <10\% of trials were convergent for any n n (see Figure 8 ). Boxes are colored according to α \alpha . See Appendix D for full details.
+
+ Figure 10: Finer-grained plots of convergence times for selected architecture configurations, for n ∈ { 10 , 11 , … , 39 , 40 } n\in\{10,11,\ldots,39,40\} and k ∈ { 2 , 3 , … , 8 } k\in\{2,3,\ldots,8\} . Medians over 1000 1000 runs are shown, with 95 % 95\% bootstrap confidence intervals. Top row: standard MLP configurations (i) through (vi). Bottom row: Miscellaneous settings ( 1 1 -neuron networks; Transformers; larger n n ). For details on each setting, see Appendix D.1.7 .
+
+ Guide to this section.
+
+ The remainder of Appendix C expands on the various discussions and figures from Sections 4 and 5 .
+
+ • 
+ 
+ Appendix C.1 gives experimental evidence that Fourier gaps are present at iterates w t w_{t} and initializations w 0 w_{0} other than sign vectors, as well as for activation functions other than ReLU. This suggests that the feature amplification mechanism is robust, and illuminates directions for strengthening the theoretical results.
+
+ • 
+ 
+ Appendix C.2 discusses how the building blocks of deep learning (activation functions, biases, initializations, learning rates, and batch sizes) play multiple, sometimes conflicting roles in this setting.
+
+ • 
+ 
+ Appendix C.3 provides additional white-box visualizations of hidden progress from Figure 3 .
+
+ • 
+ 
+ Appendix C.4 explores the implications of the feature amplification mechanism for scaling model size– namely, unlike random search, large width does not impart parallel speedups.
+
+ • 
+ 
+ Appendix C.5 shows that our results hold in the finite-sample setting (allowing for multiple passes over a training set of size m m ). In particular, we show that in low-data regimes, the models exhibit the grokking phenomenon.
+
+ • 
+ 
+ Appendix C.6 extends our results to noisy parities (which comprise the true “emblematic computationally-hard problem”).
+
+ • 
+ 
+ Appendix C.7 builds a counterexample for “layer-by-layer learning”, using parity distributions whose degrees are higher than those of the individual layers’ polynomial activations. Preliminary experiments show that standard training works in this setting.
+
+ • 
+ 
+ Appendix C.8 presents examples of training curves for wide polynomial-activation MLPs, where, unlike the other settings, there is no initial plateau in the model’s error.
+
+ C.1 Fourier gaps at initialization and SGD iterates
+
+ Proposition 5 shows that if the function x ↦ σ ′ ​ ( w 0 ⊤ ​ x ) x\mapsto\sigma^{\prime}(w_{0}^{\top}x) has a Fourier gap at S S , then S S can be identified from a batch gradient at initialization w 0 w_{0} with B = O ⁡ ( 1 / γ 2 ) B=O(1/\gamma^{2}) samples.
+Our end-to-end result (Theorem 4 ) requires ReLU activations and sign vector initialization, because
+the Fourier gap condition (Definition 1 ) arises from exact formulas for the Fourier coefficients of the majority function.
+Stronger end-to-end theoretical guarantees would follow from analogous Fourier gaps in more general population gradients. This requires x ↦ σ ′ ​ ( w ⊤ ​ x ) x\mapsto\sigma^{\prime}(w^{\top}x) to satisfy these conditions simultaneously:
+
+ • 
+ 
+ Fourier concentration: upper bounds on the degree- ( k + 1 ) (k+1) coefficients f ^ ​ ( S ∪ { i } ) \widehat{f}(S\cup\{i\}) , for i ∉ S i\not\in S . The term is borrowed from Klivans et al. (2004) , who use upper bounds on Fourier coefficients of LTFs to approximate them (thus, learn halfspaces) with low-degree polynomials.
+
+ • 
+ 
+ Fourier anti-concentration: lower bounds on the degree- ( k − 1 ) (k-1) coefficients f ^ ​ ( S ∖ { i } ) \widehat{f}(S\setminus\{i\}) , for i ∈ S i\in S .
+
+ A natural question is:
+ which Boolean functions, other than majority, satisfy the γ \gamma -Fourier gap property at S S , for γ ≥ n − Ω ⁡ ( k ) \gamma\geq n^{-\Omega(k)} ? 
+
+ We present some numerical evidence for large Fourier gaps in functions x ↦ σ ′ ​ ( w ⊤ ​ x ) x\mapsto\sigma^{\prime}(w^{\top}x) other than majority, which arise from gradients of architectures other than ReLU MLPs with sign initialization. This shows that the mechanism of feature emergence is empirically robust in settings not fully explained by our current theory.
+Establishing corresponding theoretical guarantees would enable stronger end-to-end global convergence guarantees for MLPs and other architectures.
+
+ In these experiments, population gradients were computed by brute force integration over all 2 n 2^{n} Boolean inputs x ∈ { ± 1 } n x\in\{\pm 1\}^{n} . In all cases, for various choices of σ , w \sigma,w , we measure a slightly weaker notion of Fourier gap Γ \Gamma in the population gradient:
+
+ Γ σ , k ​ ( w ) := max i ∈ [ k ] ⁡ | g i | − max i ∉ [ k ] ⁡ | g i | , g := 𝔼 [ y ​ x ​ σ ′ ​ ( w ⊤ ​ x ) ] . \Gamma_{\sigma,k}(w):=\max_{i\in[k]}|g_{i}|-\max_{i\not\in[k]}|g_{i}|,\qquad g:=\mathop{\mathbb{E}}[yx\,\sigma^{\prime}(w^{\top}x)]. 
+
+ If Γ > 0 \Gamma>0 , then one 10 10 
+ 10 
+
+ Replacing the first max \max in the definition of Γ \Gamma with min \min would give us a notion closer to Definition 1 : if all the relevant coordinates are larger than all of the irrelevant ones, estimating the population gradient allows us to recover the relevant coordinates. coordinate from the parity can be identified from O ⁡ ( 1 / Γ 2 ) O(1/\Gamma^{2}) samples of the gradient at w w .
+
+ Figure 11: Distributions of exact Fourier gaps Γ σ , k ​ ( w ) \Gamma_{\sigma,k}(w) when σ = ReLU \sigma=\mathrm{ReLU} , and w w is an i.i.d. {uniform, Gaussian} random vector. These are derived from the Fourier coefficients of the corresponding random LTFs, computed here in exponential time for n = 15 n=15 .
+
+ Random LTFs.
+
+ For ReLU activations and symmetric Bernoulli (i.e. random sign) initialization w i ∼ Unif ⁡ ( { ± c } n ) w_{i}\sim\mathrm{Unif}(\{\pm c\}^{n}) , the Fourier coefficients are the same as those of majority; thus, there is a Fourier gap of γ ≥ n − Ω ⁡ ( k ) \gamma\geq n^{-\Omega(k)} at every set S S (and the same is true of Γ \Gamma ). We probe the Fourier gaps of linear threshold functions (LTFs) under other ubiquitous initializations: i.i.d. uniform and Gaussian. These are shown in Figure 11 , which indicates (at least for small n , k n,k ) that the Fourier gap is comparable to that of majority with non-negligible probability.
+
+ Random non-LTFs.
+
+ The successful convergence of architectures with smoother activations (in the parity setting and beyond) motivates the question of whether large Fourier gaps are present in population gradients corresponding to functions other than LTFs. Figure 12 (left) shows that this is the case for sinusoidal activations.
+
+ Figure 12: Numerical evidence for Fourier gaps beyond random LTFs. Left: Fourier gaps of exact population gradients 𝔼 𝒟 S [ y ​ x i ​ sin ⁡ ( w ⊤ ​ x / n ) ] \mathop{\mathbb{E}}_{\mathcal{D}_{S}}[yx_{i}\sin(w^{\top}x/\sqrt{n})] induced by sinusoidal activations, for random initializations w w . In these small cases, they are comparable the the Fourier gaps of majority (red dashed line). Right: Fourier gaps of a sinusoidal neuron’s population gradients along the SGD optimization path (10 trials shown). The Fourier gap is consistently positive at initialization, but somewhat smaller than that of majority (red dashed line). Interestingly, it amplifies through the course of training.
+
+ Boolean functions along the SGD path.
+
+ Finally, to further close the gap between Theorem 4 and the empirical results, it is necessary to address the fact that SGD accumulates gradients with respect to time-varying iterates, while our analysis approximates this using a large-batch gradient at a static iterate w 0 w_{0} . In fact, SGD seems to help in some cases: Figure 12 (right) shows that when training a sinusoidal neuron, SGD amplifies the initial Fourier gap.
+
+ C.2 Counterintuitive roles of the building blocks of deep learning
+
+ Even in this simple problem setting, the simultaneous computational and statistical considerations lead to counterintuitive consequences for the optimal configurations of architectures and algorithms for this setting. We encountered the following, in the search for architecture configurations for the empirical study:
+
+ • 
+ 
+ Activation functions. This mechanism of features emerging via Fourier gaps (see Definition 1 ) is strongest with non-smooth activations such as the ReLU, whose derivatives are discontinuous threshold functions. This is an orthogonal consideration to representational capacity and mitigation of local minima (under which one might conclude that degree- k k polynomial activations are optimal). In summary, in feature learning settings where the Fourier gaps and low-complexity solutions are simultaneous relevant, there is a sharpness-smoothness tradeoff for the activation function.
+
+ • 
+ 
+ Biases. The symmetry of the majority function (as well as all unbiased LTFs) causes its even-degree Fourier coefficients to be zero; thus, certain variants of the setups in Section 3 fail for odd k k . Bias terms (trainable or fixed) are necessary to break this symmetry, in theory and practice. Simultaneously, biases serve the more conventional role of shifting the loss surface; see Section D.1.2 for how this affects the details of how the biases were chosen in the experiments.
+
+ • 
+ 
+ Initializations. The role of the initialization distribution is similarly twofold in this setting: w 0 w_{0} should be close to the desired solution w ∗ w^{*} , but it must also be selected such that SGD will successfully amplify the Fourier gap. A third consideration, which we do not attempt to study in this work, is that multiple randomly-initialized neurons will tend to learn the correct features at different times (see the weight trajectory visualizations in Figure 3 and Figure 13 , as well the staircase-like training curves seen for MLPs in Figure 1 (left) ). We expect this symmetry breaking phenomenon to be present in more complex feature learning settings. Finally, as shown in the training curves from setting (vi) in Figure 6 , and in more detail in Appendix C.8 , the choice of activation function influences the qualitative behavior of the training curves: namely, whether the plateaus disappear at large widths and batch sizes.
+
+ • 
+ 
+ Batch sizes and learning rates. The empirical and theoretical results both suggest that SGD uses independent samples to gradually amplify a signal containing the correct features in the initial population gradient of the correlation ( ∇ w 𝔼 [ − y x i σ ′ ( w ⊤ x ) ] ) | w = w 0 \left(\nabla_{w}\mathop{\mathbb{E}}[-yx_{i}\sigma^{\prime}(w^{\top}x)]\right)|_{w=w_{0}} . However, it would be truer to this mechanism to stay at the initialization w 0 w_{0} until the algorithm has accumulated enough data to discern the correct indices (equivalently, scale up the batch size); in contrast, standard training takes gradients with respect to w t w_{t} along the SGD path.
+We hypothesize that the bias incurred by this drifting w t w_{t} (and thus drifting population gradient) accounts for the degradations seen in Figure 2 (right) and Figure 10 . However, Figure 12 (right) shows that the movement of SGD can be helpful, amplifying the Fourier gap.
+
+ C.3 Hidden progress measures
+
+ We provide some supplemental plots for the experiments outlined in Figure 3 .
+
+ Figure 13: Supplementary plots for visualizations of the optimization trajectory w t w_{t} , and the hidden progress measure ρ ( w 0 : t ) \rho(w_{0:t}) . In the MLP plots, the single scalar ρ \rho is the ∞ \infty -norm of the entire first layer W W , and weights are color-coded by row (i.e. neuron). With small batch sizes B ∈ { 1 , 4 } B\in\{1,4\} , per-iteration losses are averaged over a short window (lengths 16 16 and 4 4 , respectively).
+
+ Weight visualizations.
+
+ Figure 3 (left, center) directly visualizes the evolution of the weights w t w_{t} for a single sinusoidal neuron (with a bias, but no second layer). Figure 13 supplements these plots from the main paper with additional plots of weight trajectories, at different batch sizes B B , as well as a width-10 MLP architecture.
+
+ ℓ ∞ \ell_{\infty} path length.
+
+ We present an example of a single measurement of the optimization path which captures hidden progress in this setting, which can be plotted alongside loss and accuracy curves. For any iterates of a neuron’s weights w t ∈ ℝ n w_{t}\in\mathbb{R}^{n} , we choose the ∞ \infty -norm of the movement from initialization: ρ ( w 0 : t ) := | | w t − w 0 | | ∞ \rho(w_{0:t}):=||w_{t}-w_{0}||_{\infty} . We present a brief intuitive sketch of the motivation for this choice of ρ ⁡ ( ⋅ ) \rho(\cdot) , and some additional visualizations.
+
+ From the theoretical analysis, under the approximation ∇ ℓ ​ ( w t ) ≈ ∇ ℓ ​ ( w 0 ) \nabla\ell(w_{t})\approx\nabla\ell(w_{0}) (so that feature learning is performed by estimating the initial population gradient to high precision), we can think of the i i -th coordinate of w t w_{t} as a biased random walk with constant variance σ 2 \sigma^{2} ; the Fourier gap condition entails that biases β i \beta_{i} of these random walks are large when i ∈ S i\in S . Then, this choice of ρ \rho is an estimate for the drift term t ⋅ max i ⁡ | β i | t\cdot\max_{i}|\beta_{i}| , which is larger than the σ ​ t \sigma\sqrt{t} contribution of the variance for sufficiently large t t .
+
+ This progress measure is shown alongside the loss curves in Figure 13 , in red. We do not attempt to characterize the dynamics of ρ \rho ; we only note that they are clearly distinguishable from the maximum of n n unbiased random walks, even when SGD appears to make no progress in terms of loss and accuracy.
+Studying hidden progress measures in deep learning more quantitatively, as well as in more general settings, presents a fruitful direction for future work.
+
+ C.4 Convergence time vs. width
+
+ We provide supplementary plots for the experiment outlined in Figure 4 (left) , which probes whether extremely large widths ( r ≫ n k r\gg n^{k} ) afford factor- r r parallel speedups of the parity learning mechanism (as one would expect from random search). On 3 parity instances n ∈ { 30 , 40 , 50 } , k = 3 n\in\{30,40,50\},k=3 , we varied the width r ∈ { 1 , 2 , 3 , … , 9 , 10 , 30 , 100 , 300 , … , 10 6 , 3 × 10 6 } r\in\{1,2,3,\ldots,9,10,30,100,300,\ldots,10^{6},3\times 10^{6}\} , keeping all other parameters the same ( B = 128 , η = 0.1 ) (B=128,\eta=0.1) .
+
+ Results.
+
+ We did not find evidence of such parallel speedups over 1000 1000 runs in each setting; see Figure 14 . This serves as further evidence that the mechanism by which standard training solves parity is best understood as deterministic and sequential, rather than behaving like random search over size- k k subsets. A benefit of width appears to be variance reduction : the upper tail of long convergence times is mitigated by a large number of randomly-initialized neurons.
+
+ Figure 14: Number of iterations for MLPs (with standard initialization and training) to converge on sparse parity problems, in terms of width r r . Boxes denote interquartile ranges over 1000 runs; whiskers denote ± 1.5 ⋅ IQR \pm 1.5\cdot\mathrm{IQR} ; × \times markers denote minimum and maximum outliers. Underparameterized models ( r < k r<k ) are shown in red, and considered “converged” at 55 % 55\% accuracy. Scaling r r this way does not lead to r × r\times parallel speedups, like the expected success time for r r copies of random search (shown in green for comparison). 
+
+ C.5 Learning and grokking in the finite-sample case
+
+ Figure 15: Supplementary plots for the finite-sample setting. The same configuration (width- 100 100 ReLU MLP, B = 32 , η = 0.1 B=32,\eta=0.1 ) varying the sample size m m (decreasing from left to right) and weight decay λ \lambda (increasing from top to bottom). When m m is sufficiently large (much larger than the statistical threshold Θ ⁡ ( k ​ log ⁡ n ) \Theta(k\log n) ), generalization error is negligible. When m m is too small, the model fails to train. In between, we observe eventual convergence to the correct solution, with training curves exhibiting the grokking phenomenon. Weight decay governs a statistical-computational tradeoff in this setting: larger λ \lambda improves generalization, but can cause optimization to fail (bottom row).
+
+ We provide some supplementary plots for the experiments outlined in Figure 4 (right) . In these settings, a fixed architecture (width- 100 100 MLP with ReLU activations) is trained with minibatch SGD in an otherwise fixed configuration (hinge loss, learning rate η = 0.1 \eta=0.1 , batches of size B = 32 B=32 ) on a finite training sample of size m m . We also vary a weight decay parameter λ \lambda .
+
+ As shown in Figure 15 , the weight decay parameter λ \lambda modulates a delicate computational-statistical tradeoff: it improves generalization (expanding the range of m m for which training eventually finds the correct solution), but the model fails to train at large values of λ \lambda . For small m m and appropriately tuned λ \lambda , we observe grokking : the model initially overfits the training data, but finds a classifier that generalizes after a large number of iterations.
+
+ C.6 Learning noisy parities
+
+ The other empirical results in this work focus on noiseless parity distributions 𝒟 S \mathcal{D}_{S} , to reduce the number of sources of variance and degrees of freedom. However, the setting of random classification noise is important for several reasons. In this section, we briefly demonstrate that our results extend to this case. Let 𝒟 S ( ϵ ) \mathcal{D}_{S}^{(\epsilon)} denote the ( n , k , ϵ ) (n,k,\epsilon) -noisy parity distribution , defined by flipping the labels in the ( n , k ) (n,k) -parity distribution 𝒟 S \mathcal{D}_{S} independently with probability 1 2 − ϵ \frac{1}{2}-\epsilon . Note that when ϵ = 0 \epsilon=0 , the labels are completely random (thus, S S cannot be learned). By a standard PAC-learning argument, when 0 < ϵ ≤ 1 2 0<\epsilon\leq\frac{1}{2} , the statistical limit for identifying S S from i.i.d. samples from 𝒟 S \mathcal{D}_{S} scales as
+ Θ ⁡ ( k ​ log ⁡ n ϵ 2 ) \Theta\left(\frac{k\log n}{\epsilon^{2}}\right) .
+
+ Motivations.
+
+ First, learning parities from noisy samples is the true “emblematic computationally-hard distribution”. Without noise, there is a non-SQ algorithm which avoids the exponential-in- k k computational barrier: Gaussian elimination can identify S S in O ⁡ ( n 3 ) O(n^{3}) time and Θ ⁡ ( n ) \Theta(n) samples. Second, viewing parities as an idealized setting in which to understand training dynamics, resource scaling, and emergence in deep learning, it is important to see that this phenomenon is robust to label noise.
+
+ Theory.
+
+ It is easy to incorporate label noise into the theoretical analysis, which works with correlations of the form 𝔼 𝒟 S [ y ​ f ​ ( x ) ] \mathop{\mathbb{E}}_{\mathcal{D}_{S}}[y\,f(x)] ; each coordinate of the population gradient of the correlation loss is a quantity of this form. In the noisy case, these quantities are replaced with
+
+ 𝔼 ( x , y ) ∼ 𝒟 S ( ϵ ) [ y ​ f ​ ( x ) ] = ϵ ⋅ 𝔼 ( x , y ) ∼ 𝒟 S [ y ​ f ​ ( x ) ] . \mathop{\mathbb{E}}_{(x,y)\sim\mathcal{D}_{S}^{(\epsilon)}}[y\,f(x)]=\epsilon\cdot\mathop{\mathbb{E}}_{(x,y)\sim\mathcal{D}_{S}}[y\,f(x)]. 
+
+ In particular, when architecture’s population gradient has a Fourier gap with parameter γ \gamma in the noiseless case implies a Fourier gap with parameter ϵ ⋅ γ \epsilon\cdot\gamma .
+
+ Figure 16: Training curves (over 5 5 random seeds) for a width- 100 100 ReLU MLP on noisy ( 50 , 3 , ϵ ) (50,3,\epsilon) -parity learning problems at various batch sizes B B and noise levels (flipping labels with probability p p , so that ϵ = 1 − 2 ​ p \epsilon=1-2p ). The models learn the features and converge successfully (measured by accuracy on the noiseless distribution), even with 49 % 49\% of labels flipped randomly (i.e. ϵ = 0.01 \epsilon=0.01 ). This is a preliminary illustration that the phenomena investigated in this paper are robust with respect to i.i.d. label noise. Note that the scale of t t is much larger for small batches and high noise. 
+
+ Experiments.
+
+ We find that the experimental findings are robust to label noise, in the sense that models are able to obtain nontrivial (and sometimes 100 % 100\% ) accuracy;
+see Figure 16 for some training curves under various settings of ϵ \epsilon . This provides concrete evidence against the (already extremely dubious) hypothesis that neural networks, with standard initialization and training, learn noiseless parities by implicitly simulating an efficient algorithm such as Gaussian elimination. Note that with a constant learning rate (here, η = 0.1 \eta=0.1 ) and label noise, the iterates of SGD do not always converge to 100 % 100\% accurate solutions.
+
+ C.7 Counterexample for layer-by-layer learning
+
+ Notation.
+
+ Consider an L L -layer MLP with activation σ \sigma , parameterized by weights and biases
+
+ θ = ( W 1 , b 1 , … , W L − 1 , b L − 1 , u ) , \theta=(W_{1},b_{1},\ldots,W_{L-1},b_{L-1},u), 
+
+ and defined by
+
+ f 𝗆𝗅𝗉 ​ ( x , θ ) := ( f 1 ∘ … ∘ f L − 1 ∘ f L ) ​ ( x ) , f_{\mathsf{mlp}}(x;\theta):=(f_{1}\circ\ldots\circ f_{L-1}\circ f_{L})(x), 
+
+ where f i f_{i} denotes the function z ↦ σ ⁡ ( W i ​ z + b i ) z\mapsto\sigma(W_{i}z+b_{i}) for 1 ≤ i ≤ L − 1 1\leq i\leq L-1 , and f L f_{L} denotes z ↦ u ⊤ ​ z z\mapsto u^{\top}z .
+The shapes of the parameters W i , b i , u W_{i},b_{i},u are selected such that each function composition is well-defined.
+Let the intermediate activations at layer i i be denoted by
+
+ z i ​ ( x , θ ) := ( f 1 ∘ … ∘ f i ) ​ ( x ) . z_{i}(x;\theta):=(f_{1}\circ\ldots\circ f_{i})(x). 
+
+ Finally, r i r_{i} (the width at layer i i ) refers to the dimensionality of z i z_{i} as defined above.
+
+ Construction where layer-by-layer learning is impossible.
+
+ Notice that when σ \sigma is a degree- 2 2 polynomial (say, σ ⁡ ( z ) = z 2 \sigma(z)=z^{2} ), an L L -layer MLP can represent parities up to degree 2 L − 1 2^{L-1} – for example, a 3 3 -layer MLP (which composes quadratic activations twice) can represent a 4 4 -sparse parity as a 2 2 -sparse parity of 2 2 -sparse parities. However, Equation ( 1 ) implies the following:
+
+ • 
+ 
+ An individual layer cannot represent a parity of k > 2 k>2 inputs.
+
+ • 
+ 
+ The population gradient (as in Equation ( 4 ) is zero (since every coordinate of the gradient is the correlation between a k k -wise parity and a polynomial of degree 2 2 ).
+
+ Thus, this setting serves as an idealized counterexample for layer-by-layer learning: if SGD succeeds on parities with higher degree than the architecture’s polynomial activations, it must do so by an end-to-end mechanism. Intuitively, earlier layers can only make progress by knowing how their outputs will be used downstream . Concretely, consider the population gradient of the correlation loss, with respect to a first-layer neuron’s weights w := ( W 1 ) j , : w:=(W_{1})_{j,:} . With layer-by-layer training, this gradient contains no information:
+
+ ∇ w 𝔼 [ − y x i σ ′ ​ ( w ⊤ ​ x ) ⏟ degree 1 u j ] = 0 . \nabla_{w}\mathop{\mathbb{E}}[-yx_{i}\,\underbrace{\sigma^{\prime}(w^{\top}x)}_{\text{degree $1$}}\,u_{j}]=0. 
+
+ However, in end-to-end training, the presence of downstream layers removes this barrier:
+
+ ∇ w 𝔼 [ − y x i σ ′ ​ ( w ⊤ ​ x ) ⏟ degree 1 ∂ f 2 ∘ … ∘ f L ∂ ( z 1 ) j ⏟ degree 2 L − 2 − 1 ] , \nabla_{w}\mathop{\mathbb{E}}\Big[-yx_{i}\,\underbrace{\sigma^{\prime}(w^{\top}x)}_{\text{degree $1$}}\,\underbrace{\frac{\partial f_{2}\circ\ldots\circ f_{L}}{\partial(z_{1})_{j}}}_{\text{degree $2^{L-2}-1$}}\Big], 
+
+ giving the gradient greater representation capacity (in terms of polynomial degree). The question remains of whether end-to-end training works in this setting, which we resolve positively in small experiments.
+
+ Results: end-to-end training works empirically.
+
+ We empirically observed successful training (to 100 % 100\% accuracy) in a few settings (with SGD, learning rate η = 0.01 \eta=0.01 , batch size B = 32 B=32 , and default uniform initialization as described in Appendix D.1 ):
+
+ • 
+ 
+ L = 3 , n ∈ { 10 , 20 , 30 } , k ∈ { 1 , 2 , 3 , 4 } L=3,n\in\{10,20,30\},k\in\{1,2,3,4\} . Small widths suffice: ( r 1 , r 2 ) = ( 2 , 1 ) (r_{1},r_{2})=(2,1) . Over 10 random seeds, all models converged within 20000 20000 iterations.
+
+ • 
+ 
+ L = 4 , n ∈ { 10 , 20 , 30 } , k ∈ { 1 , 2 , 3 , 4 , 5 , 6 } L=4,n\in\{10,20,30\},k\in\{1,2,3,4,5,6\} . Widths were chosen to be slightly larger for stability: ( r 1 , r 2 , r 3 ) = ( 10 , 10 , 1 ) (r_{1},r_{2},r_{3})=(10,10,1) . Over 10 random seeds, all models converged within 50000 50000 iterations. Additionally, models trained on ( n , k ) ∈ { ( 10 , 7 ) , ( 20 , 7 ) , ( 30 , 7 ) , ( 10 , 8 ) } (n,k)\in\{(10,7),(20,7),(30,7),(10,8)\} converged within 500000 500000 iterations.
+
+ As a sanity check, the models failed to converge in experimental setups where k > 2 L − 1 k>2^{L-1} : ( L = 2 , k ≥ 3 ) (L=2,k\geq 3) and ( L = 3 , k ≥ 5 ) (L=3,k\geq 5) .
+
+ Discussion.
+
+ This construction serves as a simple counterexample to the “deep only works if shallow is good” principle of Malach and Shalev-Shwartz (2019) , demonstrating a case where a deep network can get near-perfect accuracy even when greedy layerwise training (e.g. ( Belilovsky et al., 2019 ) ) cannot beat trivial performance. It remains to characterize these positive empirical results theoretically, as well as to investigate whether there are pertinent analogues in real data distributions.
+
+ C.8 Lack of plateaus for wide polynomial-activation MLPs
+
+ An interesting qualitative observation from the training curves in Figure 6 is that the validation accuracy curves in setting (vi) (width-1000 polynomial-activation MLPs) do not follow the same “plateau” or ”staircase” pattern as the others. Figure 17 shows a few additional examples of training curves for polynomial-activation MLPs, varying the width r r and batch size B B . We find that the rate of descent of the validation error increases with both of these parameters; note that this does not occur with ReLU activations (where there are sharp phase transitions between plateaus at all batch sizes).
+
+ This constitutes an exception to this paper’s theme of “hidden progress” behind flat loss (or error) curves: with enough overparameterization and “over-sampling”, the continuous progress of SGD in this setting is no longer hidden, and manifests in the training curves. This phenomenon seems to be specific to certain activation functions; we leave it for future work to understand why and when it occurs, as well as potential practical implications.
+
+ Figure 17: Additional training curves for polynomial-activation MLP architectures (iv), (v), (vi), on the (50, 3)-sparse parity problem. Unlike the other architectures, these settings exhibit continuous progress when the width r r and batch size B B are large.
+
+ Appendix D Details for all experiments
+
+ D.1 Deep learning configurations
+
+ Losses.
+
+ Our “robust space” of empirical results use the following loss functions:
+
+ • 
+ 
+ Hinge: ℓ ⁡ ( y , y ^ ) := ( 1 − y ​ y ^ ) + \ell(y,\widehat{y}):=(1-y\widehat{y})_{+} .
+
+ • 
+ 
+ Square: ℓ ⁡ ( y , y ^ ) := ( y − y ^ ) 2 \ell(y,\widehat{y}):=(y-\widehat{y})^{2} .
+
+ • 
+ 
+ Cross entropy: ℓ ⁡ ( y , y ^ ) := − log ⁡ e y ​ y ^ 1 + e y ​ y ^ \ell(y,\widehat{y}):=-\log\frac{e^{y\widehat{y}}}{1+e^{y\widehat{y}}} .
+
+ Additionally, the theoretical analysis considers the correlation loss ℓ ⁡ ( y , y ^ ) := − y ​ y ^ \ell(y,\widehat{y}):=-y\widehat{y} .
+
+ In the configurations corresponding to all of the figures and convergence time experiments, we used the hinge loss. This was a relatively arbitrary choice (i.e. they appeared to be interchangeable upon running small experiments); an advantage of the hinge and square losses over cross entropy is that for architectures that can realize the parity function, there is a zero-loss solution with finite weights.
+
+ Initializations.
+
+ Our empirical results use the following i.i.d. weight initializations:
+
+ • 
+ 
+ Uniform on the interval [ − c , c ] [-c,c] , where the scale c c is chosen for all affine transformation parameters using the “Xavier initialization” convention ( Glorot and Bengio, 2010 ) . The experiments are quite tolerant to the particular choice of c c (as these are not deep networks); this choice, which is the default in deep learning packages, emphasizes that our positive empirical results hold under a standard initialization scheme.
+
+ • 
+ 
+ Gaussian with mean 0 0 and variance σ 2 \sigma^{2} , selected using the “Kaiming initialization” convention ( He et al., 2015 ) .
+
+ • 
+ 
+ Bernoulli (i.e. random sign) initialization: the discrete distribution Unif ⁡ ( { − c , c } ) \mathrm{Unif}(\{-c,c\}) , for the same choice of c c as for the uniform distribution.
+
+ D.1.1 2-layer MLPs
+
+ We consider 2 2 -layer MLPs f ⁡ ( x , W , b , u ) = u ⊤ ​ σ ​ ( W ​ x + b ) f(x;W,b,u)=u^{\top}\sigma(Wx+b) for two choices of activations:
+
+ • 
+ 
+ ReLU: σ ⁡ ( z ) := ( z ) + = max ⁡ ( 0 , z ) \sigma(z):=(z)_{+}=\max(0,z) .
+
+ • 
+ 
+ Degree- k k polynomial: σ ⁡ ( z ) := z k \sigma(z):=z^{k} .
+
+ In both cases, whenever r ≥ k r\geq k (and, in the case of polynomial activations, choosing the degree to be k k ), there exists a width- r r MLP which can represent k k -sparse parities: for all ( n , k ) (n,k) and | S | = k |S|=k , there is a setting of W , b , u W,b,u such that f ⁡ ( x , W , b , u ) = χ S ​ ( x ) f(x;W,b,u)=\chi_{S}(x) .
+
+ Note that if the output f ⁡ ( x , θ ) f(x;\theta) is a degree- k ′ < k k^{\prime}<k polynomial in x x (e.g. an MLP with σ ⁡ ( z ) = z k ′ \sigma(z)=z^{k^{\prime}} activations), the architecture is incapable of representing a parity of k k inputs. In fact, it is incapable of representing any function that has a nonzero correlation with parity; this follows from orthogonality (Equation ( 1 )).
+
+ D.1.2 Single neurons
+
+ To explore the limits of concise parameterization for architectures capable of learning parities, we propose a variety of non-standard activation functions which allow a single neuron to learn sparse parities. These constructions leverage the fact that the parity is a nonlinear function of the sum of its inputs w S ⊤ ​ x w_{S}^{\top}x , where w S := ∑ i ∈ S e i w_{S}:=\sum_{i\in S}e_{i} .
+
+ Figure 18: Visualizations of all activation functions considered in this work. As discussed in Section D.1.2 , care must be taken to ensure that the architectures can realize sparse parities with the same bias b b (in particular, b = 0 b=0 ) across varying k k . Multiple k k -dependent displacements are shown for the ∞ \infty -zigzag and sinusoidal activations.
+
+ k k -zigzag activation.
+
+ σ ⁡ ( ⋅ ) \sigma(\cdot) is the piecewise linear function which interpolates the k + 1 k+1 points { ( k , + 1 ) , ( k − 2 , − 1 ) , ( k − 4 , + 1 ) , … , ( − k + 2 , ± 1 ) , ( − k , ∓ 1 ) } \{(k,+1),(k-2,-1),(k-4,+1),\ldots,(-k+2,\pm 1),(-k,\mp 1)\} with k k linear regions { ( − ∞ , − k ] , [ − k , − k + 2 ] , … , [ k − 2 , k ] , [ k , + ∞ ) } \{(-\infty,-k],[-k,-k+2],\ldots,[k-2,k],[k,+\infty)\} . Then, σ ⁡ ( w S ⊤ ​ x ) = χ S ​ ( x ) \sigma(w_{S}^{\top}x)=\chi_{S}(x) .
+
+ Oscillating polynomial activation.
+
+ σ ⁡ ( ⋅ ) \sigma(\cdot) is the degree- k k polynomial which interpolates the same points as above.
+
+ ∞ \infty -zigzag activation.
+
+ The infinite extension of the zigzag activation is the triangle wave function σ ⁡ ( ⋅ ) \sigma(\cdot) which linearly interpolates the infinite set of points ⋃ i ∈ ℤ { ( 2 ​ i , + 1 ) , ( 2 ​ i + 1 , − 1 ) } \bigcup_{i\in\mathbb{Z}}\{(2i,+1),(2i+1,-1)\} . This can express parities of arbitrary degree. The + 1 +1 and − 1 -1 can be swapped (resulting in an activation which is equivalent when shifted by a bias term). However, in our experiments, we choose the sign convention depending on k k such that σ ⁡ ( w S ⊤ ​ x ) = + 1 \sigma(w_{S}^{\top}x)=+1 . This allows different convergence time curves to be more directly comparable across different k k , since it removes the effects of the bias of the global minimizer alternating with k k .
+
+ Sinusoidal activation.
+
+ σ ⁡ ( z ) := sin ⁡ ( z ) \sigma(z):=\sin(z) . The sinusoidal neuron sin ⁡ ( w ⊤ ​ x + b ) \sin(w^{\top}x+b) can also express parities of arbitrary degree, since it can interpolate the same set of points as the ∞ \infty -zigzag activation. In the experiments, we pick a shift β \beta and use the activation σ ⁡ ( z ) := sin ⁡ ( π 2 ​ z + β ) \sigma(z):=\sin(\frac{\pi}{2}z+\beta) , such that σ ⁡ ( z ) \sigma(z) interpolates the same points as the sign convention selected for the ∞ \infty -zigzag activation. In the experiments in Section 3 , the sinusoidal activation is additionally scaled by a factor of 2 ( z ↦ σ ⁡ ( 2 ​ z ) z\mapsto\sigma(2z) ); this is interchangeable with scaling the learning rate and initialization, and is done to obtain more robust convergence in the particular setting of ( n , k ) = ( 50 , 3 ) (n,k)=(50,3) .
+
+ Figure 18 visualizes all families of activations considered in this paper.
+
+ D.1.3 Parity Transformer
+
+ The Transformer experiments use a slightly simplified version of the architecture introduced in ( Vaswani et al., 2017 ) . In particular, it omits dropout, layer normalization, tied input/output embedding weights, and a positional embedding on the special [CLS] token. Including these does not change the results significantly; they are all present in the preliminary findings in ( Edelman et al., 2021 ) (in which an “off-the-shelf” Transformer implementation successfully learns sparse parities). We specify the architecture below.
+
+ Our Parity Transformer has the following hyperparameters: sequence length n n , token embedding dimension d emb d_{\mathrm{emb}} , attention embedding dimension d attn d_{\mathrm{attn}} , feedforward embedding dimension d mlp d_{\mathrm{mlp}} , and number of heads H H . Its trainable parameters (together denoted by θ \theta ) are:
+
+ • 
+ 
+ Token embeddings E − 1 , E + 1 , E [CLS] ∈ ℝ d emb E_{-1},E_{+1},E_{\texttt{[CLS]}}\in\mathbb{R}^{d_{\mathrm{emb}}} and position embeddings P 1 , … , P n ∈ ℝ d emb P_{1},\ldots,P_{n}\in\mathbb{R}^{d_{\mathrm{emb}}} . Let θ 𝖾𝗆𝖻 \theta_{\mathsf{emb}} denote this subset of parameters.
+
+ • 
+ 
+ Attention head matrices: W Q [ h ] , W K [ h ] , W V [ h ] ∈ ℝ d emb × d attn W_{Q}^{[h]},W_{K}^{[h]},W_{V}^{[h]}\in\mathbb{R}^{d_{\mathrm{emb}}\times d_{\mathrm{attn}}} and W out [ h ] ∈ ℝ d attn × d emb W_{\mathrm{out}}^{[h]}\in\mathbb{R}^{d_{\mathrm{attn}}\times d_{\mathrm{emb}}} , for h = 1 , … , H h=1,\ldots,H . Let θ 𝖺𝗍𝗍𝗇 \theta_{\mathsf{attn}} denote this subset of parameters.
+
+ • 
+ 
+ MLP weights and biases: W 1 ∈ ℝ d mlp × d emb , b 1 ∈ ℝ d mlp , W 2 ∈ ℝ d mlp × d emb , b 2 ∈ d emb W_{1}\in\mathbb{R}^{d_{\mathrm{mlp}}\times d_{\mathrm{emb}}},b_{1}\in\mathbb{R}^{d_{\mathrm{mlp}}},W_{2}\in\mathbb{R}^{d_{\mathrm{mlp}}\times d_{\mathrm{emb}}},b_{2}\in d_{\mathrm{emb}} . Let θ 𝗆𝗅𝗉 \theta_{\mathsf{mlp}} denote this subset of parameters.
+
+ • 
+ 
+ Classification head: u ∈ ℝ d emb u\in\mathbb{R}^{d_{\mathrm{emb}}} .
+
+ Then,
+
+ f 𝗍𝖿 ​ ( x , θ ) := u ⊤ ​ ( f 𝗆𝗅𝗉 ​ ( f 𝖺𝗍𝗍𝗇 ​ ( f 𝖾𝗆𝖻 ​ ( x , θ 𝖾𝗆𝖻 ) , θ 𝖺𝗍𝗍𝗇 ) , θ 𝗆𝗅𝗉 ) ) , f_{\mathsf{tf}}(x;\theta):=u^{\top}\left(f_{\mathsf{mlp}}(f_{\mathsf{attn}}(f_{\mathsf{emb}}(x;\theta_{\mathsf{emb}});\theta_{\mathsf{attn}});\theta_{\mathsf{mlp}})\right), 
+
+ where these submodules are defined by
+
+ • 
+ 
+ Embedding f 𝖾𝗆𝖻 : { ± 1 } n → ℝ ( n + 1 ) × d emb f_{\mathsf{emb}}:\{\pm 1\}^{n}\rightarrow\mathbb{R}^{(n+1)\times d_{\mathrm{emb}}} : f 𝖾𝗆𝖻 ( x ; θ 𝖾𝗆𝖻 ) i , : := E x i + P i f_{\mathsf{emb}}(x;\theta_{\mathsf{emb}})_{i,:}:=E_{x_{i}}+P_{i} for i ∈ [ n ] i\in[n] . We will include an the extra index [CLS] , for which f 𝖾𝗆𝖻 ( x ; θ 𝖾𝗆𝖻 ) [CLS] , : := E [CLS] f_{\mathsf{emb}}(x;\theta_{\mathsf{emb}})_{\texttt{[CLS]},:}:=E_{\texttt{[CLS]}} (with no positional embedding). [CLS] stands for “classification”, as in “use the output at this position to classify the sequence”. This is a standard construction which makes the classifier permutation-invariant.
+
+ • 
+ 
+ Attention block f 𝖺𝗍𝗍𝗇 : ℝ ( n + 1 ) × d emb → ℝ d emb f_{\mathsf{attn}}:\mathbb{R}^{(n+1)\times d_{\mathrm{emb}}}\rightarrow\mathbb{R}^{d_{\mathrm{emb}}} :
+
+ f 𝖺𝗍𝗍𝗇 ( X ; θ 𝖺𝗍𝗍𝗇 ) = X [CLS] , : + ∑ h = 1 H 𝗌𝗈𝖿𝗍𝗆𝖺𝗑 ( 1 d attn X [CLS] , : W Q [ h ] ( X W K [ h ] ) ⊤ ) W V [ h ] W out [ h ] , f_{\mathsf{attn}}(X;\theta_{\mathsf{attn}})=X_{\texttt{[CLS]},:}+\sum_{h=1}^{H}\mathsf{softmax}\left(\frac{1}{\sqrt{d_{\mathrm{attn}}}}X_{\texttt{[CLS]},:}W_{Q}^{[h]}(XW_{K}^{[h]})^{\top}\right)W_{V}^{[h]}W_{\mathrm{out}}^{[h]}, 
+
+ where 𝗌𝗈𝖿𝗍𝗆𝖺𝗑 ⁡ ( z ) := exp ⁡ ( z ) / 𝟏 ⊤ ​ exp ⁡ ( z ) \mathsf{softmax}(z):=\exp(z)/\mathbf{1}^{\top}\exp(z) . Note that we have specialized this architecture to a single output, at the [CLS] position.
+
+ • 
+ 
+ MLP f 𝗆𝗅𝗉 : ℝ d emb → ℝ d emb f_{\mathsf{mlp}}:\mathbb{R}^{d_{\mathrm{emb}}}\rightarrow\mathbb{R}^{d_{\mathrm{emb}}} :
+
+ f 𝗆𝗅𝗉 ​ ( z , θ 𝗆𝗅𝗉 ) := z + W 2 ​ σ ​ ( W 1 ​ x + b 1 ) + b 2 , f_{\mathsf{mlp}}(z;\theta_{\mathsf{mlp}}):=z+W_{2}\sigma(W_{1}x+b_{1})+b_{2}, 
+
+ where σ ⁡ ( ⋅ ) = 𝖦𝖾𝖫𝖴 ⁡ ( ⋅ ) \sigma(\cdot)=\mathsf{GeLU}(\cdot) (the Gaussian error linear unit) is the standard choice in Transformers.
+
+ Training.
+
+ Each matrix-shaped parameter was initialized using PyTorch’s default “Xavier uniform” convention. Unlike the other settings considered in this paper, we were unable to observe successful convergence beyond a few small ( n , k ) (n,k) using standard SGD. As is common practice when training Transformers, we used Adam ( Kingma and Ba, 2014 ) with default adaptive parameters β 1 = 0.9 , β 2 = 0.999 , ϵ = 10 − 8 \beta_{1}=0.9,\beta_{2}=0.999,\epsilon=10^{-8} in our experiments. While there are more fine-grained accounts of why Adam outperforms vanilla SGD ( Zhang et al., 2020 , Agarwal et al., 2020 ) , finding the optimal optimizer configuration and investigating ablations of this optimizer are outside the scope of this work. In this work, we only tune Adam’s learning rate η \eta .
+
+ D.1.4 PolyNet
+
+ For positive integers n , k n,k , the PolyNet architecture is parameterized by weights and biases θ := { ( w i ∈ ℝ n , b i ∈ ℝ ) } i = 1 k \theta:=\{(w_{i}\in\mathbb{R}^{n},b_{i}\in\mathbb{R})\}_{i=1}^{k} , and is defined by
+
+ f 𝖯𝗈𝗅𝗒𝖭𝖾𝗍 ​ ( x , θ ) := ∏ i = 1 k ( w i ⊤ ​ x + b i ) . f_{\mathsf{PolyNet}}(x;\theta):=\prod_{i=1}^{k}(w_{i}^{\top}x+b_{i}). 
+
+ Even with all biases b i b_{i} set to 0 0 , this architecture can realize a k k -wise parity, by setting { w i } = { e j : j ∈ S } \{w_{i}\}=\{e_{j}:j\in S\} in any permutation.
+
+ D.1.5 Details for Figure 1 (left)
+
+ Figure 1 (left) shows training curves from 8 representative configurations, with online i.i.d. samples from the same distribution, corresponding to the ( n = 50 , k = 3 ) (n=50,k=3) -sparse parity problem. The first row encompasses various MLP settings with standard activations:
+
+ • 
+ 
+ Setting (i): width- 10 10 MLP with ReLU activation ( B = 32 , η = 0.5 B=32,\eta=0.5 ).
+
+ • 
+ 
+ Setting (i): width- 10 10 MLP with ReLU activation, with large batches ( B = 1024 , η = 0.05 B=1024,\eta=0.05 ).
+
+ • 
+ 
+ Setting (ii): width- 100 100 MLP with ReLU activation, with tiny batches ( B = 1 , η = 0.05 B=1,\eta=0.05 ).
+
+ • 
+ 
+ Setting (iv): width- 10 10 MLP with polynomial σ ⁡ ( z ) = z 3 \sigma(z)=z^{3} activation ( B = 32 , η = 0.05 B=32,\eta=0.05 ).
+
+ The second row shows other settings:
+
+ • 
+ 
+ Setting (vii): width- 1 1 MLP with a piecewise linear k k -zigzag activation ( B = 32 , η = 0.2 B=32,\eta=0.2 ).
+
+ • 
+ 
+ Setting (x): width- 1 1 MLP with a sinusoidal activation (scaled and shifted for k = 3 k=3 ; see the discussion in Section D.1.2 ) ( B = 32 , η = 0.05 B=32,\eta=0.05 ).
+
+ • 
+ 
+ Setting (*iii): Parity Transformer, with d emb = 1024 , d attn = 8 , H = 128 d_{\mathrm{emb}}=1024,d_{\mathrm{attn}}=8,H=128 ( B = 32 , η = 5 × 10 − 4 B=32,\eta=5\times 10^{-4} ).
+
+ • 
+ 
+ Setting (xv): degree- 3 3 PolyNet ( B = 32 , η = 0.07 B=32,\eta=0.07 ).
+
+ D.1.6 Details for Figure 6 
+
+ The first row uses the width- 10 10 ReLU MLP configuration ( i ​ i ) (ii) , holding B = 32 B=32 and η = 0.1 \eta=0.1 while varying the task difficulty across 6 settings: ( n , k ) ∈ { ( 30 , 3 ) , ( 60 , 3 ) , ( 90 , 3 ) , ( 30 , 4 ) , ( 30 , 5 ) , ( 30 , 6 ) } (n,k)\in\{(30,3),(60,3),(90,3),(30,4),(30,5),(30,6)\} . The remaining plots are all for the ( 50 , 3 ) (50,3) setting.
+
+ The second row uses the k = 3 k=3 PolyNet configuration ( x ​ v ) (xv) , varying ( B , η ) ∈ { ( 1 , 0.005 ) , ( 4 , 0.01 ) , ( 16 , 0.1 ) , ( 64 , 0.1 ) , ( 256 , 0.1 ) , ( 1024 , 0.1 ) } (B,\eta)\in\{(1,0.005),(4,0.01),(16,0.1),\allowbreak(64,0.1),(256,0.1),(1024,0.1)\} .
+
+ The third row uses the minimally-wide configurations (*i), (*ii), (vii), (viii), (xi), (xii) (thus presenting an example for each non-standard activation), holding batch size B = 1 B=1 . η = 0.1 \eta=0.1 in each of the cases except (*ii), where η = 0.01 \eta=0.01 .
+
+ The fourth row uses three large architectures: settings (iii), (vi), and (*iii), with ( B , η ) ∈ { ( 1 , 0.1 ) , ( 1024 , 0.1 ) , ( 1 , 0.001 ) , ( 1024 , 0.01 ) , ( 32 , 0.0003 ) , ( 1024 , 0.0003 ) . } (B,\eta)\in\{(1,0.1),(1024,0.1),\allowbreak(1,0.001),(1024,0.01),(32,0.0003),(1024,0.0003).\} (*iii) uses the Adam optimizer instead of SGD.
+
+ D.1.7 Details for Figure 10 
+
+ Figure 10 contains scaling plots in various settings for the median convergence time t c t_{c} . Below, we give comprehensive details about these settings. For each of these runs, we chose B = 32 B=32 (settings with smaller batch sizes exhibited additional variance; with larger batch sizes, the models were slower to converge), as well as the hinge loss. We used SGD with constant learning rate η \eta (enumerated below), except in setting (*iii).
+
+ The top row shows MLP settings (i) through (vi). From left to right:
+
+ • 
+ 
+ Setting (i): width- 10 10 MLP with ReLU activation ( η = 1 \eta=1 ).
+
+ • 
+ 
+ Setting (ii): width- 100 100 MLP with ReLU activation ( η = 1 \eta=1 ).
+
+ • 
+ 
+ Setting (iii): width- 1000 1000 MLP with ReLU activation ( η = 1 \eta=1 ).
+
+ • 
+ 
+ Setting (iv): width- 10 10 MLP with σ ⁡ ( z ) = z k \sigma(z)=z^{k} activation ( η = 0.01 \eta=0.01 ).
+
+ • 
+ 
+ Setting (v): width- 100 100 MLP with σ ⁡ ( z ) = z k \sigma(z)=z^{k} activation ( η = 0.01 \eta=0.01 ).
+
+ • 
+ 
+ Setting (vi): width- 1000 1000 MLP with σ ⁡ ( z ) = z k \sigma(z)=z^{k} activation ( η = 0.01 \eta=0.01 ).
+
+ The bottom row shows miscellaneous settings. From left to right:
+
+ • 
+ 
+ Setting (vii): width- 1 1 MLP with degree- k k oscillating polynomial activation interpolating the parity function ( η = 0.01 \eta=0.01 ).
+
+ • 
+ 
+ Setting (xiv): single sinusoidal neuron with no second layer ( η = 0.01 \eta=0.01 ).
+
+ • 
+ 
+ Setting (*iii): Parity Transformer, with d emb = 1024 , d attn = 8 , H = 128 d_{\mathrm{emb}}=1024,d_{\mathrm{attn}}=8,H=128 ( B = 32 , η = 3 × 10 − 4 B=32,\eta=3\times 10^{-4} ).
+
+ • 
+ 
+ Setting (iv): degree- k k PolyNet ( η = 0.05 \eta=0.05 ).
+
+ • 
+ 
+ Setting (ii): width- 100 100 MLP with ReLU activation ( η = 1 \eta=1 ), showing an expanded range of n n for smaller k k .
+
+ • 
+ 
+ Setting (xv): width- 100 100 MLP with σ ⁡ ( z ) = z k \sigma(z)=z^{k} activation ( η = 1 \eta=1 ), showing an expanded range of n n for smaller k k .
+
+ D.2 Training curves and convergence time plots
+
+ For all example training curves in all figures (in Sections 3 and 5 , as well as the appendix), population losses and accuracies are approximated using a batch of size 8192 8192 , sampled once at the beginning of training from the same distribution 𝒟 S \mathcal{D}_{S} . All plots of single representative training runs use a fixed random seed ( torch.manual_seed(0) ); when R R training runs are shown, seeds 0 , … , R − 1 0,\ldots,R-1 are used.
+
+ In Figures 7 and 8 , validation accuracies were recorded every 10 10 iterations, and a run was recorded as converged if it reached 100 % 100\% accuracy within 10 5 10^{5} iterations; we report the 10 th 10^{\text{th}} percentile over 25 random seeds, to reduce variance arising from the more initialization-sensitive settings. In Figure 9 , coarse-grained scaling estimates for the ( 10 th 10^{\text{th}} percentile) convergence time are computed as follows: for n ∈ 𝒩 := { 10 , 20 , 30 } n\in\mathcal{N}:=\{10,20,30\} , the smallest α \alpha is chosen such that t c ≤ c ⋅ ( n − n 0 ) α t_{c}\leq c\cdot(n-n_{0})^{\alpha} , choosing n 0 = min ⁡ 𝒩 − 1 = 9 n_{0}=\min\mathcal{N}-1=9 , so that c = t c c=t_{c} at n = 10 n=10 . These estimates are calculated to give quantitative order-of-magnitude upper bounds for the convergence time. Indeed, the power-law convergence times do not extrapolate at a constant learning rate; see Figure 2 (right) , the “larger n n ” plots in Figure 10 , and the discussion on batch sizes and learning rates in Appendix C.2 .
+
+ To reduce computational load, for the larger-scale probes of convergence times t c t_{c} , validation accuracies were instead checked on a sample of size 128 128 . For the underparameterized networks (i.e. unable to represent parity, but can still get a meaningful gradient signal), this threshold was changed to 10 10 consecutive batches with accuracy at least 55 % 55\% .
+Note that for parity learning in particular, a weak learner can be converted into a strong learner: there is an efficient algorithm ( Goldreich and Levin, 1989 , Kushilevitz and Mansour, 1993 ) which, given a classifier which achieves 1 / 2 + ϵ 1/2+\epsilon accuracy on 𝒟 S \mathcal{D}_{S} for a constant ϵ > 0 \epsilon>0 , outputs S S with high probability.
+
+ In the median convergence time plots in Figure 1 (right) , Figure 2 (right) , and Figure 10 , error bars for median convergence times in all plots are 95 % 95\% confidence intervals, computed from 100 100 bootstrap samples. Each point on the each curve corresponds to 1000 1000 random trials. Halted curves signify more than 50 % 50\% of runs failing to converge within T = 10 5 T=10^{5} iterations (hence, infinite medians).
+
+ D.3 Implementation, hardware, and compute time
+
+ All training experiments were implemented using PyTorch ( Paszke et al., 2019 ) .
+
+ Although most of the networks considered in the main empirical results are relatively small, a large ( ∼ 10 8 \sim 10^{8} ) total number of models were trained to certify the “robust space” of results and obtain precise scaling curves. These individual experiments were not large enough to benefit from GPU acceleration; on an internal cluster, the CPU compute expenditure totaled approximately 1500 1500 CPU hours.
+
+ A subset of these experiments stood to benefit from GPU acceleration: width r ≥ 100 r\geq 100 MLPs; scaling behaviors for n ≥ 100 n\geq 100 ; all experiments involving Transformers. These were performed with NVIDIA Tesla P100, Tesla P40, and RTX A6000 GPUs on an internal cluster, consuming a total of approximately 200 200 GPU hours.

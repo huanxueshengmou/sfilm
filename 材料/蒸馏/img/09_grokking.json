@@ -1,0 +1,42 @@
+[
+ {
+  "file": "09_grokking_01.png",
+  "w": 784,
+  "h": 687,
+  "bytes": 141877,
+  "src": "https://arxiv.org/html/2310.06110v1/a.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "09_grokking_02.png",
+  "w": 794,
+  "h": 677,
+  "bytes": 164047,
+  "src": "https://arxiv.org/html/2310.06110v1/b.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "09_grokking_03.png",
+  "w": 782,
+  "h": 639,
+  "bytes": 129521,
+  "src": "https://arxiv.org/html/2310.06110v1/c.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "09_grokking_04.png",
+  "w": 768,
+  "h": 576,
+  "bytes": 61455,
+  "src": "https://arxiv.org/html/2310.06110v1/grokking_heatmap.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "09_grokking_05.png",
+  "w": 1500,
+  "h": 375,
+  "bytes": 33443,
+  "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+  "alt": "Simons Foundation International"
+ }
+]

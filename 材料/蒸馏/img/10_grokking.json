@@ -1,0 +1,26 @@
+[
+ {
+  "file": "10_grokking_01.png",
+  "w": 651,
+  "h": 479,
+  "bytes": 26272,
+  "src": "https://arxiv.org/html/2309.07311v1/images_new/correlation_blimp.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "10_grokking_02.png",
+  "w": 2023,
+  "h": 645,
+  "bytes": 354690,
+  "src": "https://arxiv.org/html/2309.07311v1/multiphase_loss_uas_blimp_step.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "10_grokking_03.png",
+  "w": 1500,
+  "h": 375,
+  "bytes": 33443,
+  "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+  "alt": "Simons Foundation International"
+ }
+]

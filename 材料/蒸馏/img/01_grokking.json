@@ -1,0 +1,98 @@
+[
+ {
+  "file": "01_grokking_01.png",
+  "w": 1228,
+  "h": 921,
+  "bytes": 97373,
+  "src": "https://arxiv.org/html/2201.02177v1/images/gen_beyond_overfitting_acc.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "01_grokking_02.png",
+  "w": 1228,
+  "h": 921,
+  "bytes": 138774,
+  "src": "https://arxiv.org/html/2201.02177v1/images/compute.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "01_grokking_03.png",
+  "w": 496,
+  "h": 510,
+  "bytes": 28123,
+  "src": "https://arxiv.org/html/2201.02177v1/images/puzzle.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "01_grokking_04.png",
+  "w": 1920,
+  "h": 960,
+  "bytes": 177623,
+  "src": "https://arxiv.org/html/2201.02177v1/images/ablations.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "01_grokking_05.png",
+  "w": 1920,
+  "h": 960,
+  "bytes": 183819,
+  "src": "https://arxiv.org/html/2201.02177v1/images/variety.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "01_grokking_06.png",
+  "w": 807,
+  "h": 560,
+  "bytes": 101391,
+  "src": "https://arxiv.org/html/2201.02177v1/images/s5_unembedding_tsne.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "01_grokking_07.png",
+  "w": 598,
+  "h": 517,
+  "bytes": 82739,
+  "src": "https://arxiv.org/html/2201.02177v1/images/addition_unembedding_tsne_cropped.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "01_grokking_08.png",
+  "w": 432,
+  "h": 288,
+  "bytes": 28407,
+  "src": "https://arxiv.org/html/2201.02177v1/images/gen_beyond_overfitting_loss.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "01_grokking_09.png",
+  "w": 3840,
+  "h": 3840,
+  "bytes": 1044340,
+  "src": "https://arxiv.org/html/2201.02177v1/images/addition_symbols.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "01_grokking_10.png",
+  "w": 1920,
+  "h": 768,
+  "bytes": 125757,
+  "src": "https://arxiv.org/html/2201.02177v1/images/noise.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "01_grokking_11.png",
+  "w": 576,
+  "h": 288,
+  "bytes": 17632,
+  "src": "https://arxiv.org/html/2201.02177v1/images/acc_by_sharpness.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "01_grokking_12.png",
+  "w": 1500,
+  "h": 375,
+  "bytes": 33443,
+  "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+  "alt": "Simons Foundation International"
+ }
+]

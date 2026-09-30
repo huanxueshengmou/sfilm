@@ -1,0 +1,90 @@
+[
+ {
+  "file": "05_grokking_01.png",
+  "w": 728,
+  "h": 224,
+  "bytes": 17008,
+  "src": "https://arxiv.org/html/2207.08799v1/figures/disjoint-polynet-plot.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "05_grokking_02.png",
+  "w": 1680,
+  "h": 1200,
+  "bytes": 545871,
+  "src": "https://arxiv.org/html/2207.08799v1/extra-examples.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "05_grokking_03.png",
+  "w": 1800,
+  "h": 1080,
+  "bytes": 280010,
+  "src": "https://arxiv.org/html/2207.08799v1/converge_time_table.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "05_grokking_04.png",
+  "w": 1800,
+  "h": 1080,
+  "bytes": 169285,
+  "src": "https://arxiv.org/html/2207.08799v1/converge_probs.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "05_grokking_05.png",
+  "w": 1800,
+  "h": 1080,
+  "bytes": 371148,
+  "src": "https://arxiv.org/html/2207.08799v1/scaling_table.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "05_grokking_06.png",
+  "w": 1680,
+  "h": 720,
+  "bytes": 373724,
+  "src": "https://arxiv.org/html/2207.08799v1/hidden_progress_sin.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "05_grokking_07.png",
+  "w": 1680,
+  "h": 720,
+  "bytes": 440372,
+  "src": "https://arxiv.org/html/2207.08799v1/hidden_progress_mlp.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "05_grokking_08.png",
+  "w": 1680,
+  "h": 1200,
+  "bytes": 311854,
+  "src": "https://arxiv.org/html/2207.08799v1/grokking_all.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "05_grokking_09.png",
+  "w": 1680,
+  "h": 1440,
+  "bytes": 634947,
+  "src": "https://arxiv.org/html/2207.08799v1/noisy.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "05_grokking_10.png",
+  "w": 1680,
+  "h": 960,
+  "bytes": 353058,
+  "src": "https://arxiv.org/html/2207.08799v1/poly_no_plateau.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "05_grokking_11.png",
+  "w": 1500,
+  "h": 375,
+  "bytes": 33443,
+  "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+  "alt": "Simons Foundation International"
+ }
+]

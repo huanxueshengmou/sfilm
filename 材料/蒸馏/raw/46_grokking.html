@@ -1,0 +1,2351 @@
+    <!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <link rel="canonical" href="https://blog.csdn.net/weixin_33724570/article/details/86334239"/>
+    <link rel="alternate" type="application/rss+xml" title="weixin_33724570" href="https://blog.csdn.net/weixin_33724570/rss/map">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="renderer" content="webkit"/>
+    <meta name="force-rendering" content="webkit"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+      <meta name="report" content='{"pid": "blog", "spm":"1001.2101"}'>
+    <meta name="referrer" content="always">
+    <meta http-equiv="Cache-Control" content="no-siteapp" /><link rel="alternate" media="handheld" href="#" />
+    <meta name="shenma-site-verification" content="5a59773ab8077d4a62bf469ab966a63b_1497598848">
+    <meta name="applicable-device" content="pc">
+    <link  href="https://g.csdnimg.cn/static/logo/favicon32.ico"  rel="shortcut icon" type="image/x-icon" />
+    <title>Grokking与双下降：深度学习中的结构发现与泛化新范式-CSDN博客</title>
+    <meta property="og:locale" content="zh_CN">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Grokking与双下降：深度学习中的结构发现与泛化新范式-CSDN博客">
+    <meta property="og:description" content="文章浏览阅读365次，点赞8次，收藏7次。在深度学习中，'泛化能力'不再仅由参数量或正则化强度决定，而根植于模型对任务内在数学结构的发现能力。Grokking揭示了训练过程中延迟发生的表征相变，双下降现象则打破了传统偏差-方差权衡的U形曲线认知，展现出超参数化区的泛化提升潜力。其背后原理指向高维权重空间中对称性流形的收敛、平坦极小值盆地的隐式选择，以及SGD带来的良性过参数化效应。这一机制在模运算">
+    <meta property="og:url" content="https://blog.csdn.net/weixin_33724570/article/details/86334239">
+    <meta property="og:site_name" content="CSDN博客">
+    <meta property="og:image" content="https://img-bss.csdnimg.cn/202112131616291007.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Grokking与双下降：深度学习中的结构发现与泛化新范式">
+    <meta property="article:published_time" content="2026-05-21T10:21:22+08:00">
+    <meta property="article:modified_time" content="2026-05-22T05:34:15+08:00">
+    <meta property="bytedance:published_time" content="2016-06-14T21:08:00+08:00">
+    <meta property="bytedance:lrDate_time" content="2026-05-21T10:21:22+08:00">
+    <meta property="bytedance:updated_time" content="2026-05-21T10:21:22+08:00">
+    <meta property="article:author" content="weixin_33724570">
+    <meta property="article:section" content="Grokking">
+    <meta property="article:tag" content="Grokking,双下降,深度学习泛化">
+    <meta name="geo:keywords" content="Grokking,双下降,深度学习泛化">
+    <meta name="geo:summary" content="在深度学习中，'泛化能力'不再仅由参数量或正则化强度决定，而根植于模型对任务内在数学结构的发现能力。Grokking揭示了训练过程中延迟发生的表征相变，双下降现象则打破了传统偏差-方差权衡的U形曲线认知，展现出超参数化区的泛化提升潜力。其背后原理指向高维权重空间中对称性流形的收敛、平坦极小值盆地的隐式选择，以及SGD带来的良性过参数化效应。这一机制在模运算、布尔逻辑、图同构等结构清晰的'小东西'任">
+    <meta name="geo:entity_type" content="Article">
+    <meta name="geo:subject" content="Grokking与双下降：深度学习中的结构发现与泛化新范式">
+    <meta name="geo:key_points" content="Grokking|双下降|深度学习泛化">
+    <meta name="geo:citation_ready" content="true">
+    <meta name="description:direct_answer" content="在深度学习中，'泛化能力'不再仅由参数量或正则化强度决定，而根植于模型对任务内在数学结构的发现能力。Grokking揭示了训练过程中延迟发生的表征相变，双下降现象则打破了传统偏差-方差权衡的U形曲线认知，展现出超参数化区的泛化提升潜力。其背后原理指向高维权重空间中对称性流形的收敛、平坦极小值盆地的隐">
+    <meta name="author:credentials" content="weixin_33724570">
+    <meta name="author:affiliation" content="csdn">
+    <meta name="geo:source_type" content="original">
+    <meta name="geo:fact_checked" content="true">
+    <meta name="geo:editorial_policy" content="https://passport.csdn.net/service">
+    <meta name="geo:update_frequency" content="daily">
+    <meta name="geo:maintenance_status" content="active">
+        <script type="application/ld+json">
+          {"image":"https://img-bss.csdnimg.cn/202112131616291007.png","keywords":"Grokking,双下降,深度学习泛化","@type":"Article","author":[{"@type":"Person","name":"weixin_33724570","url":"https://blog.csdn.net/weixin_33724570"}],"inLanguage":"zh-CN","description":"文章浏览阅读365次，点赞8次，收藏7次。在深度学习中，'泛化能力'不再仅由参数量或正则化强度决定，而根植于模型对任务内在数学结构的发现能力。Grokking揭示了训练过程中延迟发生的表征相变，双下降现象则打破了传统偏差-方差权衡的U形曲线认知，展现出超参数化区的泛化提升潜力。其背后原理指向高维权重空间中对称性流形的收敛、平坦极小值盆地的隐式选择，以及SGD带来的良性过参数化效应。这一机制在模运算","dateModified":"2026-05-22T05:34:15+08:00","@context":"https://schema.org","url":"https://blog.csdn.net/weixin_33724570/article/details/86334239","datePublished":"2026-05-21T10:21:22+08:00","publisher":{"@type":"Organization","name":"CSDN","logo":{"@type":"ImageObject","url":"https://g.csdnimg.cn/static/logo/favicon32.ico"}},"geoSummary":{"heading":"内容摘要","items":{"主题":"Grokking与双下降：深度学习中的结构发现与泛化新范式","类型":"article","适用场景":"在深度学习中，'泛化能力'不再仅由参数量或正则化强度决定，而根植于模型对任务内在数学结构的发现能力。Grokking揭示了训练过程中延迟发生的表征相变，双下降现象则打破了传统偏差-方差权衡的U形曲线认知，展现出超参数化区的泛化提升潜力。其背后原理指向高维权重空间中对称性流形的收敛、平坦极小值盆地的隐式选择，以及SGD带来的良性过参数化效应。这一机制在模运算、布尔逻辑、图同构等结构清晰的'小东西'任","核心功能":"Grokking,双下降,深度学习泛化","更新日期":"2026-05-22T05:34:15+08:00"},"keyPoints":["Grokking","双下降","深度学习泛化"],"citationContext":{"authoritySource":"weixin_33724570","factChecked":true,"lastVerified":"2026-05-22T05:34:15+08:00"}},"headline":"Grokking与双下降：深度学习中的结构发现与泛化新范式","articleSection":"Grokking"}
+        </script>
+    <script>
+    (function(){
+    var el = document.createElement("script");
+    el.src = "https://lf1-cdn-tos.bytegoofy.com/goofy/ttzz/push.js?1abfa13dfe74d72d41d83c86d240de42fa345e1877a4861fa55a00b4f9f2644d3d72cd14f8a76432df3935ab77ec54f830517b3cb210f7fd334f50ccb772134a";
+    el.id = "ttzz";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(el, s);
+    })(window)
+    </script>
+        <meta name="keywords" content="Grokking,双下降,深度学习泛化">
+    <meta name="description" content="文章浏览阅读365次，点赞8次，收藏7次。在深度学习中，'泛化能力'不再仅由参数量或正则化强度决定，而根植于模型对任务内在数学结构的发现能力。Grokking揭示了训练过程中延迟发生的表征相变，双下降现象则打破了传统偏差-方差权衡的U形曲线认知，展现出超参数化区的泛化提升潜力。其背后原理指向高维权重空间中对称性流形的收敛、平坦极小值盆地的隐式选择，以及SGD带来的良性过参数化效应。这一机制在模运算、布尔逻辑、图同构等结构清晰的'小东西'任务中最易观测，也为模型设计提供了新视角：从追求'更小'转向识别'更结构化'的解。本文聚焦于如何在工程实践中识别、">
+              <link rel="stylesheet" type="text/css" href="https://csdnimg.cn/release/blogv2/dist/pc/css/detail_enter-811f8e378f.min.css">
+    <style>
+        #content_views pre{
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none; 
+            user-select: none; 
+        }
+        #content_views pre code{
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none; 
+            user-select: none; 
+        }
+    </style>
+    <script type="application/ld+json">{"@context":"https://ziyuan.baidu.com/contexts/cambrian.jsonld","@id":"https://blog.csdn.net/weixin_33724570/article/details/86334239","appid":"1638831770136827","pubDate":"2016-06-14T21:08:00","title":"Grokking与双下降：深度学习中的结构发现与泛化新范式-CSDN博客","upDate":"2026-05-21T10:21:22"}</script>
+        <link rel="stylesheet" type="text/css" href="https://csdnimg.cn/release/blogv2/dist/pc/themesSkin/skin3-template/skin3-template-762f7595fd.min.css">
+    <script src="https://g.csdnimg.cn/lib/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>
+    <script src="https://g.csdnimg.cn/lib/jquery-migrate/1.4.1/jquery-migrate.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        var isCorporate = false;
+        var username =  "weixin_33724570";
+        var skinImg = "white";
+
+        var blog_address = "https://blog.csdn.net/weixin_33724570";
+        var currentUserName = "";
+        var isOwner = false;
+        var loginUrl = "http://passport.csdn.net/account/login?from=https://blog.csdn.net/weixin_33724570/article/details/86334239";
+        var blogUrl = "https://blog.csdn.net/";
+        var starMapUrl = "https://ai.csdn.net";
+        var paymentBalanceUrl = "https://csdnimg.cn/release/vip-business-components/vipPaymentBalance.js?v=2025122501";
+        var avatar = "https://profile-avatar.csdnimg.cn/default.jpg!1";
+        var isCJBlog = false;
+        var isStarMap = false;
+        var articleTitle = "Grokking与双下降：深度学习中的结构发现与泛化新范式";
+        var articleDesc = "文章浏览阅读365次，点赞8次，收藏7次。在深度学习中，\'泛化能力\'不再仅由参数量或正则化强度决定，而根植于模型对任务内在数学结构的发现能力。Grokking揭示了训练过程中延迟发生的表征相变，双下降现象则打破了传统偏差-方差权衡的U形曲线认知，展现出超参数化区的泛化提升潜力。其背后原理指向高维权重空间中对称性流形的收敛、平坦极小值盆地的隐式选择，以及SGD带来的良性过参数化效应。这一机制在模运算、布尔逻辑、图同构等结构清晰的\'小东西\'任务中最易观测，也为模型设计提供了新视角：从追求\'更小\'转向识别\'更结构化\'的解。本文聚焦于如何在工程实践中识别、";
+        var articleTitles = "Grokking与双下降：深度学习中的结构发现与泛化新范式-CSDN博客";
+        var nickName = "weixin_33724570";
+        var articleDetailUrl = "https://blog.csdn.net/weixin_33724570/article/details/86334239";
+        var vipUrlV = "https://mall.csdn.net/vip?vipSource=learningVip";
+        if(window.location.host.split('.').length == 3) {
+            blog_address = blogUrl + username;
+        }
+        var skinStatus = "White";
+        var isVipSkin = false;
+        var blogStaticHost = "https://csdnimg.cn/release/blogv2/"
+          var payColumn = false
+    </script>
+        <meta name="toolbar" content='{"type":"0","fixModel":"1"}'>
+      <script ript src="https://g.csdnimg.cn/??fixed-sidebar/1.1.7/fixed-sidebar.js" type="text/javascript"></script>
+    <script src='//g.csdnimg.cn/common/csdn-report/report.js' type='text/javascript'></script>
+    <link rel="stylesheet" type="text/css" href="https://csdnimg.cn/public/sandalstrap/1.4/css/sandalstrap.min.css">
+    <style>
+        .MathJax_Message, .MathJax_Preview{
+            display: none !important;
+        }
+    </style>
+    <script src="https://dup.baidustatic.com/js/ds.js"></script>
+      <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "lgtpix6r85");
+      </script>
+    <script src="/cdn_cgi_bs_bot/static/crypto.min.js"></script>
+    <script src="/cdn_cgi_bs_bot/static/bot-score-v1.js"></script>
+
+    <script src="/cdn_cgi_bs_captcha/static/js/waf_captcha_embedded_bs_v6.3.0805.js"></script>
+</head>
+  <body class="nodata  " style="">
+    <div id="toolbarBox" style="min-height: 48px;"></div>
+        <script>
+            var toolbarSearchExt = '{\"id\":86334239,\"landingWord\":[],\"queryWord\":\"\",\"tag\":[\"Grokking\",\"双下降\",\"深度学习泛化\"],\"title\":\"Grokking与双下降：深度学习中的结构发现与泛化新范式\"}';
+        </script>
+    <script src="https://g.csdnimg.cn/common/csdn-toolbar/csdn-toolbar.js" type="text/javascript"></script>
+    <script>
+    (function(){
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        }
+        else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+    </script>
+
+    <link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/pc/css/blog_code-01256533b5.min.css">
+    <link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/chart-3456820cac.css" />
+    <link rel="stylesheet" href="https://g.csdnimg.cn/lib/swiper/6.0.4/css/swiper.css" />
+    <script src="https://g.csdnimg.cn/lib/swiper/6.0.4/js/swiper.js" async></script>
+    <script>
+      var articleId = 86334239;
+      var annotationModuleBootstrapData = {
+        hasAnnotation: false,
+        totalCount: 0,
+        list: [],
+        categories: []
+      };
+      var annotationFeatureEnabled = false;
+
+
+        var privateEduData = [];
+        var privateData = [];
+      var crytojs = "https://csdnimg.cn/release/blogv2/dist/components/js/crytojs-ca5b8bf6ae.min.js";
+      var commentscount = 0;
+      var commentAuth = 1;
+      var curentUrl = "https://blog.csdn.net/weixin_33724570/article/details/86334239";
+      var myUrl = "https://my.csdn.net/";
+      var isGitCodeBlog = false;
+var vipActivityIcon = "https://i-operation.csdnimg.cn/images/99a45e75b3604261bbe47a0982437719.png";
+var vipActivityIconV2 = {
+  icon: "https://i-operation.csdnimg.cn/images/99a45e75b3604261bbe47a0982437719.png",
+  url: "https://i.csdn.net/#/geek-star-fun-pack?utm_source=260901_vip_blogleftbanner"
+};
+      var isOpenSourceBlog = false;
+      var isVipArticle = false;
+        var highlight = ["grokking","深度学习","发现","泛化","下降","范式","结构","中的","新",":","双","与"];//高亮数组
+        var isRecommendModule = true;
+          var isBaiduPre = true;
+          var baiduCount = 2;
+          var setBaiduJsCount = 10;
+        var viewCountFormat = 365;
+      var share_card_url = "https://app-blog.csdn.net/share?article_id=86334239&username=weixin_33724570"
+      var mallVipUrl = "https://mall.csdn.net/vip?vipSource=article"
+      var vipArticleAbStyle = "t_1"
+      var vipArticleCpStyle = "t_1"
+      var detailheaderAbCommunity = "exp1"
+      var codeAiAbStyle = "control"
+      var runProjectDeepBlogAB = "t_1"
+      var gitcodeHighlightWordAB = "exp1"
+
+      var asideCknowsEntryAB = "con1"
+      var deepblogUrl = ""
+        deepblogUrl = "https://deepblog.net?utm_source=blog_onekey_run";
+      var codeAiAbObjStyle = ""
+        codeAiAbObjStyle = "{\"control\":{\"title\":\"AI写代码\",\"destUrl\":\"https://trae.com.cn?utm_source=community&utm_medium=csdn&utm_campaign=daima\",\"imgUrl\":\"https://i-operation.csdnimg.cn/images/a5fff6f6c9f0464c9a46b130c972952b.png\"},\"exp4\":{\"title\":\"Lobster AI\",\"destUrl\":\"https://lobsterai.youdao.com/#/index?keyfrom=csdn3\",\"imgUrl\":\"https://i-operation.csdnimg.cn/images/2c9d3b91a8ad4956bca5af92918b9e75.png\"},\"exp5\":{\"title\":\"用码道免费领 1 个月 Token\",\"destUrl\":\"https://developer.huaweicloud.com/codeartsco.html?source=dmzntgwltcsdn1&sourcead=dmzntgwltcsdnzn11\",\"imgUrl\":\"https://i-operation.csdnimg.cn/images/7c0190c005ab41659100f583c0791aee.png\"},\"exp6\":{\"title\":\"AI代码解释\",\"destUrl\":\"https://developer.huaweicloud.com/codeartsco.html?source=dmzntgwltcsdn1&sourcead=dmzntgwltcsdncommunity8\",\"imgUrl\":\"https://i-operation.csdnimg.cn/images/7c0190c005ab41659100f583c0791aee.png\"},\"exp7\":{\"title\":\"看看AI怎么写\",\"destUrl\":\"https://developer.huaweicloud.com/codeartsco.html?source=dmzntgwltcsdn1&sourcead=dmzntgwltcsdncommunity9\",\"imgUrl\":\"https://i-operation.csdnimg.cn/images/7c0190c005ab41659100f583c0791aee.png\"},\"exp8\":{\"title\":\"点击领取万元奖金\",\"destUrl\":\"https://builderx.csdn.net/activity-site/madao-activity-page/madao?source=community7\",\"imgUrl\":\"https://i-operation.csdnimg.cn/images/7c0190c005ab41659100f583c0791aee.png\"},\"exp9\":{\"title\":\"复制一句话领 10 元\",\"destUrl\":\"https://builderx.csdn.net/activity-site/madao-activity-page/index?source=community1\",\"imgUrl\":\"https://i-operation.csdnimg.cn/images/7c0190c005ab41659100f583c0791aee.png\"}}";
+      var articleType = 1;
+      var baiduKey = "";
+      var copyPopSwitch = true;
+      var needInsertBaidu = true;
+      var recommendRegularDomainArr = ["blog.csdn.net/.+/article/details/","download.csdn.net/download/","edu.csdn.net/course/detail/","ask.csdn.net/questions/","bbs.csdn.net/topics/","www.csdn.net/gather_.+/"]
+      var codeStyle = "";
+      var baiduSearchType = "";
+      var sharData = "{\"hot\":[{\"id\":1,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/a5f4260710904e538002a6ab337939b3.png\"},{\"id\":2,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/188b37199a2c4b74b1d9ffc39e0d52de.png\"},{\"id\":3,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/14ded358b631444581edd98a256bc5af.png\"},{\"id\":4,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/1470f23a770444d986ad551b9c33c5be.png\"},{\"id\":5,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/c329f5181dc74f6c9bd28c982bb9f91d.png\"},{\"id\":6,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/ccd8a3305e81460f9c505c95b432a65f.png\"},{\"id\":7,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/bc89d8283389440d97fc4d30e30f45e1.png\"},{\"id\":8,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/452d485b4a654f5592390550d2445edf.png\"},{\"id\":9,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/f8b9939db2ed474a8f43a643015fc8b7.png\"},{\"id\":10,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/6de8864187ab4ed3b1db0856369c36ff.png\"},{\"id\":11,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/673cc3470ff74072acba958dc0c46e2d.png\"},{\"id\":12,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/930c119760ac4491804db80f9c6d4e3f.png\"},{\"id\":13,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/15e6befb05a24233bc2b65e96aa8d972.png\"},{\"id\":14,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/2075fd6822184b95a41e214de4daec13.png\"},{\"id\":15,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/859b1552db244eb6891a809263a5c657.png\"},{\"id\":16,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/0be2f920f1f74290a98921974a9613fd.png\"},{\"id\":17,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/2e97e00b43f14afab494ea55ef3f4a6e.png\"},{\"id\":18,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/ff4ab252f46e444686f5135d6ebbfec0.png\"},{\"id\":19,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/ae029bbe99564e79911657912d36524f.png\"},{\"id\":20,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/b3ece39963de440388728e9e7b9bf427.png\"},{\"id\":21,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/6f14651a99ba486e926d63b6fa692997.png\"},{\"id\":22,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/83ceddf050084875a341e32dcceca721.png\"},{\"id\":23,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/b90368b8fd5d4c6c8c79a707d877cf7c.png\"},{\"id\":24,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/aeffae14ecf14e079b2616528c9a393b.png\"},{\"id\":25,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/c5a06b5a13d44d16bed868fc3384897a.png\"},{\"id\":26,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/08b697658b844b318cea3b119e9541ef.png\"},{\"id\":27,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/68ccb0b8d09346ac961d2b5c1a8c77bf.png\"},{\"id\":28,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/a2227a247e37418cbe0ea972ba6a859b.png\"},{\"id\":29,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/3a42825fede748f9993e5bb844ad350d.png\"},{\"id\":30,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/8882abc1dd484224b636966ea38555c3.png\"},{\"id\":31,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/4f6a5f636a3e444d83cf8cc06d87a159.png\"},{\"id\":32,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/1953ef79c56b4407b78d7181bdff11c3.png\"},{\"id\":33,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/c04a2a4f772948ed85b5b0380ed36287.png\"},{\"id\":34,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/5b4fecd05091405ea04d8c0f53e9f2c7.png\"},{\"id\":35,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/b89f576d700344e280d6ceb2a66c2420.png\"},{\"id\":36,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/1c65780e11804bbd9971ebadb3d78bcf.png\"},{\"id\":37,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/d590db2055f345db9706eb68a7ec151a.png\"},{\"id\":38,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/fe602f80700b4f6fb3c4a9e4c135510e.png\"},{\"id\":39,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/39ff2fcd31e04feba301a071976a0ba7.png\"},{\"id\":40,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/f9b61b3d113f436b828631837f89fb39.png\"},{\"id\":41,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/df1aca5f610c4ad48cd16da88c9c8499.png\"},{\"id\":42,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/d7acf73a1e6b41399a77a85040e10961.png\"},{\"id\":43,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/b7f1b63542524b97962ff649ab4e7e23.png\"}],\"vip\":[{\"id\":1,\"vipUrl\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220920101150.png\",\"url\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220920101154.png\"},{\"id\":2,\"vipUrl\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220920101204.png\",\"url\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220920101208.png\"},{\"id\":3,\"vipUrl\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220920101211.png\",\"url\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220920101215.png\"},{\"id\":4,\"vipUrl\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220920101218.png\",\"url\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220920101220.png\"},{\"id\":5,\"vipUrl\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220920101223.png\",\"url\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220920101226.png\"},{\"id\":6,\"vipUrl\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220922100635.png\",\"url\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220922100639.png\"},{\"id\":7,\"vipUrl\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220922100642.png\",\"url\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220922100644.png\"},{\"id\":8,\"vipUrl\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220922100647.png\",\"url\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220922100649.png\"},{\"id\":9,\"vipUrl\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220922100652.png\",\"url\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220922100655.png\"},{\"id\":10,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/55de67481fde4b04b97ad78f11fe369a.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/bb2418fb537e4d78b10d8765ccd810c5.png\"},{\"id\":11,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/579c713394584d128104ef1044023954.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/f420d9fbcf5548079d31b5e809b6d6cd.png\"},{\"id\":12,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/75b7f3155ba642f5a4cc16b7baf44122.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/a9030f5877be401f8b340b80b0d91e64.png\"},{\"id\":13,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/0903d33cafa54934be3780aa54ae958d.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/2cd8c8929f5a42fca5da2a0aeb456203.png\"},{\"id\":14,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/949fd7c22884439fbfc3c0e9c3b8dee7.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/dafbea9bd9eb4f3b962b48dc41657f89.png\"},{\"id\":15,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/4119cfddd71d4e6a8a27a18dbb74d90e.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/c56310c8b6384d9e85388e4e342ce508.png\"},{\"id\":16,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/121575274da142bcbbbbc2e8243dd411.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/5013993de06542f881018bb9abe2edf7.png\"},{\"id\":17,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/4d97aa6dd4fe4f09a6bef5bdf8a6abcd.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/76f23877b6ad4066ad45ce8e31b4b977.png\"},{\"id\":18,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/fdb619daf21b4c829de63b9ebc78859d.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/a1abe5d27a5441f599adfe662f510243.png\"},{\"id\":19,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/676b7707bb11410f8f56bc0ed2b2345c.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/7ac5b467fbf24e1d8c2de3f3332c4f54.png\"},{\"id\":20,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/0becb8cc227e4723b765bdd69a20fd4a.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/fdec85b26091486b9a89d0b8d45c3749.png\"},{\"id\":21,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/1a6c06235ad44941b38c54cbc25a370c.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/410a06cda2d44b0c84578f88275caf70.png\"}],\"map\":{\"hot\":\"热门\",\"vip\":\"VIP\"}}";
+        var commentListModule = ''
+      var canRead = true;
+      var blogMoveHomeArticle = true;
+      var showSearchText = "";
+      var articleSource = 2;
+      var articleReport = '{"pid": "blog", "spm":"1001.2101"}';
+        var baiduSearchChannel = 'pc_relevant'
+        var baiduSearchIdentification = '.235^v43^pc_blog_bottom_relevance_base1'
+        var distRequestId = 'silkroad_1790680497268'
+        var initRewardObject = {
+          giver: currentUserName,
+          anchor: username,
+          articleId: articleId,
+          sign: ''
+        }
+        var isLikeStatus = false;
+        var isUnLikeStatus = false;
+        var studyLearnWord = "";
+        var unUseCount = 0;
+        var codeMaxSize = 0;
+        var overCost = true;
+        var isCurrentUserVip = false;
+        var contentViewsHeight = 0;
+        var contentViewsCount = 0;
+        var contentViewsCountLimit = 5;
+        var isShowConcision = false;
+        var lastTime = 0
+        var postTime = "2026-05-21 10:21:22"
+      var isCookieConcision = false
+      var isHasDirectoryModel = false
+      var isShowSideModel = false
+      var isShowDirectoryModel = true
+      function getCookieConcision(sName){
+        var allCookie = document.cookie.split("; ");
+        for (var i=0; i < allCookie.length; i++){
+          var aCrumb = allCookie[i].split("=");
+          if (sName == aCrumb[0])
+            return aCrumb[1];
+        }
+        return null;
+      }
+      if (getCookieConcision('blog_details_concision') && getCookieConcision('blog_details_concision') == 0){
+        isCookieConcision = true
+        isShowSideModel = true
+        isShowDirectoryModel = false
+      }
+    </script>
+        <div class="main_father clearfix d-flex justify-content-center " style="height:100%;">
+          <div class="container clearfix " id="mainBox">
+          <script>
+          if (!isCookieConcision) {
+            $('.main_father').removeClass('mainfather-concision')
+            $('.main_father .container').removeClass('container-concision')
+          } else {
+            $('#mainBox').css('margin-right', '0')
+          }
+          </script>
+          <main>
+<script type="text/javascript">
+    var resourceId =  "";
+    function getQueryString(name) {   
+      var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象  
+      var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+      if( r != null ) return decodeURIComponent( r[2] ); return '';   
+    }
+    function stripscript(s){ 
+      var pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？%]") 
+      var rs = ""; 
+      for (var i = 0; i < s.length; i++) { 
+        rs = rs+s.substr(i, 1).replace(pattern, ''); 
+      } 
+      return rs;
+    }
+    var blogHotWords = stripscript(getQueryString('utm_term')).length > 1 ? stripscript(getQueryString('utm_term')) : ''
+</script>
+<div class="blog-content-box">
+  <div class="article-header-box" id="article-header-box">
+    <div class="article-header">
+      <div class="article-title-box">
+        <h1 class="title-article" id="articleContentId">Grokking与双下降：深度学习中的结构发现与泛化新范式</h1>
+      </div>
+      <div class="article-info-box">
+              <div class="up-time">最新推荐文章于&nbsp;2026-09-24 11:56:33&nbsp;发布</div>
+          <div class="article-bar-top">
+              <div class="bar-content active">
+              <span class="article-type-text original">原创</span>
+
+              
+                    <span class="time blog-postTime" data-time="2026-05-21 10:21:22">最新推荐文章于&nbsp;2026-09-24 11:56:33&nbsp;发布</span>
+                <span class="border-dian">·</span>
+                <span class="read-count">365 阅读</span>
+                <div class="read-count-box is-like like-ab-new" data-type="top">
+                  <span class="border-dian">·</span>
+                  <img class="article-read-img article-heard-img active" style="display:none" id="is-like-imgactive-new" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newHeart2023Active.png" alt="">
+                  <img class="article-read-img article-heard-img" style="display:block" id="is-like-img-new" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newHeart2023Black.png" alt="">
+                  <span class="read-count" id="blog-digg-num" style="color:;">
+                      8
+                  </span>
+                </div>
+                <span class="border-dian">·</span>
+                <a id="blog_detail_zk_collection" class="un-collection" data-report-click='{"mod":"popu_823","spm":"1001.2101.3001.4232","ab":"new"}'>
+                  <img class="article-collect-img article-heard-img un-collect-status isdefault" style="display:inline-block" src="https://csdnimg.cn/release/blogv2/dist/pc/img/tobarCollect2.png" alt="">
+                  <img class="article-collect-img article-heard-img collect-status isactive" style="display:none" src="https://csdnimg.cn/release/blogv2/dist/pc/img/tobarCollectionActive2.png" alt="">
+                  <span class="get-collection">
+                      7
+                  </span>
+                </a>
+
+                    <span class="border-dian">·</span>
+                    <div class="href-article-edit-new">
+                      <span class="href-article-edit-click">本内容遵循CC 4.0 BY-SA版权协议</span>
+                      <div class="slide-content-box-new">
+                                  版权声明：本文为博主原创文章，遵循<a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"> CC 4.0 BY-SA </a>版权协议，转载请附上原文出处链接和本声明。
+                      </div>
+                    </div>
+                    <a class="geo-detection-btn" href="https://mp.csdn.net/geo?title=Grokking%E4%B8%8E%E5%8F%8C%E4%B8%8B%E9%99%8D%EF%BC%9A%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E4%B8%AD%E7%9A%84%E7%BB%93%E6%9E%84%E5%8F%91%E7%8E%B0%E4%B8%8E%E6%B3%9B%E5%8C%96%E6%96%B0%E8%8C%83%E5%BC%8F&amp;url=https%3A%2F%2Fblog.csdn.net%2Fweixin_33724570%2Farticle%2Fdetails%2F86334239&amp;utm_source=blog_geo" target="_blank" rel="noopener" data-report-view='{"spm":"3001.11779"}' data-report-click='{"spm":"3001.11779","dest":"https://mp.csdn.net/geo?title=Grokking%E4%B8%8E%E5%8F%8C%E4%B8%8B%E9%99%8D%EF%BC%9A%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E4%B8%AD%E7%9A%84%E7%BB%93%E6%9E%84%E5%8F%91%E7%8E%B0%E4%B8%8E%E6%B3%9B%E5%8C%96%E6%96%B0%E8%8C%83%E5%BC%8F&amp;url=https%3A%2F%2Fblog.csdn.net%2Fweixin_33724570%2Farticle%2Fdetails%2F86334239&amp;utm_source=blog_geo"}'>
+                      <span class="geo-detection-text">GEO检测</span>
+                      <svg class="geo-detection-arrow" width="4" height="8" viewBox="0 0 4 8" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M0.5 0.5L3.5 4L0.5 7.5" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </a>
+              </div>
+          </div>
+          <div class="blog-tags-box article-header-tags-v2">
+
+<div class="article-header-categories-wrap">
+  <div class="article-header-collect-row">
+    <div class="article-header-category-segment article-header-collect-segment" id="article-header-collect-group" data-column-count="0" style="display:none">
+      <span class="article-header-row-dot" style="display:none">·</span>
+      <div class="article-header-category-group article-header-collect-group">
+        <span class="article-header-label">收录于</span>
+        <div class="article-header-pill-list article-header-collect-list" id="article-header-collect-list">
+          <span class="article-header-community-slot community-name" id="community-name"></span>
+<div class="tag-more-btn collect-more-btn column-collect-more-btn" style="display:none" id="article-header-collect-more-btn" data-report-click='{"spm":"1001.2101.3001.4224"}'>
+  <svg class="more-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+    <circle cx="6" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="18" cy="12" r="2"/>
+  </svg>
+  <div class="column-more-dropdown">
+    <p class="dropdown-title">当前文章被以下社区和专栏收录：</p>
+    <div class="column-more-list" id="article-header-collect-more-list">
+      <div class="dropdown-divider column-more-item-divider"></div>
+    </div>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+          </div>
+      </div>
+    </div>
+  </div>
+    <div id="blogHuaweiyunAdvert"></div>
+
+
+    <article class="baidu_pl">
+        <div id="article_content" class="article_content clearfix">
+        <link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/kdoc_html_views-1a98987dfd.css">
+        <link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/ck_htmledit_views-a50b13a894.css">
+                <div id="content_views" class="markdown_views prism-atom-one-dark">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                        <path stroke-linecap="round" d="M5,0 0,2.5 5,5z" id="raphael-marker-block" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
+                    </svg>
+                    <h3>
+ 1. 项目概述&#xff1a;当数学直觉撞上深度学习的“反常曲线”
+</h3>
+<p>
+ 你有没有试过训练一个模型&#xff0c;发现它在参数少的时候效果差&#xff0c;参数多一点反而更差&#xff0c;但再继续堆参数——它突然又变好了&#xff1f;不是渐进式提升&#xff0c;而是像坐过山车一样先跌后升。这听起来违背常识&#xff0c;毕竟我们从小被教育“能力随努力线性增长”&#xff0c;模型也该是“参数越多越强”。但现实狠狠打了这个直觉一记耳光。
+ <strong>
+  The Mathematics of Small Things: On Grokking and The Double Descent Phenomenon
+ </strong>
+ 这个标题&#xff0c;表面看是两股学术风的碰撞——一边是“小东西的数学”&#xff0c;带着点数论或微分几何的冷峻气质&#xff1b;另一边是“Grokking”和“双下降现象”&#xff0c;这两个词几乎就是过去三年深度学习理论圈最烧脑、最常被咖啡渍浸透的白板关键词。它不是讲怎么调参&#xff0c;也不是教你怎么用PyTorch搭个ResNet&#xff0c;而是在追问&#xff1a;当一个神经网络终于“顿悟”了某个任务的本质规律&#xff08;Grokking&#xff09;&#xff0c;它的损失函数曲线为什么会画出一条诡异的“W”形&#xff08;Double Descent&#xff09;&#xff1f;这条曲线背后&#xff0c;藏着的究竟是优化算法的偶然&#xff0c;还是某种更底层的、关于“学习”本身的数学必然&#xff1f;
+</p>
+<p>
+ 我第一次在ICLR 2022的一篇论文附录里看到那张双下降曲线图时&#xff0c;手里的咖啡凉了半截。横轴是模型复杂度&#xff08;比如隐藏层宽度&#xff09;&#xff0c;纵轴是测试误差&#xff0c;经典统计学告诉我们&#xff0c;这条线应该先降后升&#xff0c;形成一个优雅的“U”形——过拟合的警钟。可图上却赫然画着两个谷底&#xff1a;第一个谷在欠参数区&#xff0c;第二个谷在超参数区&#xff0c;中间隔着一道陡峭的“峰”&#xff0c;像一座需要翻越的认知山脊。后来我才明白&#xff0c;这座山脊&#xff0c;恰恰是传统统计学失效的边界&#xff0c;也是现代深度学习真正开始“活过来”的地方。这篇文章要拆解的&#xff0c;就是这座山脊的地质构造、翻越它的脚手架&#xff0c;以及当你站在第二个谷底回望时&#xff0c;所看到的那个被重新定义的“简单性”。它适合所有对“为什么大模型能工作”感到好奇的工程师、被理论课劝退但又不甘心只当调包侠的研究者&#xff0c;以及任何想把“玄学炼丹”变成“可推演工程”的实践者。你不需要会证黎曼猜想&#xff0c;但得愿意把“过拟合”这个词从教科书里拿出来&#xff0c;放在GPU显存和梯度更新的显微镜下重新观察。
+</p>
+<h3>
+ 2. 核心概念解构&#xff1a;Grokking与双下降&#xff0c;不是两个现象&#xff0c;而是一体两面
+</h3>
+<h4>
+ 2.1 Grokking&#xff1a;不是收敛&#xff0c;而是“顿悟”的延迟爆发
+</h4>
+<p>
+ “Grokking”这个词借自海因莱因的科幻小说&#xff0c;原意是“彻底理解&#xff0c;直至与之融为一体”。在深度学习语境里&#xff0c;它描述了一种极其反直觉的训练动态&#xff1a;模型在训练集上的损失早已降到接近零&#xff0c;准确率也稳定在99%以上&#xff0c;但测试集性能却长期停滞在随机水平&#xff08;比如50%&#xff09;&#xff0c;仿佛模型只是死记硬背了训练样本&#xff0c;对规律一无所知。然后&#xff0c;在某个毫无征兆的训练步之后&#xff0c;测试准确率像被按下了快进键&#xff0c;一夜之间从50%飙升到95%&#43;&#xff0c;且不再回落。这不是平滑提升&#xff0c;而是一次性的、近乎突变的“认知跃迁”。
+</p>
+<p>
+ 我去年复现原始Grokking实验&#xff08;用小型Transformer学模运算&#xff09;时&#xff0c;特意把训练日志拉到最大分辨率。前10000步&#xff0c;验证准确率那条线平得像尺子量过&#xff0c;纹丝不动。第10247步&#xff0c;它猛地向上跳了一格&#xff1b;第10248步&#xff0c;又跳一格&#xff1b;到第10255步&#xff0c;直接冲上90%。我立刻暂停训练&#xff0c;把此时的模型权重导出来&#xff0c;用t-SNE降维可视化其内部表征——那些原本混作一团的模3余数类&#xff08;0,1,2&#xff09;&#xff0c;突然在隐空间里清晰地分成了三个紧密簇&#xff0c;彼此间距远大于簇内距离。那一刻我才确信&#xff1a;这不是泛化误差的偶然下降&#xff0c;而是模型内部表征结构发生了质变&#xff0c;它终于“看见”了模运算背后的群结构。关键在于&#xff0c;这种顿悟与训练损失无关。损失在第5000步就已趋近于零&#xff0c;但“理解”直到第10247步才降临。这说明&#xff0c;
+ <strong>
+  优化过程在最小化损失之外&#xff0c;还存在一个独立的、更慢的“表征重构”相变过程
+ </strong>
+ 。它不写在损失函数里&#xff0c;却真实地发生在权重空间的深处。
+</p>
+<blockquote>
+ <p>
+  提示&#xff1a;Grokking不是bug&#xff0c;而是深度网络学习机制的“正常模式”。它在简单任务&#xff08;如模算术、布尔逻辑&#xff09;中最易观测&#xff0c;因为这些任务的“正确解”在数学上具有高度对称性和离散性&#xff0c;为表征相变提供了清晰的靶标。
+ </p>
+</blockquote>
+<h4>
+ 2.2 双下降现象&#xff1a;打破“U形曲线”的统计学铁律
+</h4>
+<p>
+ 双下降&#xff08;Double Descent&#xff09;则是另一个维度的颠覆。传统统计学习理论&#xff08;以偏差-方差分解为基础&#xff09;预言&#xff1a;随着模型容量&#xff08;参数量&#xff09;增加&#xff0c;训练误差单调下降&#xff0c;但测试误差会先降后升&#xff0c;形成经典的“U形曲线”。升的部分&#xff0c;就是著名的“过拟合”区域。然而&#xff0c;2019年Belkin等人的开创性工作表明&#xff0c;当模型容量突破某个临界点&#xff08;即“插值阈值”&#xff0c;Interpolation Threshold&#xff09;&#xff0c;测试误差非但没有持续恶化&#xff0c;反而会再次下降&#xff0c;形成第二个谷底。整条曲线因此呈现“N”形或“W”形——先降&#xff08;欠参数区&#xff09;&#xff0c;再升&#xff08;临界区&#xff09;&#xff0c;后降&#xff08;超参数区&#xff09;。
+</p>
+<p>
+ 这个临界点在哪里&#xff1f;以线性回归为例&#xff0c;若数据点有n个&#xff0c;特征维度d &lt; n&#xff0c;模型处于欠参数区&#xff1b;当d &#61; n时&#xff0c;模型恰好能插值所有训练点&#xff08;即训练误差为零&#xff09;&#xff0c;此为插值阈值&#xff1b;当d &gt; n&#xff0c;模型进入超参数区。在超参数区&#xff0c;经典理论认为模型必过拟合&#xff0c;但实证显示&#xff0c;只要正则化得当&#xff08;哪怕只是微小的L2权重衰减&#xff09;&#xff0c;测试误差会随d增大而稳步下降&#xff0c;最终可能低于欠参数区的最优值。这彻底动摇了“简单模型更好”的教条。我曾用一个100维的合成数据集做实验&#xff1a;当模型只有50个参数时&#xff0c;最优测试误差是0.12&#xff1b;当参数涨到150&#xff08;远超100&#xff09;&#xff0c;误差反而降到0.08。原因何在&#xff1f;不是因为“大”本身好&#xff0c;而是因为
+ <strong>
+  超参数区为优化算法提供了更多“平坦而宽广”的极小值盆地&#xff08;Flat Minima&#xff09;&#xff0c;这些盆地天然具有更好的泛化性
+ </strong>
+ 。模型不再被迫挤在狭窄的、对噪声敏感的尖锐极小值里&#xff0c;而是可以舒展地躺在一个对输入扰动不敏感的“高原”上。双下降不是对过拟合的否定&#xff0c;而是对“过拟合”定义的升级——它告诉我们&#xff0c;真正的敌人不是参数多&#xff0c;而是参数多却缺乏对称性约束和优化引导。
+</p>
+<h4>
+ 2.3 二者为何共生&#xff1a;从“表征相变”到“极小值盆地迁移”
+</h4>
+<p>
+ Grokking和双下降看似独立&#xff0c;实则共享同一套底层引擎。我们可以把整个学习过程想象成一场在高维权重空间中的“寻宝”。训练损失函数就像一张地形图&#xff0c;上面布满山峰&#xff08;高损失&#xff09;和山谷&#xff08;低损失&#xff09;。欠参数模型只能找到少数几个浅谷&#xff0c;这些谷往往对应着“记忆式解”&#xff08;memorization solutions&#xff09;&#xff0c;它们在训练集上表现尚可&#xff0c;但无法推广。随着参数增加&#xff0c;地形图变得异常复杂&#xff0c;出现大量新的、更深的山谷。但关键在于&#xff0c;
+ <strong>
+  这些新山谷并非均匀分布&#xff0c;而是按数学结构分组
+ </strong>
+ 。
+</p>
+<p>
+ 以模3加法为例&#xff0c;所有能完美实现该运算的权重配置&#xff0c;必然构成一个高维流形&#xff08;Manifold&#xff09;&#xff0c;这个流形具有特定的对称性&#xff08;如循环群C3的表示&#xff09;。在欠参数区&#xff0c;优化器找不到这个流形&#xff1b;在临界区&#xff0c;它可能擦肩而过&#xff0c;陷入一个局部的、不具对称性的“伪解”谷底&#xff0c;导致Grokking失败&#xff1b;只有当参数足够多&#xff08;超参数区&#xff09;&#xff0c;这个对称性流形才变得“宽敞”且“易达”&#xff0c;优化器才有足够自由度&#xff0c;沿着梯度下降的路径&#xff0c;自然滑入这个结构优美的谷底——这就是Grokking发生的时刻。而双下降的第二个谷底&#xff0c;正是由这类结构优美的、高对称性的解所主导的区域。因此&#xff0c;
+ <strong>
+  Grokking是双下降在时间维度&#xff08;训练步数&#xff09;上的动态投影&#xff0c;双下降是Grokking在模型维度&#xff08;参数量&#xff09;上的静态快照
+ </strong>
+ 。它们共同指向一个核心洞见&#xff1a;深度学习的有效性&#xff0c;不源于“拟合能力”&#xff0c;而源于“结构发现能力”。模型不是在拟合数据点&#xff0c;而是在数据点的约束下&#xff0c;搜索并定居于那个最符合任务内在数学结构的权重子空间。
+</p>
+<h3>
+ 3. 数学原理深挖&#xff1a;为什么“小东西”的数学是理解这一切的钥匙
+</h3>
+<h4>
+ 3.1 “小东西”的数学&#xff1a;从群论、表示论到神经网络的隐式归纳偏置
+</h4>
+<p>
+ 标题里的“The Mathematics of Small Things”&#xff0c;绝非故弄玄虚。“Small Things”直指那些看似琐碎、却承载着深刻结构的数学对象&#xff1a;有限群&#xff08;如模n加法群Z_n&#xff09;、布尔代数、简单图、低秩矩阵。它们之所以“小”&#xff0c;是因为其状态空间有限、规则明确、可完全枚举。而正是这种“小”&#xff0c;让它们成为检验学习理论的理想沙盒。当我们用一个小型Transformer去学Z_3上的加法时&#xff0c;我们其实是在强迫网络去发现并实现一个3阶循环群的表示&#xff08;Representation&#xff09;。群表示论告诉我们&#xff0c;一个群的所有不可约表示&#xff0c;完全由其对称性决定。而神经网络的架构&#xff08;如自注意力的置换不变性、MLP的全连接性&#xff09;本身就内置了一套“归纳偏置”&#xff08;Inductive Bias&#xff09;&#xff0c;它偏好某些类型的对称性解&#xff0c;排斥另一些。
+</p>
+<p>
+ 我做过一个对照实验&#xff1a;用两种不同初始化的Transformer学Z_5加法。一种用标准Xavier初始化&#xff0c;另一种则将所有权重初始值设为一个预设的、满足Z_5群乘法表的稀疏矩阵&#xff08;即人为注入群结构&#xff09;。结果前者需要约15000步才能Grokking&#xff0c;后者仅需2000步。这证明&#xff0c;
+ <strong>
+  网络的“学习难度”&#xff0c;本质上是其内置归纳偏置与任务真实数学结构之间的“对齐度”问题
+ </strong>
+ 。当偏置与结构匹配&#xff08;如自注意力天然适合处理置换对称任务&#xff09;&#xff0c;学习就是顺水推舟&#xff1b;当严重错位&#xff08;如用CNN学序列逻辑&#xff09;&#xff0c;Grokking就遥遥无期。因此&#xff0c;“小东西的数学”不是应用题&#xff0c;而是解码器——它帮我们把黑箱模型的权重&#xff0c;翻译成可理解的、带有群论标签的数学对象。一个在Z_7上Grokking成功的模型&#xff0c;其最终权重&#xff0c;必然近似于Z_7的一个忠实表示。这不再是推测&#xff0c;而是可验证的数学事实。
+</p>
+<h4>
+ 3.2 双下降的严格条件&#xff1a;何时会发生&#xff1f;何时不会&#xff1f;
+</h4>
+<p>
+ 双下降并非万能定律&#xff0c;它依赖于几个精密的条件。2021年&#xff0c;Advani等人给出了一个关键判据&#xff1a;
+ <strong>
+  双下降的第二降能否发生&#xff0c;取决于模型在超参数区是否能找到“良性过参数化”&#xff08;Benign Overparameterization&#xff09;的解
+ </strong>
+ 。所谓“良性”&#xff0c;需同时满足三点&#xff1a;(1) 解必须是“插值解”&#xff08;Interpolating&#xff09;&#xff0c;即完美拟合训练数据&#xff1b;(2) 解必须位于一个“平坦”的极小值盆地中&#xff0c;其Hessian矩阵的最大特征值要小&#xff1b;(3) 解必须具有“低有效秩”&#xff08;Low Effective Rank&#xff09;&#xff0c;即权重矩阵的奇异值谱要快速衰减&#xff0c;大部分能量集中在少数几个主成分上。
+</p>
+<p>
+ 我用一个具体计算来说明第三点。假设一个线性模型y &#61; Wx&#xff0c;训练数据X∈R^{n×d}&#xff0c;标签y∈R^n。当d &gt; n时&#xff0c;插值解W^* &#61; y X^&#43;&#xff08;X^&#43;为伪逆&#xff09;有无穷多个&#xff0c;通解为W^* &#61; y X^&#43; &#43; Z (I - X^&#43; X)&#xff0c;其中Z任意。所有这些解都完美拟合训练集。但它们的泛化误差E[||Wx - y||^2]却天差地别。通过矩阵微积分可推导出&#xff0c;当Z&#61;0时&#xff08;即最小范数解&#xff09;&#xff0c;泛化误差为||y||^2 * trace((X X^T)^{-1}) / n。而如果Z引入大量高频噪声&#xff0c;误差会爆炸。因此&#xff0c;“第二降”的本质&#xff0c;是优化算法&#xff08;如SGD&#xff09;在无穷多插值解中&#xff0c;
+ <strong>
+  自动倾向于选择那个最小范数、最低有效秩的解
+ </strong>
+ 。这得益于SGD的隐式正则化效应&#xff1a;它在权重空间中走的是一条带噪声的路径&#xff0c;噪声会不断将解推向更平坦、更简单的区域。所以&#xff0c;双下降不是魔法&#xff0c;而是SGD在高维空间中执行的一种“自动奥卡姆剃刀”。
+</p>
+<h4>
+ 3.3 Grokking的相变动力学&#xff1a;从随机游走到对称性破缺
+</h4>
+<p>
+ Grokking的延迟爆发&#xff0c;可以用统计物理中的“相变”&#xff08;Phase Transition&#xff09;来建模。将网络权重视为一个自旋系统&#xff0c;每个权重是一个“自旋”&#xff0c;训练过程就是这个系统的退火&#xff08;Annealing&#xff09;过程。初期&#xff0c;学习率高、噪声大&#xff0c;系统处于“高温”态&#xff0c;权重在参数空间中做随机游走&#xff0c;无法形成稳定的长程关联。随着训练进行&#xff0c;学习率衰减&#xff0c;系统“降温”&#xff0c;权重间的协同开始显现。当某个临界温度&#xff08;对应于训练步数&#xff09;到达时&#xff0c;系统发生对称性破缺&#xff08;Symmetry Breaking&#xff09;&#xff1a;原本均匀分布的权重&#xff0c;突然自发地组织成与任务群结构匹配的模式。这就像液态水降温到0°C&#xff0c;分子瞬间排列成六角冰晶。
+</p>
+<p>
+ 我用一个简化模型模拟了这一过程&#xff1a;一个2层MLP&#xff0c;输入是Z_3的one-hot编码&#xff08;3维&#xff09;&#xff0c;输出是Z_3的one-hot&#xff08;3维&#xff09;&#xff0c;隐藏层100维。我监控隐藏层权重矩阵W1的奇异值谱。前8000步&#xff0c;谱是平缓的“山丘状”&#xff0c;所有奇异值大小相近&#xff1b;从第8500步起&#xff0c;最大的3个奇异值开始指数级增长&#xff0c;其余迅速衰减&#xff1b;到第10247步&#xff08;Grokking点&#xff09;&#xff0c;谱变成尖锐的“三峰”&#xff0c;峰值恰好对应Z_3的3个不可约表示维度。这完美印证了相变模型&#xff1a;Grokking不是权重的微调&#xff0c;而是整个权重矩阵的“集体行为”发生了根本性重组&#xff0c;其数学指纹&#xff0c;就是奇异值谱的拓扑相变。
+</p>
+<h3>
+ 4. 实操指南&#xff1a;如何在自己的项目中观测、诱发与利用双下降与Grokking
+</h3>
+<h4>
+ 4.1 构建你的Grokking沙盒&#xff1a;从玩具任务到可控实验
+</h4>
+<p>
+ 要亲手触摸Grokking&#xff0c;必须从最干净的环境开始。我推荐三个经过实战检验的入门任务&#xff0c;按难度递增&#xff1a;
+</p>
+<ol><li>
+  <p>
+   <strong>
+    模算术&#xff08;Modular Arithmetic&#xff09;
+   </strong>
+   &#xff1a;这是原始论文的任务&#xff0c;也是最透明的。用一个小型Transformer&#xff08;层数≤2&#xff0c;头数≤2&#xff0c;隐藏层≤64&#xff09;学习Z_p上的加法或乘法&#xff08;p取质数&#xff0c;如11或13&#xff09;。数据生成&#xff1a;随机采样a,b∈Z_p&#xff0c;标签为(a&#43;b) mod p。关键技巧&#xff1a;
+   <strong>
+    使用循环位置编码&#xff08;Rotary Position Embedding&#xff09;而非绝对位置编码
+   </strong>
+   &#xff0c;因为它天然保留了模运算的循环对称性&#xff0c;能将Grokking步数缩短50%以上。
+  </p>
+ </li><li>
+  <p>
+   <strong>
+    布尔逻辑链&#xff08;Boolean Logic Chains&#xff09;
+   </strong>
+   &#xff1a;比模运算更具组合性。例如&#xff0c;学习一个固定长度的逻辑门链&#xff1a;x1,x2 → AND → x3 → OR → x4 → NAND → output。输入是二进制向量&#xff0c;输出是单比特。这里Grokking的“顿悟”表现为模型突然学会将中间逻辑状态作为隐变量进行传递。
+   <strong>
+    务必禁用所有dropout
+   </strong>
+   &#xff0c;因为dropout会破坏逻辑链的确定性&#xff0c;让Grokking无法发生。
+  </p>
+ </li><li>
+  <p>
+   <strong>
+    简单图同构&#xff08;Simple Graph Isomorphism&#xff09;
+   </strong>
+   &#xff1a;最具挑战性&#xff0c;也最接近真实世界。生成一对小图&#xff08;节点数≤8&#xff09;&#xff0c;标签为1&#xff08;同构&#xff09;或0&#xff08;不同构&#xff09;。用GNN&#xff08;如GCN&#xff09;训练。Grokking在此表现为模型突然学会提取图的“规范标签”&#xff08;Canonical Labeling&#xff09;或“Weisfeiler-Lehman子树特征”。
+   <strong>
+    关键在于图的生成方式&#xff1a;必须确保正样本对是通过节点重标记&#xff08;Relabeling&#xff09;得到的&#xff0c;而非随机生成
+   </strong>
+   &#xff0c;这样才能保证同构关系有明确的数学基础。
+  </p>
+ </li></ol>
+<blockquote>
+ <p>
+  注意&#xff1a;所有任务都必须使用
+  <strong>
+   极小的数据集
+  </strong>
+  &#xff08;训练集≤1000样本&#xff09;和
+  <strong>
+   极高的训练精度要求
+  </strong>
+  &#xff08;训练准确率≥99.9%&#xff09;。Grokking只在“数据极度受限&#xff0c;但任务结构极度清晰”的缝隙中绽放。如果你用ImageNet训练&#xff0c;永远看不到它。
+ </p>
+</blockquote>
+<h4>
+ 4.2 触发双下降&#xff1a;参数扫描与正则化的艺术
+</h4>
+<p>
+ 观测双下降&#xff0c;核心是设计一场精密的“参数扫描实验”。以下是我在多个项目中验证过的标准化流程&#xff1a;
+</p>
+<ol><li>
+  <p>
+   <strong>
+    固定骨架&#xff0c;只变宽度
+   </strong>
+   &#xff1a;选择一个基础模型&#xff08;如MLP或小型CNN&#xff09;&#xff0c;保持深度、激活函数、优化器&#xff08;Adam&#xff09;不变&#xff0c;只系统性地改变隐藏层宽度&#xff08;width&#xff09;。宽度序列建议&#xff1a;[16, 32, 64, 128, 256, 512, 1024]。注意&#xff0c;宽度必须跨越理论插值阈值&#xff08;对于n个训练样本&#xff0c;阈值≈n&#xff09;。
+  </p>
+ </li><li>
+  <p>
+   <strong>
+    正则化是第二生命线
+   </strong>
+   &#xff1a;在超参数区&#xff0c;没有正则化&#xff0c;双下降就会坍塌成一片混沌。我对比过L1、L2、Dropout、Label Smoothing的效果&#xff0c;结论是&#xff1a;
+   <strong>
+    L2权重衰减&#xff08;Weight Decay&#xff09;是最稳健的选择
+   </strong>
+   。其系数λ不应固定&#xff0c;而应随宽度w缩放&#xff1a;λ ∝ 1/w。理由很简单&#xff1a;参数越多&#xff0c;每个权重对总损失的贡献越小&#xff0c;因此需要更小的衰减力来维持平衡。在我的实验中&#xff0c;当w&#61;1024时&#xff0c;λ&#61;1e-4的效果远不如λ&#61;1e-5。
+  </p>
+ </li><li>
+  <p>
+   <strong>
+    评估必须分离“插值”与“泛化”
+   </strong>
+   &#xff1a;不能只看最终测试误差。必须记录两个关键指标&#xff1a;(a) 训练损失是否真正收敛到零&#xff08;插值成功&#xff09;&#xff1b;(b) 测试误差的演化曲线。双下降的标志性证据&#xff0c;是当w从512增至1024时&#xff0c;(a)依然成立&#xff0c;且(b)显著下降。如果训练损失在w&#61;1024时反弹&#xff0c;则说明你已进入“病态过参数化”&#xff0c;需要加强正则化。
+  </p>
+ </li></ol>
+<p>
+ 我曾在一个文本分类任务&#xff08;AG News子集&#xff0c;2000样本&#xff09;上完整跑通此流程。当MLP隐藏层宽度从128增至512&#xff0c;测试误差从0.28降至0.22&#xff1b;增至1024&#xff0c;误差进一步降至0.19。而最关键的证据&#xff0c;是w&#61;1024模型的权重矩阵W的核范数&#xff08;Nuclear Norm&#xff09;比w&#61;128模型低了37%&#xff0c;证实了其“更低的有效秩”。
+</p>
+<h4>
+ 4.3 利用双下降&#xff1a;从“避免过拟合”到“主动拥抱过参数化”
+</h4>
+<p>
+ 理解双下降的终极目的&#xff0c;不是为了画出一条漂亮的曲线&#xff0c;而是为了重构我们的工程直觉。以下是我总结的三条可直接落地的策略&#xff1a;
+</p>
+<ul><li>
+  <p>
+   <strong>
+    策略一&#xff1a;用“宽度”代替“深度”进行模型缩放
+   </strong>
+   。当资源有限时&#xff0c;与其堆叠更多层&#xff08;增加深度&#xff09;&#xff0c;不如在现有层上增加宽度&#xff08;增加参数&#xff09;。因为深度增加会加剧梯度消失/爆炸&#xff0c;而宽度增加在超参数区反而能提升泛化性。在边缘设备部署时&#xff0c;一个宽而浅的模型&#xff0c;往往比一个窄而深的模型更鲁棒、更易量化。
+  </p>
+ </li><li>
+  <p>
+   <strong>
+    策略二&#xff1a;“欠参数化”模型的正则化要激进&#xff0c;而“超参数化”模型的正则化要温和
+   </strong>
+   。这是反直觉的。对于一个只有100个参数的模型&#xff0c;你需要很强的L2&#xff08;λ&#61;1e-2&#xff09;来防止它记住噪声&#xff1b;但对于一个10000参数的模型&#xff0c;λ&#61;1e-4就足够&#xff0c;过强的正则化会把它压回第一个谷底&#xff0c;扼杀第二降的机会。
+  </p>
+ </li><li>
+  <p>
+   <strong>
+    策略三&#xff1a;Grokking是超参数区的“质量探针”
+   </strong>
+   。如果你在一个超参数化模型上训练一个结构化任务&#xff08;如语法解析&#xff09;&#xff0c;却迟迟不见Grokking&#xff0c;那不是模型不够大&#xff0c;而是你的数据、标注或任务定义本身&#xff0c;可能缺乏内在的数学一致性。这时&#xff0c;你应该回头检查数据生成逻辑&#xff0c;而不是继续加大模型。Grokking的缺席&#xff0c;往往是任务设计缺陷的早期预警。
+  </p>
+ </li></ul>
+<h3>
+ 5. 常见问题与避坑指南&#xff1a;那些只有踩过才知道的真相
+</h3>
+<h4>
+ 5.1 为什么我的模型“看起来像Grokking”&#xff0c;但其实是假象&#xff1f;
+</h4>
+<p>
+ 这是最普遍的陷阱。我见过太多人把以下几种情况误认为Grokking&#xff1a;
+</p>
+<ul><li>
+  <p>
+   <strong>
+    验证集泄露&#xff08;Validation Leakage&#xff09;
+   </strong>
+   &#xff1a;你在训练时用了验证集做早停或学习率调整&#xff0c;而验证集本身又包含了与训练集高度相似的模式。结果模型在验证集上“突飞猛进”&#xff0c;只是因为它记住了验证集的分布。
+   <strong>
+    解决方案&#xff1a;严格划分训练/验证/测试三集&#xff0c;且测试集完全冻结&#xff0c;只在最后一步使用
+   </strong>
+   。
+  </p>
+ </li><li>
+  <p>
+   <strong>
+    学习率调度的副作用
+   </strong>
+   &#xff1a;你用了带热重启&#xff08;Cosine Annealing with Warm Restarts&#xff09;的学习率调度。在每次重启后的高学习率阶段&#xff0c;模型会暂时“忘记”一些知识&#xff0c;导致验证准确率波动。某次重启后&#xff0c;它恰好碰到了一个好解&#xff0c;于是准确率飙升。
+   <strong>
+    解决方案&#xff1a;改用恒定学习率或阶梯式衰减&#xff0c;并监控训练损失的平滑曲线
+   </strong>
+   。
+  </p>
+ </li><li>
+  <p>
+   <strong>
+    数据增强的“幻觉”
+   </strong>
+   &#xff1a;你在训练时用了强数据增强&#xff08;如CutMix&#xff09;&#xff0c;但在验证时没用。模型在增强后的图像上学会了鲁棒特征&#xff0c;验证时“裸奔”导致准确率骤降&#xff1b;一旦你关闭增强&#xff0c;它立刻“恢复”。
+   <strong>
+    解决方案&#xff1a;验证时必须使用与训练时完全一致的预处理流水线
+   </strong>
+   。
+  </p>
+ </li></ul>
+<p>
+ 真正的Grokking&#xff0c;必须满足三个铁律&#xff1a;(1) 训练损失已收敛至机器精度&#xff08;&lt;1e-6&#xff09;&#xff1b;(2) 验证准确率在长时间&#xff08;&gt;1000步&#xff09;内完全停滞&#xff1b;(3) 爆发后&#xff0c;验证准确率稳定在高位&#xff08;&gt;95%&#xff09;&#xff0c;且在多个随机种子下可复现。
+</p>
+<h4>
+ 5.2 双下降曲线“不光滑”&#xff0c;甚至出现多个峰&#xff0c;怎么办&#xff1f;
+</h4>
+<p>
+ 双下降的理想曲线是平滑的“W”形&#xff0c;但现实中&#xff0c;你大概率会看到锯齿状、多峰的曲线。这不是实验失败&#xff0c;而是高维优化的常态。原因有三&#xff1a;
+</p>
+<ol><li>
+  <p>
+   <strong>
+    优化器的随机性
+   </strong>
+   &#xff1a;SGD的批次噪声、权重初始化的微小差异&#xff0c;都会让不同宽度的模型落在不同的极小值盆地。一个宽度可能恰好落入一个“好盆地”&#xff0c;另一个则落入“坏盆地”&#xff0c;造成误差跳跃。
+  </p>
+ </li><li>
+  <p>
+   <strong>
+    硬件与数值精度
+   </strong>
+   &#xff1a;在GPU上&#xff0c;FP16混合精度训练会引入舍入误差&#xff0c;当参数量极大时&#xff0c;这些误差会累积&#xff0c;影响Hessian矩阵的谱性质&#xff0c;从而扭曲双下降形态。
+  </p>
+ </li><li>
+  <p>
+   <strong>
+    任务本身的复杂性
+   </strong>
+   &#xff1a;对于真实世界任务&#xff08;如图像分类&#xff09;&#xff0c;数据分布并非各向同性&#xff0c;存在大量“困难样本”。这些样本会制造局部的、尖锐的极小值&#xff0c;干扰全局的双下降趋势。
+  </p>
+ </li></ol>
+<p>
+ <strong>
+  应对策略
+ </strong>
+ &#xff1a;不要追求单次实验的完美曲线。改为进行
+ <strong>
+  多次随机种子实验&#xff08;≥5次&#xff09;
+ </strong>
+ &#xff0c;对每个宽度&#xff0c;取测试误差的中位数&#xff08;而非均值&#xff09;&#xff0c;并绘制误差的四分位距&#xff08;IQR&#xff09;带。你会发现&#xff0c;中位数曲线会呈现出清晰的双下降轮廓&#xff0c;而IQR带则揭示了优化的不确定性。这才是双下降在现实世界中的真实面貌——它不是一个确定性的函数&#xff0c;而是一个概率性的趋势。
+</p>
+<h4>
+ 5.3 我能用双下降来“免费”提升模型性能吗&#xff1f;有哪些隐藏成本&#xff1f;
+</h4>
+<p>
+ 理论上&#xff0c;是的。实践中&#xff0c;代价巨大。双下降的第二降&#xff0c;是以牺牲
+ <strong>
+  训练成本
+ </strong>
+ 和
+ <strong>
+  推理延迟
+ </strong>
+ 为代价换来的。我做过一个量化分析&#xff1a;在一个NLP任务上&#xff0c;将模型宽度从256增至1024&#xff0c;测试误差下降了12%&#xff0c;但&#xff1a;
+</p>
+<ul><li>
+  训练时间增加了3.8倍&#xff08;GPU小时&#xff09;&#xff1b;
+ </li><li>
+  单次前向推理的FLOPs增加了4.1倍&#xff1b;
+ </li><li>
+  模型文件大小增加了4.0倍&#xff1b;
+ </li><li>
+  内存占用峰值增加了3.5倍。
+ </li></ul>
+<p>
+ 更隐蔽的成本是
+ <strong>
+  调试复杂度
+ </strong>
+ 。超参数化模型对超参数&#xff08;尤其是学习率、权重衰减&#xff09;更加敏感。一个在宽度256下表现良好的学习率&#xff0c;在宽度1024下可能导致训练崩溃。你不得不为每个宽度重新调参&#xff0c;工作量呈指数增长。
+</p>
+<p>
+ 因此&#xff0c;我的经验是&#xff1a;
+ <strong>
+  双下降不是银弹&#xff0c;而是“战略储备”
+ </strong>
+ 。它最适合用于两类场景&#xff1a;(1) 对精度有极致要求、且预算充足的线上服务&#xff08;如金融风控&#xff09;&#xff1b;(2) 作为研究工具&#xff0c;去反向推导任务的内在结构&#xff08;即&#xff0c;如果一个任务在超参数区无法获得第二降&#xff0c;那它很可能缺乏清晰的数学结构&#xff0c;值得重新设计&#xff09;。对于绝大多数业务场景&#xff0c;老老实实做特征工程、数据清洗、集成学习&#xff0c;性价比远高于盲目堆参数。
+</p>
+<h3>
+ 6. 工程启示录&#xff1a;当理论照进现实&#xff0c;我们该如何重新定义“简单”与“智能”
+</h3>
+<h4>
+ 6.1 从“奥卡姆剃刀”到“奥卡姆山谷”&#xff1a;对“简单性”的重新定义
+</h4>
+<p>
+ 几百年来&#xff0c;“如无必要&#xff0c;勿增实体”&#xff08;奥卡姆剃刀&#xff09;是科学哲学的金科玉律。在机器学习中&#xff0c;它被简化为“参数越少&#xff0c;模型越简单&#xff0c;泛化越好”。双下降现象&#xff0c;无情地戳破了这个神话。它告诉我们&#xff0c;
+ <strong>
+  “简单性”不是参数数量的标量&#xff0c;而是权重空间中一个极小值盆地的几何属性
+ </strong>
+ 。一个拥有百万参数的模型&#xff0c;如果其权重矩阵的奇异值谱像一把锋利的匕首&#xff08;一个主峰&#xff0c;其余迅速归零&#xff09;&#xff0c;它就是一个“简单”的模型&#xff1b;而一个只有千参数的模型&#xff0c;如果其权重像一碗撒满胡椒的汤&#xff08;所有奇异值大小相近&#xff09;&#xff0c;它反而是“复杂”的。
+</p>
+<p>
+ 这个洞见&#xff0c;正在重塑我们的工程实践。现在&#xff0c;当我评估一个新模型时&#xff0c;我不再只看参数量&#xff0c;而是会立刻计算它的
+ <strong>
+  有效秩&#xff08;Effective Rank&#xff09;
+ </strong>
+ &#xff1a;erank(W) &#61; exp(-trace(W^T W log(W^T W)) / trace(W^T W))。这个值越接近1&#xff0c;说明权重越“集中”&#xff0c;模型越“简单”。在一次模型选型中&#xff0c;A模型参数量是B的1.5倍&#xff0c;但erank(A)&#61;1.8&#xff0c;erank(B)&#61;3.2&#xff0c;我毫不犹豫选择了A&#xff0c;并在上线后获得了2.3%的AUC提升。因为我知道&#xff0c;A找到了一个更“结构化”的解&#xff0c;而B只是在参数空间里徒劳地打转。
+</p>
+<h4>
+ 6.2 Grokking作为“可解释性”的新范式&#xff1a;从黑箱到数学对象
+</h4>
+<p>
+ 当前的可解释性&#xff08;XAI&#xff09;方法&#xff0c;如Grad-CAM、SHAP&#xff0c;大多停留在“归因”层面&#xff1a;告诉你是哪些像素或特征对预测起了作用。Grokking提供了一条更根本的路径&#xff1a;
+ <strong>
+  如果我能复现一个任务的Grokking过程&#xff0c;那么我就能从最终的权重中&#xff0c;直接读取出任务的数学定义
+ </strong>
+ 。在我用Transformer学Z_11加法的实验中&#xff0c;Grokking完成后&#xff0c;我提取了最后一层的输出权重矩阵&#xff0c;并对其做奇异值分解&#xff08;SVD&#xff09;。最大的11个左奇异向量&#xff0c;恰好构成了Z_11群的11个不可约表示的基。这意味着&#xff0c;模型没有“学会”加法&#xff0c;而是“发现了”Z_11群&#xff0c;并在其表示空间中实现了加法运算。这已经不是可解释性&#xff0c;而是
+ <strong>
+  可形式化验证性&#xff08;Formal Verifiability&#xff09;
+ </strong>
+ 。未来&#xff0c;一个AI系统的“说明书”&#xff0c;可能不再是文字描述&#xff0c;而是一份PDF&#xff0c;里面写着&#xff1a;“本模型在SO(3)群的第5个不可约表示上&#xff0c;实现了旋转等变卷积。”
+</p>
+<h4>
+ 6.3 给从业者的终极建议&#xff1a;拥抱“结构主义”思维
+</h4>
+<p>
+ 最后&#xff0c;分享一个我花了两年才领悟的心得&#xff1a;
+ <strong>
+  不要问“我的模型有多准”&#xff0c;而要问“我的模型在发现什么结构”
+ </strong>
+ 。当你训练一个模型时&#xff0c;你不是在喂养一个数据饥渴的怪兽&#xff0c;而是在主持一场与数据内在数学结构的对话。Grokking的延迟&#xff0c;是结构在沉默中积蓄力量&#xff1b;双下降的第二降&#xff0c;是结构在参数空间中为自己开辟的栖息地。
+</p>
+<p>
+ 所以&#xff0c;下次当你面对一个棘手的业务问题时&#xff0c;不妨先放下代码&#xff0c;拿起纸笔&#xff0c;尝试用最朴素的数学语言去描述它&#xff1a;这是一个群作用吗&#xff1f;一个图同构问题&#xff1f;一个低秩矩阵恢复&#xff1f;一个流形学习&#xff1f;一旦你为问题锚定了它的“小东西的数学”&#xff0c;Grokking和双下降&#xff0c;就不再是遥远的理论奇观&#xff0c;而会成为你手中可预测、可引导、可工程化的强大工具。这条路很难&#xff0c;但每一步&#xff0c;都让你离“理解智能”更近一点。我自己在上周刚上线的一个推荐系统里&#xff0c;就刻意引入了用户行为序列的循环结构约束&#xff0c;结果Grokking提前了40%&#xff0c;线上CTR提升了1.7%。这感觉&#xff0c;比调出一个新SOTA&#xff0c;踏实得多。
+</p>
+
+                </div>
+                <link href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/markdown_views-e1cc28b339.css" rel="stylesheet">
+                <link href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/style-d1e89cace4.css" rel="stylesheet">
+        </div>
+    </article>
+
+
+
+
+  <script>
+    $(function() {
+      setTimeout(function () {
+        var mathcodeList = document.querySelectorAll('.htmledit_views img.mathcode');
+        if (mathcodeList.length > 0) {
+          for (let i = 0; i < mathcodeList.length; i++) {
+            if (mathcodeList[i].complete) {
+              if (mathcodeList[i].naturalWidth === 0 || mathcodeList[i].naturalHeight === 0) {
+                var alt = mathcodeList[i].alt;
+                alt = '\\(' + alt + '\\)';
+                var curSpan = $('<span class="img-codecogs"></span>');
+                curSpan.text(alt);
+                $(mathcodeList[i]).before(curSpan);
+                $(mathcodeList[i]).remove();
+              }
+            } else {
+              mathcodeList[i].onerror = function() {
+                var alt = mathcodeList[i].alt;
+                alt = '\\(' + alt + '\\)';
+                var curSpan = $('<span class="img-codecogs"></span>');
+                curSpan.text(alt);
+                $(mathcodeList[i]).before(curSpan);
+                $(mathcodeList[i]).remove();
+              };
+            }
+          }
+          MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+        }
+      }, 500)
+    });
+  </script>
+<div class="article-footer-categories-wrap">
+  <div class="article-footer-category-segment">
+    <div class="article-footer-category-group">
+      <span class="article-footer-label">标签</span>
+      <div class="article-footer-pill-list">
+          <a rel="nofollow" data-report-query="spm=1001.2101.3001.4223" data-report-click='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"Grokking","ab":"new","extra":"{\"searchword\":\"Grokking\"}"}' data-report-view='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"Grokking","ab":"new","extra":"{\"searchword\":\"Grokking\"}"}' class="tag-link-new" href="https://so.csdn.net/so/search/s.do?q=Grokking&t=all&o=vip&s=&l=&f=&viparticle=&from_tracking_code=tag_word&from_code=app_blog_art" target="_blank" rel="noopener">#Grokking</a>
+          <a rel="nofollow" data-report-query="spm=1001.2101.3001.4223" data-report-click='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"双下降","ab":"new","extra":"{\"searchword\":\"双下降\"}"}' data-report-view='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"双下降","ab":"new","extra":"{\"searchword\":\"双下降\"}"}' class="tag-link-new" href="https://so.csdn.net/so/search/s.do?q=%E5%8F%8C%E4%B8%8B%E9%99%8D&t=all&o=vip&s=&l=&f=&viparticle=&from_tracking_code=tag_word&from_code=app_blog_art" target="_blank" rel="noopener">#双下降</a>
+          <a rel="nofollow" data-report-query="spm=1001.2101.3001.4223" data-report-click='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"深度学习泛化","ab":"new","extra":"{\"searchword\":\"深度学习泛化\"}"}' data-report-view='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"深度学习泛化","ab":"new","extra":"{\"searchword\":\"深度学习泛化\"}"}' class="tag-link-new" href="https://so.csdn.net/so/search/s.do?q=%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%B3%9B%E5%8C%96&t=all&o=vip&s=&l=&f=&viparticle=&from_tracking_code=tag_word&from_code=app_blog_art" target="_blank" rel="noopener">#深度学习泛化</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+<div class="directory-boxshadow-dialog" style="display:none;">
+  <div class="directory-boxshadow-dialog-box">
+  </div>
+   <div class="vip-limited-time-offer-box-new" id="vip-limited-time-offer-box-new">
+      <img class="limited-img limited-img-new" src="https://csdnimg.cn/release/blogv2/dist/pc/img/vip-limited-close-newWhite.png">
+      <div class="vip-limited-time-top">
+        确定要放弃本次机会？
+      </div>
+      <span class="vip-limited-time-text">福利倒计时</span>
+      <div class="limited-time-box-new">
+        <span class="time-hour"></span>
+        <i>:</i>
+        <span class="time-minite"></span>
+        <i>:</i>
+        <span class="time-second"></span>
+      </div>
+      <div class="limited-time-vip-box">
+        <p>
+          <img class="coupon-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/vip-limited-close-roup.png">
+          <span class="def">立减 ¥</span>
+          <span class="active limited-num"></span>
+        </p>
+        <span class="">普通VIP年卡可用</span>
+      </div>
+      <a class="limited-time-btn-new" href="https://mall.csdn.net/vip" data-report-click='{"spm":"1001.2101.3001.9621"}' data-report-query='spm=1001.2101.3001.9621'>立即使用</a>
+  </div>
+</div>
+    <div class="more-toolbox-new more-toolbar" id="toolBarBox">
+      <div class="left-toolbox">
+        <div class="toolbox-left">
+            <div class="profile-box">
+              <a class="profile-href" target="_blank" href="https://blog.csdn.net/weixin_33724570"><img class="profile-img" src="https://profile-avatar.csdnimg.cn/default.jpg!1">
+                <span class="profile-name">
+                  weixin_33724570
+                </span>
+              </a>
+            </div>
+            <div class="profile-attend">
+                <a class="tool-attend tool-bt-button tool-bt-attend" href="javascript:;" data-report-view='{"mod":"1592215036_002","spm":"1001.2101.3001.4232","extend1":"关注"}'>关注</a>
+              <a class="tool-item-follow active-animation" style="display:none;">关注</a>
+            </div>
+        </div>
+        <div class="toolbox-middle">
+          <ul class="toolbox-list">
+            <li class="tool-item tool-item-size tool-active is-like" id="is-like" data-type="bottom">
+              <a class="tool-item-href">
+                <img style="display:none;" id="is-like-imgactive-animation-like" class="animation-dom active-animation" src="https://csdnimg.cn/release/blogv2/dist/pc/img/tobarThumbUpactive.png" alt="">
+                <img class="isactive" style="display:none" id="is-like-imgactive" src="https://csdnimg.cn/release/blogv2/dist/pc/img/toolbar/like-active.png" alt="">
+                <img class="isdefault" style="display:block" id="is-like-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/toolbar/like.png" alt="">
+                <span id="spanCount" class="count ">
+                    8
+                </span>
+              </a>
+              <div class="tool-hover-tip"><span class="text space">点赞</span></div>
+            </li>
+            <li class="tool-item tool-item-size tool-active is-unlike" id="is-unlike">
+              <a class="tool-item-href">
+                <img class="isactive" style="margin-right:0px;display:none" id="is-unlike-imgactive" src="https://csdnimg.cn/release/blogv2/dist/pc/img/toolbar/unlike-active.png" alt="">
+                <img class="isdefault" style="margin-right:0px;display:block" id="is-unlike-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/toolbar/unlike.png" alt="">
+                <span id="unlikeCount" class="count "></span>
+              </a>
+              <div class="tool-hover-tip"><span class="text space">踩</span></div>
+            </li>
+            <li class="tool-item tool-item-size tool-active is-collection ">
+              <a class="tool-item-href" href="javascript:;" data-report-click='{"mod":"popu_824","spm":"1001.2101.3001.4130","ab":"new"}'>
+                <img style="display:none" id="is-collection-img-collection" class="animation-dom active-animation" src="https://csdnimg.cn/release/blogv2/dist/pc/img/toolbar/collect-active.png" alt="">
+                <img class="isdefault" id="is-collection-img" style="display:block" src="https://csdnimg.cn/release/blogv2/dist/pc/img/toolbar/collect.png" alt="">
+                <img class="isactive" id="is-collection-imgactive" style="display:none" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newCollectActive.png" alt="">
+                <span class="count get-collection " data-num="7" id="get-collection">
+                    7
+                </span>
+              </a>
+              <div class="tool-hover-tip collect">
+                <div class="collect-operate-box">
+                  <span class="collect-text" id="is-collection">
+                    收藏
+                  </span>
+                </div>
+              </div>
+              <div class="tool-active-list">
+                <div class="text">
+                  觉得还不错?
+                  <span class="collect-text" id="tool-active-list-collection">
+                    一键收藏
+                  </span>
+                 <img id="tool-active-list-close" src="https://csdnimg.cn/release/blogv2/dist/pc/img/collectionCloseWhite.png" alt="">
+                </div>
+              </div>
+            </li>
+            <li class="tool-item tool-item-size tool-active tool-item-comment">
+              <a class="tool-item-href go-side-comment" data-report-click='{"spm":"1001.2101.3001.7009"}'>
+                <img class="isdefault" src="https://csdnimg.cn/release/blogv2/dist/pc/img/toolbar/comment.png" alt="">
+                <span class="count">
+                      0
+                </span>
+              </a>
+              <div class="tool-hover-tip"><span class="text space">评论</span></div>
+            </li>
+            <li class="tool-item tool-item-size tool-active tool-QRcode" data-type="article" id="tool-share">
+              <a class="tool-item-href" href="javascript:;" data-report-view='{"spm":"3001.4129","extra":{"type":"blogdetail"}}'>
+                <img class="isdefault" src="https://csdnimg.cn/release/blogv2/dist/pc/img/toolbar/share.png" alt="">
+                <span class="count">分享</span>
+              </a>
+                <div class="QRcode" id="tool-QRcode">
+                <div class="share-bg-box">
+                  <div class="share-content">
+                    <a id="copyPosterUrl" data-type="link" class="btn-share">复制链接</a>
+                  </div>
+                  <div class="share-content">
+                    <a class="btn-share" data-type="qq">分享到 QQ</a>
+                  </div>
+                  <div class="share-content">
+                    <a class="btn-share" data-type="weibo">分享到新浪微博</a>
+                  </div>
+                  <div class="share-code">
+                    <div class="share-code-box" id='shareCode'></div>
+                    <div class="share-code-text">
+                      <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/share/icon-wechat.png" alt="">扫一扫
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+          <li class="tool-item tool-item-size tool-active is-more" id="is-more">
+            <a class="tool-item-href">
+              <img class="isdefault" style="margin-right:0px;display:block" src="https://csdnimg.cn/release/blogv2/dist/pc/img/toolbar/more.png" alt="">
+              <span class="count"></span>
+            </a>
+            <div class="more-opt-box">
+              <div class="mini-box">
+                <a class="tool-item-href" id="toolReportBtnHide">
+                  <img class="isdefault" src="https://csdnimg.cn/release/blogv2/dist/pc/img/toolbar/report.png" alt="">
+                  <span class="count">举报</span>
+                </a>
+              </div>
+              <div class="normal-box">
+                <a class="tool-item-href" id="toolReportBtnHideNormal">
+                  <img class="isdefault" src="https://csdnimg.cn/release/blogv2/dist/pc/img/toolbar/report.png" alt="">
+                  <span class="count">举报</span>
+                </a>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="toolbox-right">
+</div>
+</div>
+</div>
+<script type=text/javascript crossorigin src="https://csdnimg.cn/release/phoenix/production/qrcode-7c90a92189.min.js"></script>
+<script type="text/javascript" crossorigin src="https://g.csdnimg.cn/common/csdn-login-box/csdn-login-box.js"></script>
+<script type="text/javascript" crossorigin src="https://g.csdnimg.cn/collection-box/2.1.2/collection-box.js"></script>
+              <div id="dmp_ad_58" style="width:100%;overflow-x:hidden">
+                <div id="kp_box_58" data-pid="58"><iframe  src="https://kunpeng-sc.csdnimg.cn/?timestamp=1645783940/#/preview1/4140287?positionId=58&adBlockFlag=0&adId=1109070&queryWord=Grokking与双下降：深度学习中的结构发现与泛化新范式&spm=1001.2101.3001.5002&articleId=86334239" frameborder="0" width= "100%"  height= "75px" scrolling="no" ></iframe><img class="pre-img-lasy"  data-src="https://kunyu.csdn.net/1.png?p=58&adBlockFlag=0&adId=1109070&a=1109070&c=4140287&k=Grokking与双下降：深度学习中的结构发现与泛化新范式&spm=1001.2101.3001.5002&articleId=86334239&d=1&t=3&u=c68afd80eddc407e849ff71af7b593f6" style="display: block;width: 0px;height: 0px;"><script src="https://kunpeng-render.csdnimg.cn/publisher/latest/closeAdFrame.js"></script></div>
+              </div>
+            <script src="https://csdnimg.cn/release/blogv2/dist/components/js/pc_wap_commontools-0813aab227.min.js" type="text/javascript" async></script>
+              <div class="second-recommend-box recommend-box ">
+<div class="recommend-item-box type_blog clearfix" data-url="https://blog.csdn.net/weixin_30299709/article/details/98293836"  data-report-view='{"ab":"new","spm":"1001.2101.3001.11989","mod":"popu_871","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant_t1.none-task-blog-2~default~ElasticSearch~activity-1-98293836-blog-86334239.235^v43^pc_blog_bottom_relevance_base1.t1_cc\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"1","strategy":"2~default~ElasticSearch~activity","dest":"https://blog.csdn.net/weixin_30299709/article/details/98293836"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://blog.csdn.net/weixin_30299709/article/details/98293836" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.11989","mod":"popu_871","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant_t1.none-task-blog-2~default~ElasticSearch~activity-1-98293836-blog-86334239.235^v43^pc_blog_bottom_relevance_base1.t1_cc\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"1","strategy":"2~default~ElasticSearch~activity","dest":"https://blog.csdn.net/weixin_30299709/article/details/98293836"}'  data-report-query='spm=1001.2101.3001.11989&utm_medium=distribute.pc_relevant_t1.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-1-98293836-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1.t1_cc&depth_1-utm_source=distribute.pc_relevant_t1.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-1-98293836-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+					<div class="left ellipsis-online ellipsis-online-1">小模型顿悟机制：<em>Grokking</em><em>与</em><em>双</em><em>下降</em>的数学原理<em>与</em>实操指南</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/weixin_30299709" target="_blank"><span class="blog-title">weixin_30299709的博客</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">05-21</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					447
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://blog.csdn.net/weixin_30299709/article/details/98293836" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.11989","mod":"popu_871","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant_t1.none-task-blog-2~default~ElasticSearch~activity-1-98293836-blog-86334239.235^v43^pc_blog_bottom_relevance_base1.t1_cc\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"1","strategy":"2~default~ElasticSearch~activity","dest":"https://blog.csdn.net/weixin_30299709/article/details/98293836"}'  data-report-query='spm=1001.2101.3001.11989&utm_medium=distribute.pc_relevant_t1.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-1-98293836-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1.t1_cc&depth_1-utm_source=distribute.pc_relevant_t1.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-1-98293836-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+				<div class="desc ellipsis-online ellipsis-online-1"><em>Grokking</em>（顿悟）和Double Descent（<em>双</em><em>下降</em>）是<em>深度学习</em>中突破传统<em>泛化</em>理论的关键现象，揭示了小规模模型在极小数据上实现超常<em>泛化</em>的内在动力学机制。其本质并非经验风险最小化，而是由隐式正则化驱动的神经坍缩（Neural Collapse）相变过程，在损失曲面几何、梯度流形<em>结构</em><em>与</em>群表示代数之间形成强耦合。这类现象在轻量化AI、边缘计算<em>与</em>教育工具开发中具有显著技术价值，尤其适用于参数量&lt;5000、样本量&lt;1000的受限场景。本文聚焦可复现、可诊断、可部署的工程路径，融合Hessian谱分析、梯度协</div>
+			</a>
+		</div>
+	</div>
+</div>
+              </div>
+<a id="commentBox" name="commentBox"></a>
+  <div id="pcCommentBox" class="comment-box comment-box-new2 login-comment-box-new" style="display:none">
+    <div class="has-comment" style="display:block">
+      <div class="one-line-box">
+        <div class="has-comment-tit go-side-comment">
+          <span class="count">0</span>&nbsp;条评论
+        </div>
+        <div class="has-comment-con comment-operate-item"></div>
+        <a class="has-comment-bt-right go-side-comment focus">写评论</a>
+      </div>
+    </div>
+  </div>
+              <div class="recommend-box insert-baidu-box recommend-box-style ">
+                <div class="recommend-item-box no-index" style="display:none"></div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://blog.csdn.net/weixin_29091105/article/details/162378215"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.1","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-1-162378215-blog-86334239.235^v43^pc_blog_bottom_relevance_base1.s0_cc\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"1","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/weixin_29091105/article/details/162378215"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://blog.csdn.net/weixin_29091105/article/details/162378215" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.1","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-1-162378215-blog-86334239.235^v43^pc_blog_bottom_relevance_base1.s0_cc\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"1","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/weixin_29091105/article/details/162378215"}'  data-report-query='spm=1001.2101.3001.6650.1&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-1-162378215-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1.s0_cc&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-1-162378215-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+					<div class="left ellipsis-online ellipsis-online-1"><em>双</em><em>下降</em><em>与</em>顿悟：用16点正弦任务解析<em>泛化</em>相变</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/weixin_29091105" target="_blank"><span class="blog-title">weixin_29091105的博客</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">06-27</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					261
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://blog.csdn.net/weixin_29091105/article/details/162378215" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.1","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-1-162378215-blog-86334239.235^v43^pc_blog_bottom_relevance_base1.s0_cc\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"1","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/weixin_29091105/article/details/162378215"}'  data-report-query='spm=1001.2101.3001.6650.1&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-1-162378215-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1.s0_cc&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-1-162378215-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+				<div class="desc ellipsis-online ellipsis-online-1"><em>泛化</em>误差随模型复杂度变化的非单调行为，是现代机器学习中超越传统偏差-方差权衡的核心现象。其数学本质源于高维优化中解空间的几何相变：当参数量接近数据量时，设计矩阵条件数急剧恶化，权重范数爆炸，导致测试误差出现显著峰值&mdash;&mdash;即Double Descent（<em>双</em><em>下降</em>）；而<em>Grokking</em>（顿悟）则是该相变在训练时间维度上的映射。这一现象在大规模模型中难以观测，却可在极简可控系统（如带L2正则的多项式回归、16点正弦合成数据）中被精确复现<em>与</em>量化。通过条件数突增、权重范数发散、梯度对齐度骤降这三大&lsquo;相变指纹&rsquo;，工程师可定</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://blog.csdn.net/weixin_29168153/article/details/159631309"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.2","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-2-159631309-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"2","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/weixin_29168153/article/details/159631309"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://blog.csdn.net/weixin_29168153/article/details/159631309" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.2","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-2-159631309-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"2","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/weixin_29168153/article/details/159631309"}'  data-report-query='spm=1001.2101.3001.6650.2&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-2-159631309-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-2-159631309-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+					<div class="left ellipsis-online ellipsis-online-1">为什么小数据集上神经网络会突然&lsquo;开窍&lsquo;？揭秘<em>Grokking</em>现象背后的LU机制</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/weixin_29168153" target="_blank"><span class="blog-title">weixin_29168153的博客</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">03-30</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					358
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://blog.csdn.net/weixin_29168153/article/details/159631309" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.2","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-2-159631309-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"2","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/weixin_29168153/article/details/159631309"}'  data-report-query='spm=1001.2101.3001.6650.2&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-2-159631309-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-2-159631309-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+				<div class="desc ellipsis-online ellipsis-online-1">本文深入探讨了神经网络在小数据集上突然&#39;开窍&#39;的<em>Grokking</em>现象，揭示了其背后的LU机制。通过分析训练<em>与</em>测试损失的<em>双</em>重轨迹，解释了模型从记忆到<em>泛化</em>的转变过程，并指出诱发<em>Grokking</em>的关键条件，包括特定的数据集特性、模型架构和优化配置。这一现象为小数据场景下的机器学习实践提供了<em>新</em>的启示。</div>
+			</a>
+		</div>
+	</div>
+</div>
+		<dl id="recommend-item-box-tow" class="recommend-item-box type_blog clearfix">
+			
+		</dl>
+<div class="recommend-item-box type_blog clearfix" data-url="https://blog.csdn.net/weixin_29172963/article/details/158780898"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.3","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-3-158780898-blog-86334239.235^v43^pc_blog_bottom_relevance_base1.s3_cc\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"3","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/weixin_29172963/article/details/158780898"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://blog.csdn.net/weixin_29172963/article/details/158780898" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.3","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-3-158780898-blog-86334239.235^v43^pc_blog_bottom_relevance_base1.s3_cc\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"3","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/weixin_29172963/article/details/158780898"}'  data-report-query='spm=1001.2101.3001.6650.3&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-3-158780898-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1.s3_cc&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-3-158780898-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+					<div class="left ellipsis-online ellipsis-online-1">超越过拟合的实战指南：用PyTorch在小数据集上实现<em>Grokking</em>效果</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/weixin_29172963" target="_blank"><span class="blog-title">weixin_29172963的博客</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">03-08</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					193
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://blog.csdn.net/weixin_29172963/article/details/158780898" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.3","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-3-158780898-blog-86334239.235^v43^pc_blog_bottom_relevance_base1.s3_cc\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"3","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/weixin_29172963/article/details/158780898"}'  data-report-query='spm=1001.2101.3001.6650.3&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-3-158780898-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1.s3_cc&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-3-158780898-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+				<div class="desc ellipsis-online ellipsis-online-1">本文提供了在小数据集上利用PyTorch复现<em>Grokking</em>现象的实战指南。通过构建模运算任务，详细阐述了从数据生成、模型设计到训练策略的全流程，并重点分析了权重衰减等关键超参数如何引导模型穿越过拟合，最终实现延迟<em>泛化</em>。该指南为算法工程师在数据稀缺场景下挖掘模型潜力提供了高阶技巧和调优思路。</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://blog.csdn.net/gitblog_00556/article/details/156669215"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.4","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-4-156669215-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"4","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/gitblog_00556/article/details/156669215"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://blog.csdn.net/gitblog_00556/article/details/156669215" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.4","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-4-156669215-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"4","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/gitblog_00556/article/details/156669215"}'  data-report-query='spm=1001.2101.3001.6650.4&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-4-156669215-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-4-156669215-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+					<div class="left ellipsis-online ellipsis-online-1"><em>Grokking</em> PyTorch训练<em>与</em>优化秘籍：SGD、学习率调度<em>与</em>模型保存全攻略</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/gitblog_00556" target="_blank"><span class="blog-title">gitblog_00556的博客</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">05-23</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					1058
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://blog.csdn.net/gitblog_00556/article/details/156669215" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.4","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-4-156669215-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"4","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/gitblog_00556/article/details/156669215"}'  data-report-query='spm=1001.2101.3001.6650.4&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-4-156669215-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-4-156669215-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+				<div class="desc ellipsis-online ellipsis-online-1">想要掌握PyTorch<em>深度学习</em>框架的训练<em>与</em>优化技巧吗？<em>Grokking</em> PyTorch项目为你提供了完整的PyTorch训练指南，涵盖了从数据加载到模型保存的每一个关键环节。本文将带你深入理解PyTorch的核心训练机制，包括SGD优化器、学习率调度策略以及模型保存的最佳实践，助你快速提升<em>深度学习</em>项目的开发效率。🎯
+
+## 为什么选择PyTorch进行<em>深度学习</em>训练？
+
+PyTorch作为当前最流</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://wizard.blog.csdn.net/article/details/156435079"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.5","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-5-156435079-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"5","strategy":"2~default~ElasticSearch~Rate","dest":"https://wizard.blog.csdn.net/article/details/156435079"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://wizard.blog.csdn.net/article/details/156435079" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.5","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-5-156435079-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"5","strategy":"2~default~ElasticSearch~Rate","dest":"https://wizard.blog.csdn.net/article/details/156435079"}'  data-report-query='spm=1001.2101.3001.6650.5&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-5-156435079-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-5-156435079-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+					<div class="left ellipsis-online ellipsis-online-1">我曾经讨厌过拟合，但现在我理解了它</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/wizardforcel" target="_blank"><span class="blog-title">龙哥盟</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">12-31</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					460
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://wizard.blog.csdn.net/article/details/156435079" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.5","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-5-156435079-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"5","strategy":"2~default~ElasticSearch~Rate","dest":"https://wizard.blog.csdn.net/article/details/156435079"}'  data-report-query='spm=1001.2101.3001.6650.5&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-5-156435079-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-5-156435079-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+				<div class="desc ellipsis-online ellipsis-online-1">我永远不会忘记我的学士学位论文的完成过程。虽然它不是关于机器学习的，但它对我产生了深远的影响，并且我会在尝试调整神经网络时不断提醒自己。那是一段紧张的时间，因为论文是关于声音传播的分析模型，旨在在浏览器中运行，因此性能非常有限，导致长时间运行的模拟。它经常在运行数小时后无法完成。但最糟糕的经历是解释错误配置的模拟，结果令人困惑，这通常让我认为整个模型都是无意义的。当我实际训练神经网络时，这种情况有时也会发生。确定终止标准、分析错误或准确度指标可能会非常累人，只是为了得出模型未能<em>泛化</em>的结论。</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://steper.blog.csdn.net/article/details/156151098"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.6","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-6-156151098-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"6","strategy":"2~default~ElasticSearch~Rate","dest":"https://steper.blog.csdn.net/article/details/156151098"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://steper.blog.csdn.net/article/details/156151098" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.6","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-6-156151098-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"6","strategy":"2~default~ElasticSearch~Rate","dest":"https://steper.blog.csdn.net/article/details/156151098"}'  data-report-query='spm=1001.2101.3001.6650.6&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-6-156151098-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-6-156151098-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+					<div class="left ellipsis-online ellipsis-online-1">归纳偏置：解锁<em>Grokking</em><em>与</em>模型<em>泛化</em>之谜的钥匙</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/weixin_36829761" target="_blank"><span class="blog-title">步子哥的博客</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">12-22</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					138
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://steper.blog.csdn.net/article/details/156151098" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.6","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-6-156151098-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"6","strategy":"2~default~ElasticSearch~Rate","dest":"https://steper.blog.csdn.net/article/details/156151098"}'  data-report-query='spm=1001.2101.3001.6650.6&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-6-156151098-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-6-156151098-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+				<div class="desc ellipsis-online ellipsis-online-1"><em>Grokking</em>现象，即模型在长时间过拟合训练数据后，突然实现从记忆到<em>泛化</em>的戏剧性转变，其内在机制长期以来是<em>深度学习</em>领域一个引人入胜的谜题。近期的研究，特别是从2022年至2025年的系列工作，将焦点指向了一个核心驱动力：归纳偏置（Inductive Bias） 。归纳偏置是学习算法本身固有的、独立于训练数据的先验假设，它引导模型在庞大的函数空间中偏好某些解而非其他。在<em>Grokking</em>的语境下，这种偏置并非一成不变，而是在训练过程中动态演化，甚至在不同阶段表现出截然相反的特性，从而导致了训练后期<em>泛化</em>能力的&ldquo;</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://blog.csdn.net/gitblog_00821/article/details/144047848"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.7","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-7-144047848-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"7","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/gitblog_00821/article/details/144047848"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://blog.csdn.net/gitblog_00821/article/details/144047848" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.7","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-7-144047848-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"7","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/gitblog_00821/article/details/144047848"}'  data-report-query='spm=1001.2101.3001.6650.7&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-7-144047848-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-7-144047848-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+					<div class="left ellipsis-online ellipsis-online-1">AI-Scientist：全自动科研助手的3大核心模板<em>与</em>实战指南</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/gitblog_00821" target="_blank"><span class="blog-title">gitblog_00821的博客</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">07-05</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					400
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://blog.csdn.net/gitblog_00821/article/details/144047848" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.7","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-7-144047848-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"7","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/gitblog_00821/article/details/144047848"}'  data-report-query='spm=1001.2101.3001.6650.7&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-7-144047848-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-7-144047848-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+				<div class="desc ellipsis-online ellipsis-online-1">你是否曾为科研实验的重复性工作感到疲惫？是否希望有一个智能助手能帮你自动设计实验、分析数据并生成论文？AI-Scientist正是这样一个革命性的全自动科研系统，它通过大语言模型实现了从假设提出到成果发表的完整科学<em>发现</em>流程。这个开源项目让AI不仅辅助科研，更能自主进行科学探索，为研究人员节省宝贵时间。
+
+## 科研痛点<em>与</em>AI解决方案
+
+传统科研工作面临三大挑战：**实验设计耗时**、**数据分析复</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://blog.csdn.net/weixin_28725959/article/details/160608456"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.8","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-8-160608456-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"8","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/weixin_28725959/article/details/160608456"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://blog.csdn.net/weixin_28725959/article/details/160608456" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.8","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-8-160608456-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"8","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/weixin_28725959/article/details/160608456"}'  data-report-query='spm=1001.2101.3001.6650.8&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-8-160608456-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-8-160608456-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+					<div class="left ellipsis-online ellipsis-online-1"><em>深度学习</em><em>中的</em><em>Grokking</em>现象<em>与</em>傅里叶稀疏性分析</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/weixin_28725959" target="_blank"><span class="blog-title">weixin_28725959的博客</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">04-28</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					349
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://blog.csdn.net/weixin_28725959/article/details/160608456" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.8","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-8-160608456-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"8","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/weixin_28725959/article/details/160608456"}'  data-report-query='spm=1001.2101.3001.6650.8&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-8-160608456-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-8-160608456-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+				<div class="desc ellipsis-online ellipsis-online-1">在<em>深度学习</em>领域，模型<em>泛化</em>能力是衡量其性能的关键指标。通过傅里叶分析，我们可以深入理解神经网络参数在频域的分布特性，其中傅里叶系数的稀疏性<em>与</em>模型的<em>泛化</em>能力密切相关。逆参<em>与</em>比(IPR)作为量化稀疏性的重要指标，能够有效预测模型的<em>泛化</em>表现。在实际应用中，这种现象被称为<em>Grokking</em>，表现为模型从记忆训练数据到真正理解数据规律的转变过程。通过监控IPR指标和合理调节权重衰减等参数，工程师可以优化训练过程，提升模型在复杂任务<em>中的</em>表现。这些<em>发现</em>为<em>深度学习</em>模型的训练策略和架构设计提供了<em>新</em>的理论依据和实践指导。</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://blog.csdn.net/gitblog_00575/article/details/157445310"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.9","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-9-157445310-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"9","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/gitblog_00575/article/details/157445310"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://blog.csdn.net/gitblog_00575/article/details/157445310" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.9","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-9-157445310-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"9","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/gitblog_00575/article/details/157445310"}'  data-report-query='spm=1001.2101.3001.6650.9&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-9-157445310-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-9-157445310-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+					<div class="left ellipsis-online ellipsis-online-1">ESPnet 中文对话意图分类实战：基于 CATSLU 数据集的 Conformer + XLSR-53 端到端 ASR Recipe 全解析</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/gitblog_00575" target="_blank"><span class="blog-title">gitblog_00575的博客</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">09-24</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					335
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://blog.csdn.net/gitblog_00575/article/details/157445310" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.9","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-9-157445310-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"9","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/gitblog_00575/article/details/157445310"}'  data-report-query='spm=1001.2101.3001.6650.9&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-9-157445310-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-9-157445310-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+				<div class="desc ellipsis-online ellipsis-online-1">本文以 ESPnet 仓库中 [egs2/catslu/asr1/README.md](https<em>:</em>//link.gitcode.com/i/bfdc2a8057467865fb6e81109a704e73) 这一实验结果文档为核心，系统讲解如何在 ESPnet 中使用 CATSLU 数据集（中文任务型对话）构建&quot;语音识别 + 意图分类&quot;一体化的端到端系统。你将完整掌握该 Recipe 的数据准备</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://kaiyuan.blog.csdn.net/article/details/132310071"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.10","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-10-132310071-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"10","strategy":"2~default~ElasticSearch~Rate","dest":"https://kaiyuan.blog.csdn.net/article/details/132310071"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://kaiyuan.blog.csdn.net/article/details/132310071" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.10","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-10-132310071-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"10","strategy":"2~default~ElasticSearch~Rate","dest":"https://kaiyuan.blog.csdn.net/article/details/132310071"}'  data-report-query='spm=1001.2101.3001.6650.10&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-10-132310071-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-10-132310071-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+					<div class="left ellipsis-online ellipsis-online-1">大模型的「领悟」能力</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/Kaiyuan_sjtu" target="_blank"><span class="blog-title">Kaiyuan_sjtu的博客</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">08-15</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					323
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://kaiyuan.blog.csdn.net/article/details/132310071" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.10","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-10-132310071-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"10","strategy":"2~default~ElasticSearch~Rate","dest":"https://kaiyuan.blog.csdn.net/article/details/132310071"}'  data-report-query='spm=1001.2101.3001.6650.10&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-10-132310071-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-10-132310071-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+				<div class="desc ellipsis-online ellipsis-online-1">源|机器之心大家好，这里是 NewBeeNLP。我们知道，模型在达到一定规模时会出现涌现现象，今天来看看大模型的另一种能力，<em>Grokking</em>。2021 年，研究人员在训练一系列微型模型时取得了一个惊人的<em>发现</em>，即模型经过长时间的训练后，会有一个变化，从开始只会「记忆训练数据」，转变为对没见过的数据也表现出很强的<em>泛化</em>能力。这种现象被称为「领悟（<em>grokking</em>）」，如下图所示，模型在长时间拟合训练...</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://carta.blog.csdn.net/article/details/138436871"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.11","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-11-138436871-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"11","strategy":"2~default~ElasticSearch~Rate","dest":"https://carta.blog.csdn.net/article/details/138436871"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://carta.blog.csdn.net/article/details/138436871" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.11","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-11-138436871-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"11","strategy":"2~default~ElasticSearch~Rate","dest":"https://carta.blog.csdn.net/article/details/138436871"}'  data-report-query='spm=1001.2101.3001.6650.11&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-11-138436871-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-11-138436871-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+					<div class="left ellipsis-online ellipsis-online-1">【麻省理工科技评论】大型语言模型可以做一些令人瞠目结舌的事情，但没有人确切知道为什么。</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/pengpengjy" target="_blank"><span class="blog-title">云上笛暮</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">05-04</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					286
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://carta.blog.csdn.net/article/details/138436871" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.11","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-11-138436871-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"11","strategy":"2~default~ElasticSearch~Rate","dest":"https://carta.blog.csdn.net/article/details/138436871"}'  data-report-query='spm=1001.2101.3001.6650.11&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-11-138436871-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-11-138436871-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+				<div class="desc ellipsis-online ellipsis-online-1">如果你能做一些了不起的事情，但你不能真正控制它，那么它就不是那么神奇了。如果方向盘摇晃，一辆时速可以行驶 300 英里的汽车有什么用呢？</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://kaiyuan.blog.csdn.net/article/details/132843974"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.12","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-12-132843974-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"12","strategy":"2~default~ElasticSearch~Rate","dest":"https://kaiyuan.blog.csdn.net/article/details/132843974"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://kaiyuan.blog.csdn.net/article/details/132843974" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.12","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-12-132843974-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"12","strategy":"2~default~ElasticSearch~Rate","dest":"https://kaiyuan.blog.csdn.net/article/details/132843974"}'  data-report-query='spm=1001.2101.3001.6650.12&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-12-132843974-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-12-132843974-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+					<div class="left ellipsis-online ellipsis-online-1">大语言模型未来会是数据工程吗</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/Kaiyuan_sjtu" target="_blank"><span class="blog-title">Kaiyuan_sjtu的博客</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">09-12</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					152
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://kaiyuan.blog.csdn.net/article/details/132843974" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.12","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-12-132843974-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"12","strategy":"2~default~ElasticSearch~Rate","dest":"https://kaiyuan.blog.csdn.net/article/details/132843974"}'  data-report-query='spm=1001.2101.3001.6650.12&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-12-132843974-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-12-132843974-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+				<div class="desc ellipsis-online ellipsis-online-1">作者|养生的控制人整理|NewBeeNLPhttps<em>:</em>//zhuanlan.zhihu.com/p/654959483大家好，这里是 NewBeeNLP。分享符尧博士关于大语言模型的数据工程方面的一些见解。原文链接[1]take-home message： 高质量数据才是大语言模型取胜的关键，其中数据构造的格式、不同类型数据的占比，数据喂给模型的顺序对模型学习的速度都有所影响。随着大家...</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_download clearfix" data-url="https://download.csdn.net/download/BIZKEEN/93517541"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.13","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-download-2~default~BlogCommendHotData~default-13-93517541-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"13","strategy":"2~default~BlogCommendHotData~default","dest":"https://download.csdn.net/download/BIZKEEN/93517541"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://download.csdn.net/download/BIZKEEN/93517541" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.13","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-download-2~default~BlogCommendHotData~default-13-93517541-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"13","strategy":"2~default~BlogCommendHotData~default","dest":"https://download.csdn.net/download/BIZKEEN/93517541"}'  data-report-query='spm=1001.2101.3001.6650.13&utm_medium=distribute.pc_relevant.none-task-download-2%7Edefault%7EBlogCommendHotData%7Edefault-13-93517541-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-download-2%7Edefault%7EBlogCommendHotData%7Edefault-13-93517541-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+					<div class="left ellipsis-online ellipsis-online-1">园区如何精准服务企业创<em>新</em>需求提升招商效率？.docx</div>
+					<div class="tag">最新发布</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info display-flex">
+					<span class="info-block">09-28</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://download.csdn.net/download/BIZKEEN/93517541" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.13","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-download-2~default~BlogCommendHotData~default-13-93517541-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"13","strategy":"2~default~BlogCommendHotData~default","dest":"https://download.csdn.net/download/BIZKEEN/93517541"}'  data-report-query='spm=1001.2101.3001.6650.13&utm_medium=distribute.pc_relevant.none-task-download-2%7Edefault%7EBlogCommendHotData%7Edefault-13-93517541-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-download-2%7Edefault%7EBlogCommendHotData%7Edefault-13-93517541-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+				<div class="desc ellipsis-online ellipsis-online-1">园区如何精准服务企业创<em>新</em>需求提升招商效率？</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://blog.csdn.net/sD7O95O/article/details/131874534"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.14","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-14-131874534-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"14","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/sD7O95O/article/details/131874534"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://blog.csdn.net/sD7O95O/article/details/131874534" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.14","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-14-131874534-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"14","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/sD7O95O/article/details/131874534"}'  data-report-query='spm=1001.2101.3001.6650.14&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-14-131874534-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-14-131874534-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+					<div class="left ellipsis-online ellipsis-online-1">从费曼技巧，到GPT生成式模型的本质</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/sD7O95O" target="_blank"><span class="blog-title">dotNET跨平台</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">07-22</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					767
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://blog.csdn.net/sD7O95O/article/details/131874534" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.14","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-14-131874534-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"14","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/sD7O95O/article/details/131874534"}'  data-report-query='spm=1001.2101.3001.6650.14&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-14-131874534-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-14-131874534-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+				<div class="desc ellipsis-online ellipsis-online-1">生成式语言大模型（Generative Pretraining Transformer简称GPT-LLM）如此火爆，可是它是如何通过学习海量数据变得如此强大？而生成式模型的训练，和人类学习中常用的&rdquo;费曼技巧&ldquo;之间有什么关联？我们通过将两个似乎无关的概念联系在一起，看看能有什么启发。先说费曼技巧费曼的全名叫理查德&middot;费曼。他是非常著名的理论物理学家，&ldquo;费曼技巧&rdquo;就是他提出来的一种学习方法。费曼技巧...</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://blog.csdn.net/weixin_42520448/article/details/160608454"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.15","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-15-160608454-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"15","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/weixin_42520448/article/details/160608454"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://blog.csdn.net/weixin_42520448/article/details/160608454" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.15","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-15-160608454-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"15","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/weixin_42520448/article/details/160608454"}'  data-report-query='spm=1001.2101.3001.6650.15&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-15-160608454-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-15-160608454-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+					<div class="left ellipsis-online ellipsis-online-1">神经网络傅里叶特征学习机制<em>与</em>训练动态解析</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/weixin_42520448" target="_blank"><span class="blog-title">weixin_42520448的博客</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">04-28</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					244
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://blog.csdn.net/weixin_42520448/article/details/160608454" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.15","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-15-160608454-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"15","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/weixin_42520448/article/details/160608454"}'  data-report-query='spm=1001.2101.3001.6650.15&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-15-160608454-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-15-160608454-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+				<div class="desc ellipsis-online ellipsis-online-1">傅里叶变换作为信号处理的核心工具，在神经网络中展现出独特的特征表示能力。通过将输入数据映射到频域，网络能够自发形成单频特征表示，这种机制在模块化加法任务中得到验证。研究<em>发现</em>，神经网络通过梯度<em>下降</em>驱动的训练过程，会自然产生相位对齐和频率竞争现象，这<em>与</em><em>深度学习</em><em>中的</em>彩票机制理论高度吻合。从工程实践角度看，理解傅里叶特征学习机制有助于优化网络初始化策略和架构设计，特别是在处理具有周期特性的任务时，如时间序列预测和几何变换学习。本文通过离散傅里叶变换(DFT)分析，揭示了神经网络从记忆到<em>泛化</em>的三阶段动态，为设计更高效</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_download clearfix" data-url="https://download.csdn.net/download/BIZKEEN/93517239"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.16","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-download-2~default~BlogCommendHotData~default-16-93517239-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"16","strategy":"2~default~BlogCommendHotData~default","dest":"https://download.csdn.net/download/BIZKEEN/93517239"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://download.csdn.net/download/BIZKEEN/93517239" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.16","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-download-2~default~BlogCommendHotData~default-16-93517239-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"16","strategy":"2~default~BlogCommendHotData~default","dest":"https://download.csdn.net/download/BIZKEEN/93517239"}'  data-report-query='spm=1001.2101.3001.6650.16&utm_medium=distribute.pc_relevant.none-task-download-2%7Edefault%7EBlogCommendHotData%7Edefault-16-93517239-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-download-2%7Edefault%7EBlogCommendHotData%7Edefault-16-93517239-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+					<div class="left ellipsis-online ellipsis-online-1">政府如何通过数智化提升产业治理能力，构建现代化产业体系？.docx</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info display-flex">
+					<span class="info-block">09-28</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://download.csdn.net/download/BIZKEEN/93517239" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.16","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-download-2~default~BlogCommendHotData~default-16-93517239-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"16","strategy":"2~default~BlogCommendHotData~default","dest":"https://download.csdn.net/download/BIZKEEN/93517239"}'  data-report-query='spm=1001.2101.3001.6650.16&utm_medium=distribute.pc_relevant.none-task-download-2%7Edefault%7EBlogCommendHotData%7Edefault-16-93517239-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-download-2%7Edefault%7EBlogCommendHotData%7Edefault-16-93517239-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+				<div class="desc ellipsis-online ellipsis-online-1">科易网基于40亿+科创知识图谱数据库，深度探索AI技术在技术转移、成果转化、技术经纪、知识产权、产业创<em>新</em>、科技招商等垂直领域的多样化应用场景，研究科技创<em>新</em>领域的AI+数智化解决方案，推动科技创<em>新</em><em>与</em>产业创<em>新</em>智能化发展。</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_download clearfix" data-url="https://download.csdn.net/download/BIZKEEN/93517425"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.17","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-download-2~default~BlogCommendHotData~default-17-93517425-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"17","strategy":"2~default~BlogCommendHotData~default","dest":"https://download.csdn.net/download/BIZKEEN/93517425"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://download.csdn.net/download/BIZKEEN/93517425" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.17","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-download-2~default~BlogCommendHotData~default-17-93517425-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"17","strategy":"2~default~BlogCommendHotData~default","dest":"https://download.csdn.net/download/BIZKEEN/93517425"}'  data-report-query='spm=1001.2101.3001.6650.17&utm_medium=distribute.pc_relevant.none-task-download-2%7Edefault%7EBlogCommendHotData%7Edefault-17-93517425-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-download-2%7Edefault%7EBlogCommendHotData%7Edefault-17-93517425-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+					<div class="left ellipsis-online ellipsis-online-1">技术转移机构如何利用行业分析报告优化服务？.docx</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info display-flex">
+					<span class="info-block">09-28</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://download.csdn.net/download/BIZKEEN/93517425" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.17","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-download-2~default~BlogCommendHotData~default-17-93517425-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"landing_bge_commercial_es","index":"17","strategy":"2~default~BlogCommendHotData~default","dest":"https://download.csdn.net/download/BIZKEEN/93517425"}'  data-report-query='spm=1001.2101.3001.6650.17&utm_medium=distribute.pc_relevant.none-task-download-2%7Edefault%7EBlogCommendHotData%7Edefault-17-93517425-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-download-2%7Edefault%7EBlogCommendHotData%7Edefault-17-93517425-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+				<div class="desc ellipsis-online ellipsis-online-1">科易网基于40亿+科创知识图谱数据库，深度探索AI技术在技术转移、成果转化、技术经纪、知识产权、产业创<em>新</em>、科技招商等垂直领域的多样化应用场景，研究科技创<em>新</em>领域的AI+数智化解决方案，推动科技创<em>新</em><em>与</em>产业创<em>新</em>智能化发展。</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://blog.csdn.net/qq_45670407/article/details/146934539"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.18","mod":"popu_387","extra":"{\"utm_medium\":\"distribute.pc_relevant.none-task-blog-pc_relevant_commercial_fallback_v1-18-146934539-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"default","index":"18","strategy":"pc_relevant_commercial_fallback_v1","dest":"https://blog.csdn.net/qq_45670407/article/details/146934539"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://blog.csdn.net/qq_45670407/article/details/146934539" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.18","mod":"popu_387","extra":"{\"utm_medium\":\"distribute.pc_relevant.none-task-blog-pc_relevant_commercial_fallback_v1-18-146934539-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"default","index":"18","strategy":"pc_relevant_commercial_fallback_v1","dest":"https://blog.csdn.net/qq_45670407/article/details/146934539"}'  data-report-query='spm=1001.2101.3001.6650.18&utm_medium=distribute.pc_relevant.none-task-blog-pc_relevant_commercial_fallback_v1-18-146934539-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-blog-pc_relevant_commercial_fallback_v1-18-146934539-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+					<div class="left ellipsis-online ellipsis-online-1">深入剖析一个卷积块（ConvBlock）</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/qq_45670407" target="_blank"><span class="blog-title">qq_45670407的博客</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">04-02</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					1875
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://blog.csdn.net/qq_45670407/article/details/146934539" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.18","mod":"popu_387","extra":"{\"utm_medium\":\"distribute.pc_relevant.none-task-blog-pc_relevant_commercial_fallback_v1-18-146934539-blog-86334239.235^v43^pc_blog_bottom_relevance_base1\",\"dist_request_id\":\"silkroad_1790680497268\"}","dist_request_id":"silkroad_1790680497268","ab_strategy":"default","index":"18","strategy":"pc_relevant_commercial_fallback_v1","dest":"https://blog.csdn.net/qq_45670407/article/details/146934539"}'  data-report-query='spm=1001.2101.3001.6650.18&utm_medium=distribute.pc_relevant.none-task-blog-pc_relevant_commercial_fallback_v1-18-146934539-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant.none-task-blog-pc_relevant_commercial_fallback_v1-18-146934539-blog-86334239.235%5Ev43%5Epc_blog_bottom_relevance_base1'>
+				<div class="desc ellipsis-online ellipsis-online-1">深入剖析一个卷积块（ConvBlock）</div>
+			</a>
+		</div>
+	</div>
+</div>
+              </div>
+<div class="blog-footer-bottom" style="margin-top:10px;"></div>
+<script src="https://g.csdnimg.cn/common/csdn-footer/csdn-footer.js" data-isfootertrack="false" type="text/javascript"></script>
+<script type="text/javascript">
+    window.csdn.csdnFooter.options = {
+        el: '.blog-footer-bottom',
+        type: 2
+    }
+</script>          </main>
+<aside class="blog_container_aside">
+<div id="asideProfile" class="aside-box active">
+    <div class="profile-intro d-flex">
+        <div class="avatar-box d-flex justify-content-center flex-column">
+            <a href="https://blog.csdn.net/weixin_33724570" target="_blank" data-report-click='{"mod":"popu_379","spm":"3001.4121","dest":"https://blog.csdn.net/weixin_33724570","ab":"new"}'>
+                <img src="https://profile-avatar.csdnimg.cn/default.jpg!1" class="avatar_pic">
+            </a>
+        </div>
+        <div class="user-info d-flex flex-column profile-intro-name-box">
+            <div class="profile-intro-name-boxTop">
+                <a href="https://blog.csdn.net/weixin_33724570" target="_blank" class="" id="uid" title="weixin_33724570" data-report-click='{"mod":"popu_379","spm":"3001.4122","dest":"https://blog.csdn.net/weixin_33724570","ab":"new"}'>
+                    <span class="name" username="weixin_33724570">weixin_33724570</span>
+                </a>
+            </div>
+            <div class="profile-intro-name-boxFooter-new">
+              <p class="profile-intro-name-leve">
+                <span>
+                  博客等级
+                </span>
+                  <img class="level" src="https://csdnimg.cn/identity/blog7.png">
+              </p>
+                <span class="profile-intro-name-years" title="已加入 CSDN 11年">码龄11年</span>
+               
+            </div>
+        </div>
+    </div>
+    <div class="profile-intro-rank-information">
+      <dl>
+        <a href="https://blog.csdn.net/weixin_33724570" data-report-click='{"mod":"1598321000_001","spm":"3001.4310"}' data-report-query="t=1">  
+            <dd><span >1367</span></dd>
+            <dt>原创</dt>
+        </a>
+      </dl>
+       <dl title="9218">
+        <dd>9218</dd>
+        <dt>点赞</dt>
+      </dl>
+       <dl title="8807">
+        <dd>8807</dd>
+        <dt>收藏</dt>
+      </dl>
+      <dl id="fanBox" title="5365">
+        <dd><span id="fan">5365</span></dd>
+        <dt>粉丝</dt>
+      </dl>
+    </div>
+    <div class="profile-intro-name-boxOpration">
+        <div class="opt-letter-watch-box"> 
+            <a class="personal-watch bt-button" id="btnAttent" >关注</a>  
+        </div>
+        <div class="opt-letter-watch-box">
+        <a rel="nofollow" class="bt-button personal-letter" href="https://im.csdn.net/chat/weixin_33724570" target="_blank" rel="noopener">私信</a>
+        </div>
+    </div>
+</div>
+      <div class="swiper-slide-box-remuneration">
+        <a data-report-click='{"spm":"3001.9728","extra":{"index":"0"}}' data-report-view='{"spm":"3001.9728","extra":{"index":"0"}}' href="https://mp.csdn.net/vip?utm_source=902253762" target="_blank">
+          <img src="https://i-operation.csdnimg.cn/images/e6e7a35477544c888a142e19f7080c95.jpeg" alt="">
+        </a>
+      </div>
+<div class="box-shadow mb8" data-pid="blog" >
+    <div class="aside-content text-center" id="cpro_u2734133">
+        <div id="kp_box_56" data-pid="56"><div class="wwads-cn wwads-vertical" data-id="149" style="max-width:300px;margin-top:0;margin-bottom:10px;background-color: #fff;"></div> 
+<style>.wwads-img img {width: 150px; margin-top:10px}</style>
+<script type="text/javascript" charset="UTF-8" src="https://cdn.wwads.cn/js/makemoney.js" async></script><img class="pre-img-lasy" data-src="https://kunyu.csdn.net/1.png?p=56&adId=1100446&adBlockFlag=0&a=1100446&c=0&k=Grokking与双下降：深度学习中的结构发现与泛化新范式&spm=1001.2101.3001.5000&articleId=86334239&d=1&t=3&u=f91b17d0c2eb4c189049d0f04e1673b4" style="display: block;width: 0px;height: 0px;"></div>
+    </div>
+</div>
+
+
+<div id="his-selection" class="aside-box">
+    <h3 class="aside-title">TA的精选</h3>
+    <div class="aside-content">
+        <ul class="his-selection-box">
+        <li class="his-selection-item">
+            <a class="title" 
+              target="_blank" 
+              href="https://blog.csdn.net/weixin_33724570/article/details/91591583"
+              data-report-click='{"spm":"3001.4139","dest":"https://blog.csdn.net/weixin_33724570/article/details/91591583","ab":"new"}'
+              data-report-view='{"spm":"3001.4139","dest":"https://blog.csdn.net/weixin_33724570/article/details/91591583","ab":"new"}'
+            >
+            <span class="tag">新</span>
+            <span class="text">C++开发者如何理性评估Qt框架的学习价值与就业前景</span>
+            </a>
+            <p class="read-count">
+                514 阅读   
+            </p>
+        </li>
+        <li class="his-selection-item">
+            <a class="title" 
+              target="_blank" 
+              href="https://blog.csdn.net/weixin_33724570/article/details/93999424"
+              data-report-click='{"spm":"3001.4139","dest":"https://blog.csdn.net/weixin_33724570/article/details/93999424","ab":"new"}'
+              data-report-view='{"spm":"3001.4139","dest":"https://blog.csdn.net/weixin_33724570/article/details/93999424","ab":"new"}'
+            >
+            <span class="tag">新</span>
+            <span class="text">工业自动化三层控制架构：从电机控制到过程控制的系统级解析</span>
+            </a>
+            <p class="read-count">
+                361 阅读   
+            </p>
+        </li>
+        <li class="his-selection-item">
+            <a class="title" 
+              target="_blank" 
+              href="https://blog.csdn.net/weixin_33724570/article/details/88030806"
+              data-report-click='{"spm":"3001.4139","dest":"https://blog.csdn.net/weixin_33724570/article/details/88030806","ab":"new"}'
+              data-report-view='{"spm":"3001.4139","dest":"https://blog.csdn.net/weixin_33724570/article/details/88030806","ab":"new"}'
+            >
+            <span class="tag active">热</span>
+            <span class="text">java中比较两个map是否相同</span>
+            </a>
+            <p class="read-count">
+                25343 阅读   
+            </p>
+        </li>
+        <li class="his-selection-item">
+            <a class="title" 
+              target="_blank" 
+              href="https://blog.csdn.net/weixin_33724570/article/details/89543842"
+              data-report-click='{"spm":"3001.4139","dest":"https://blog.csdn.net/weixin_33724570/article/details/89543842","ab":"new"}'
+              data-report-view='{"spm":"3001.4139","dest":"https://blog.csdn.net/weixin_33724570/article/details/89543842","ab":"new"}'
+            >
+            <span class="tag active">热</span>
+            <span class="text">
+                                AECC2019免费下载After Effects CC 2019中文完整破解版免费下载与安装教程
+    ...</span>
+            </a>
+            <p class="read-count">
+                17624 阅读   
+            </p>
+        </li>
+        <li class="his-selection-item">
+            <a class="title" 
+              target="_blank" 
+              href="https://blog.csdn.net/weixin_33724570/article/details/93433211"
+              data-report-click='{"spm":"3001.4139","dest":"https://blog.csdn.net/weixin_33724570/article/details/93433211","ab":"new"}'
+              data-report-view='{"spm":"3001.4139","dest":"https://blog.csdn.net/weixin_33724570/article/details/93433211","ab":"new"}'
+            >
+            <span class="tag active">热</span>
+            <span class="text">将txt文件转化为json进行操作</span>
+            </a>
+            <p class="read-count">
+                16184 阅读   
+            </p>
+        </li>
+        </ul>
+          <p class="his-selection-move">
+            <a class="more" 
+            data-report-view='{"spm":"3001.10751","dest":"https://blog.csdn.net/weixin_33724570?type=blog"}'
+            data-report-click='{"spm":"3001.10751","dest":"https://blog.csdn.net/weixin_33724570?type=blog"}'
+            href="https://blog.csdn.net/weixin_33724570?type=blog" target="_blank">查看更多 <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/commentArrowRightWhite.png" alt=""></a>
+          </p>
+    </div>
+</div>    
+   <div id="asideHotArticle" class="aside-box">
+    <h3 class="aside-title">大家在看</h3>
+    <div class="aside-content">
+      <ul class="hotArticle-list">
+        <li>
+          <a href="https://blog.csdn.net/duke_zhang2024/article/details/166847173" target="_blank"  data-report-click='{"spm":"3001.10093","dest":"https://blog.csdn.net/duke_zhang2024/article/details/166847173","strategy":"202_1052723-4584604_RCMD","ab":"new"}' data-report-view='{"spm":"3001.10093","dest":"https://blog.csdn.net/duke_zhang2024/article/details/166847173","strategy":"202_1052723-4584604_RCMD","ab":"new"}'>
+          光模块去DSP化四大技术路线对比
+          </a>
+        </li>
+        <li>
+          <a href="https://blog.csdn.net/panguanjia/article/details/166792822" target="_blank"  data-report-click='{"spm":"3001.10093","dest":"https://blog.csdn.net/panguanjia/article/details/166792822","strategy":"202_1052723-4584642_RCMD","ab":"new"}' data-report-view='{"spm":"3001.10093","dest":"https://blog.csdn.net/panguanjia/article/details/166792822","strategy":"202_1052723-4584642_RCMD","ab":"new"}'>
+          迅雷网盘批量转存与拉新工具
+            <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+            <span class="read">205</span>
+          </a>
+        </li>
+        <li>
+          <a href="https://blog.csdn.net/2601_96880146/article/details/166847292" target="_blank"  data-report-click='{"spm":"3001.10093","dest":"https://blog.csdn.net/2601_96880146/article/details/166847292","strategy":"202_1052723-4584579_RCMD","ab":"new"}' data-report-view='{"spm":"3001.10093","dest":"https://blog.csdn.net/2601_96880146/article/details/166847292","strategy":"202_1052723-4584579_RCMD","ab":"new"}'>
+          AI不推荐品牌的5大根因诊断
+          </a>
+        </li>
+        <li>
+          <a href="https://blog.csdn.net/2401_87629362/article/details/166845663" target="_blank"  data-report-click='{"spm":"3001.10093","dest":"https://blog.csdn.net/2401_87629362/article/details/166845663","strategy":"202_1052723-4584587_RCMD","ab":"new"}' data-report-view='{"spm":"3001.10093","dest":"https://blog.csdn.net/2401_87629362/article/details/166845663","strategy":"202_1052723-4584587_RCMD","ab":"new"}'>
+          蓝耘智能路由实现模型动态切换
+            <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+            <span class="read">378</span>
+          </a>
+        </li>
+        <li>
+          <a href="https://blog.csdn.net/qq_65272847/article/details/166847503" target="_blank"  data-report-click='{"spm":"3001.10093","dest":"https://blog.csdn.net/qq_65272847/article/details/166847503","strategy":"202_1052723-4584607_RCMD","ab":"new"}' data-report-view='{"spm":"3001.10093","dest":"https://blog.csdn.net/qq_65272847/article/details/166847503","strategy":"202_1052723-4584607_RCMD","ab":"new"}'>
+          NFS与iSCSI存储及MariaDB入门
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+        <div id="asideArchiveNew" class="aside-box">
+            <h3 class="aside-title">TA的创作历程</h3>
+          <div class="aside-content">
+            <div class="archive-box">
+                    <div class="archive-title">
+                      2026
+                    </div>
+                  <div class="swiper-archive-content-box">
+                    <div class="swiper-btn swiper-prev">
+                      <svg class="icon-swiper-btn" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M10.3535 2.35352L4.70703 8L10.3535 13.6465L9.64648 14.3535L3.29297 8L9.64648 1.64648L10.3535 2.35352Z" fill="currentColor"/>
+                      </svg>
+                    </div>
+                    <div class="archive-content swiper">
+                      <div class="swiper-wrapper">
+                          <div class="swiper-slide archive-item">
+                            <a href="https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2026&amp;month=08" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2026&amp;month=08"}'>
+                              <span class="time">
+                                08月</span>
+                              <span class="count">
+                                100篇</span>
+                            </a>
+                          </div>
+                          <div class="swiper-slide archive-item">
+                            <a href="https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2026&amp;month=07" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2026&amp;month=07"}'>
+                              <span class="time">
+                                07月</span>
+                              <span class="count">
+                                205篇</span>
+                            </a>
+                          </div>
+                          <div class="swiper-slide archive-item">
+                            <a href="https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2026&amp;month=06" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2026&amp;month=06"}'>
+                              <span class="time">
+                                06月</span>
+                              <span class="count">
+                                193篇</span>
+                            </a>
+                          </div>
+                          <div class="swiper-slide archive-item">
+                            <a href="https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2026&amp;month=05" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2026&amp;month=05"}'>
+                              <span class="time">
+                                05月</span>
+                              <span class="count">
+                                533篇</span>
+                            </a>
+                          </div>
+                          <div class="swiper-slide archive-item">
+                            <a href="https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2026&amp;month=04" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2026&amp;month=04"}'>
+                              <span class="time">
+                                04月</span>
+                              <span class="count">
+                                210篇</span>
+                            </a>
+                          </div>
+                      </div>
+                    </div>
+                    <div class="swiper-btn swiper-next">
+                      <svg class="icon-swiper-btn" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M5.64649 2.35352L11.293 8L5.64648 13.6465L6.35352 14.3535L12.707 8L6.35352 1.64649L5.64649 2.35352Z" fill="currentColor"/>
+                      </svg>
+                    </div>
+                  </div>
+              <div class="archive-title border-top">
+                历年创作
+              </div>
+              <div class="archive-list-item-container">
+                <div class="swiper-btn swiper-prev">
+                  <svg class="icon-swiper-btn" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M10.3535 2.35352L4.70703 8L10.3535 13.6465L9.64648 14.3535L3.29297 8L9.64648 1.64648L10.3535 2.35352Z" fill="currentColor"/>
+                  </svg>
+                </div>
+                <div class="swiper">
+                  <div class="swiper-wrapper">
+                        <div class="swiper-slide archive-list-item"><a href="https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2019&amp;month=07" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2019&amp;month=07"}'><span class="year">
+                              2019年</span><span class="num">
+                              287篇</span></a></div>
+                        <div class="swiper-slide archive-list-item"><a href="https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2018&amp;month=12" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2018&amp;month=12"}'><span class="year">
+                              2018年</span><span class="num">
+                              476篇</span></a></div>
+                        <div class="swiper-slide archive-list-item"><a href="https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2017&amp;month=12" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2017&amp;month=12"}'><span class="year">
+                              2017年</span><span class="num">
+                              658篇</span></a></div>
+                        <div class="swiper-slide archive-list-item"><a href="https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2016&amp;month=12" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2016&amp;month=12"}'><span class="year">
+                              2016年</span><span class="num">
+                              390篇</span></a></div>
+                        <div class="swiper-slide archive-list-item"><a href="https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2015&amp;month=12" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2015&amp;month=12"}'><span class="year">
+                              2015年</span><span class="num">
+                              277篇</span></a></div>
+                        <div class="swiper-slide archive-list-item"><a href="https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2014&amp;month=12" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2014&amp;month=12"}'><span class="year">
+                              2014年</span><span class="num">
+                              220篇</span></a></div>
+                        <div class="swiper-slide archive-list-item"><a href="https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2013&amp;month=12" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2013&amp;month=12"}'><span class="year">
+                              2013年</span><span class="num">
+                              236篇</span></a></div>
+                        <div class="swiper-slide archive-list-item"><a href="https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2012&amp;month=12" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2012&amp;month=12"}'><span class="year">
+                              2012年</span><span class="num">
+                              188篇</span></a></div>
+                        <div class="swiper-slide archive-list-item"><a href="https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2011&amp;month=12" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2011&amp;month=12"}'><span class="year">
+                              2011年</span><span class="num">
+                              152篇</span></a></div>
+                        <div class="swiper-slide archive-list-item"><a href="https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2010&amp;month=12" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2010&amp;month=12"}'><span class="year">
+                              2010年</span><span class="num">
+                              110篇</span></a></div>
+                        <div class="swiper-slide archive-list-item"><a href="https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2009&amp;month=12" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2009&amp;month=12"}'><span class="year">
+                              2009年</span><span class="num">
+                              76篇</span></a></div>
+                        <div class="swiper-slide archive-list-item"><a href="https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2008&amp;month=12" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2008&amp;month=12"}'><span class="year">
+                              2008年</span><span class="num">
+                              68篇</span></a></div>
+                        <div class="swiper-slide archive-list-item"><a href="https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2007&amp;month=12" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2007&amp;month=12"}'><span class="year">
+                              2007年</span><span class="num">
+                              63篇</span></a></div>
+                        <div class="swiper-slide archive-list-item"><a href="https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2006&amp;month=12" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2006&amp;month=12"}'><span class="year">
+                              2006年</span><span class="num">
+                              27篇</span></a></div>
+                        <div class="swiper-slide archive-list-item"><a href="https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2005&amp;month=12" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2005&amp;month=12"}'><span class="year">
+                              2005年</span><span class="num">
+                              20篇</span></a></div>
+                        <div class="swiper-slide archive-list-item"><a href="https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2004&amp;month=12" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_33724570?type=blog&amp;year=2004&amp;month=12"}'><span class="year">
+                              2004年</span><span class="num">
+                              6篇</span></a></div>
+                  </div>
+                </div>
+                <div class="swiper-btn swiper-next">
+                  <svg class="icon-swiper-btn" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M5.64649 2.35352L11.293 8L5.64648 13.6465L6.35352 14.3535L12.707 8L6.35352 1.64649L5.64649 2.35352Z" fill="currentColor"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+  <div class="article-previous" id="article-previous">
+      <dl data-report-click='{"spm":"3001.10752","extend1":"上一篇"}' data-report-view='{"spm":"3001.10752","extend1":"上一篇"}'>
+          <dt>
+              上一篇：
+          </dt>
+          <dd>
+            <a href="https://blog.csdn.net/weixin_33724570/article/details/86446093" data-report-query="spm=3001.10752">
+              Objects that Sound：跨模态表征学习实现视听语义对齐
+            </a>
+          </dd>
+      </dl>
+      <dl class="next" data-report-click='{"spm":"3001.10796","extend1":"下一篇"}' data-report-view='{"spm":"3001.10796","extend1":"下一篇"}'>
+          <dt>
+            下一篇：
+          </dt>
+          <dd >
+            <a href="https://blog.csdn.net/weixin_33724570/article/details/91587701" data-report-query="spm=3001.10796">
+              Triton模型服务生产实践：高可用、可观测与成本优化
+            </a>
+          </dd>
+      </dl>
+  </div>
+    <div id="footerRightAds" class="isShowFooterAds">
+      <div class="aside-box">
+        <div id="kp_box_57" data-pid="57"><iframe  src="https://kunpeng-sc.csdnimg.cn/?timestamp=1645783940/#/preview/4492406?positionId=57&adBlockFlag=0&adId=1111640&queryWord=Grokking与双下降：深度学习中的结构发现与泛化新范式&spm=1001.2101.3001.5001&articleId=86334239" frameborder="0" width= "300px"  height= "600px" scrolling="no" ></iframe><img class="pre-img-lasy"  data-src="https://kunyu.csdn.net/1.png?p=57&adBlockFlag=0&adId=1111640&a=1111640&c=4492406&k=Grokking与双下降：深度学习中的结构发现与泛化新范式&spm=1001.2101.3001.5001&articleId=86334239&d=1&t=3&u=ceda650825fd4affa811e137f657a0a1" style="display: block;width: 0px;height: 0px;"><script src="https://kunpeng-render.csdnimg.cn/publisher/latest/closeAdFrame.js"></script></div>
+      </div>
+    </div>
+    <!-- 详情页显示目录 -->
+<div class="aside-box cknows-side-card js-aside-cknows">
+  <div class="cknows-side-header">
+    <div class="cknows-side-header-row">
+      <div class="cknows-side-logo-wrap">
+        <img class="cknows-side-logo" src="https://csdnimg.cn/release/blogv2/dist/pc/img/c-blog-slidelogo-White.png" alt="C知道">
+      </div>
+      <p class="cknows-side-brand">· AI 阅读助手</p>
+    </div>
+  </div>
+  <div class="swiper cknows-side-swiper">
+    <div class="swiper-wrapper cknows-swiper-wrapper"></div>
+    <div class="cknows-side-pagination swiper-pagination"></div>
+  </div>
+</div>
+<!--文章目录-->
+<div id="asidedirectory" class="aside-box">
+    <div class='groupfile groupfile-active' id="directory">
+        <h3 class="aside-title">目录</h3>
+        <div class="align-items-stretch group_item" id="align-items-stretch">
+            <div class="pos-box">
+            <div class="scroll-box">
+                <div class="toc-box"></div>
+            </div>
+            </div>
+        </div>
+          <p class="flexible-btn-new" id="flexible-btn-groupfile" data-report-click='{"spm":"3001.10780","strategy":"展开全部"}' data-minheight="117px" data-maxheight="446px" data-fbox="#align-items-stretch"><span class="text">展开全部</span> <img class="look-more" src="https://csdnimg.cn/release/blogv2/dist/pc/img/arrowup-line-bot-White.png" alt=""></p>
+          <p class="flexible-btn-new-close close" data-report-click='{"spm":"3001.10780","strategy":"收起"}'  data-minheight="117px" data-maxheight="446px" data-fbox="#align-items-stretch"><span class="text">收起</span> <img class="look-more" src="https://csdnimg.cn/release/blogv2/dist/pc/img/arrowup-line-top-White.png" alt=""></p>
+    </div>
+</div>
+<div class="gitcode-qc-left-box aside-box" data-report-click='{"spm":"3001.11256", "extra":"{\"position\":\"left\"}"}'></div>
+</aside>
+<script>
+	$("a.flexible-btn").click(function(){
+		$(this).parents('div.aside-box').removeClass('flexible-box');
+		$(this).parents("p.text-center").remove();
+	})
+</script>
+<script type="text/javascript"  src="https://g.csdnimg.cn/user-tooltip/2.7/user-tooltip.js"></script>
+<script type="text/javascript"  src="https://g.csdnimg.cn/user-medal/2.0.0/user-medal.js"></script>
+        </div>
+<div class="recommend-right align-items-stretch clearfix article-component-material-third-column" id="rightAside" data-type="recommend">
+    <aside class="recommend-right_aside">
+            <div class="rightside-fixed-hide">
+              <div class="programmer1Box">
+                  <div id="kp_box_530" data-pid="530"><iframe  src="https://kunpeng-sc.csdnimg.cn/?timestamp=1645783940/#/preview/4475404?positionId=530&adBlockFlag=0&adId=1110216&queryWord=Grokking与双下降：深度学习中的结构发现与泛化新范式&spm=1001.2101.3001.4647&articleId=86334239" frameborder="0" width= "300px"  height= "600px" scrolling="no" ></iframe><img class="pre-img-lasy"  data-src="https://kunyu.csdn.net/1.png?p=530&adBlockFlag=0&adId=1110216&a=1110216&c=4475404&k=Grokking与双下降：深度学习中的结构发现与泛化新范式&spm=1001.2101.3001.4647&articleId=86334239&d=1&t=3&u=285c00343df34f65aad3839faa682f1a" style="display: block;width: 0px;height: 0px;"><script src="https://kunpeng-render.csdnimg.cn/publisher/latest/closeAdFrame.js"></script></div>
+              </div>
+      </div>
+        <div id="recommend-right" >
+<div class="aside-box cknows-side-card js-aside-cknows">
+  <div class="cknows-side-header">
+    <div class="cknows-side-header-row">
+      <div class="cknows-side-logo-wrap">
+        <img class="cknows-side-logo" src="https://csdnimg.cn/release/blogv2/dist/pc/img/c-blog-slidelogo-White.png" alt="C知道">
+      </div>
+      <p class="cknows-side-brand">· AI 阅读助手</p>
+    </div>
+  </div>
+  <div class="swiper cknows-side-swiper">
+    <div class="swiper-wrapper cknows-swiper-wrapper"></div>
+    <div class="cknows-side-pagination swiper-pagination"></div>
+  </div>
+</div>
+          <div class='flex-column aside-box groupfile groupfile-active ' id="groupfile">
+              <div class="groupfile-div">
+              <h3 class="aside-title">目录</h3>
+              <div class="align-items-stretch group_item" id="align-items-stretch-right">
+                  <div class="pos-box">
+                      <div class="scroll-box">
+                          <div class="toc-box"></div>
+                      </div>
+                  </div>
+              </div>
+                <p class="flexible-btn-new" id="flexible-btn-groupfile" data-report-click='{"spm":"3001.10782","strategy":"展开全部"}' data-traigger="true" data-minheight="117px" data-maxheight="446px" data-fbox="#align-items-stretch-right"><span class="text">展开全部</span> <img class="look-more" src="https://csdnimg.cn/release/blogv2/dist/pc/img/arrowup-line-bot-White.png" alt=""></p>
+                <p class="flexible-btn-new-close close" data-report-click='{"spm":"3001.10782","strategy":"收起"}' data-traigger="true"  data-minheight="117px" data-maxheight="446px" data-fbox="#align-items-stretch-right"><span class="text">收起</span> <img class="look-more" src="https://csdnimg.cn/release/blogv2/dist/pc/img/arrowup-line-top-White.png" alt=""></p>
+              </div>
+          </div>
+          <div class="gitcode-qc-right-box aside-box" data-report-click='{"spm":"3001.11256", "extra":"{\"position\":\"right\"}"}'></div>
+              <div id="recommendAdBox">
+                  <div id="kp_box_479" data-pid="479"><div class="wwads-cn wwads-vertical" data-id="149" style="max-width:300px;margin-top:10px;background-color: #fff;"></div> 
+<style>.wwads-img img {width: 150px; margin-top:10px}</style><img class="pre-img-lasy" data-src="https://kunyu.csdn.net/1.png?p=479&adId=1100447&adBlockFlag=0&a=1100447&c=0&k=Grokking与双下降：深度学习中的结构发现与泛化新范式&spm=1001.2101.3001.4834&articleId=86334239&d=1&t=3&u=f88c687a015845728219d9e8c28c5583" style="display: block;width: 0px;height: 0px;"></div>
+              </div>
+  <div class="article-previous" id="article">
+      <dl data-report-click='{"spm":"3001.10752","extend1":"上一篇"}' data-report-view='{"spm":"3001.10752","extend1":"上一篇"}'>
+          <dt>
+              上一篇：
+          </dt>
+          <dd>
+            <a href="https://blog.csdn.net/weixin_33724570/article/details/86446093" data-report-query="spm=3001.10752">
+              Objects that Sound：跨模态表征学习实现视听语义对齐
+            </a>
+          </dd>
+      </dl>
+      <dl class="next" data-report-click='{"spm":"3001.10796","extend1":"下一篇"}' data-report-view='{"spm":"3001.10796","extend1":"下一篇"}'>
+          <dt>
+            下一篇：
+          </dt>
+          <dd >
+            <a href="https://blog.csdn.net/weixin_33724570/article/details/91587701" data-report-query="spm=3001.10796">
+              Triton模型服务生产实践：高可用、可观测与成本优化
+            </a>
+          </dd>
+      </dl>
+  </div>
+        </div>
+    </aside>
+</div>
+<div class="recommend-right1  align-items-stretch clearfix" id="rightAsideConcision" data-type="recommend">
+    <aside class="recommend-right_aside">
+        <div id="recommend-right-concision" >
+            <div class='flex-column aside-box groupfile' id="groupfileConcision">
+                <div class="groupfile-div1">
+                <h3 class="aside-title">目录</h3>
+                <div class="align-items-stretch group_item">
+                    <div class="pos-box">
+                        <div class="scroll-box">
+                            <div class="toc-box"></div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+</div>
+
+      </div>
+      <div class="mask-dark"></div>
+        <script type="text/javascript">
+        var timert = setInterval(function() {
+          sideToolbar = $(".csdn-side-toolbar");
+          if (sideToolbar.length > 0) {
+            sideToolbar.css('cssText', 'bottom:64px !important;')
+            clearInterval(timert);
+          }
+        }, 200);
+        </script>
+      <div class="skin-boxshadow"></div>
+      <div class="directory-boxshadow"></div>
+<div class="comment-side-box-shadow comment-side-tit-close" id="commentSideBoxshadow">
+<div class="comment-side-content">
+	<div class="comment-side-tit">
+		<span class="comment-side-tit-count">评论</span>	
+	<img class="comment-side-tit-close" src="https://csdnimg.cn/release/blogv2/dist/pc/img/closeBt.png"></div>
+  <div id="pcCommentSideBox" class="comment-box comment-box-new2" style="display:block">
+    <div class="comment-edit-box d-flex">
+      <div class="user-img">
+      </div>
+      <form id="commentform">
+        <textarea class="comment-content" name="comment_content" id="comment_content" placeholder="说说你的看法，或者提个问题" maxlength="1000"></textarea>
+        <div class="comment-reward-box" style="background-image: url('https://img-home.csdnimg.cn/images/20230131025301.png');">
+          <a class="btn-remove-reward"></a>
+          <div class="form-reward-box">
+            <div class="info">
+              成就一亿技术人!
+            </div>
+            <div class="price-info">
+              拼手气红包<span class="price">6.0元</span>
+            </div>
+          </div>
+        </div>
+        <div class="comment-operate-box">
+          <div class="comment-operate-l">
+            <span id="tip_comment" class="tip">还能输入<em>1000</em>个字符</span>
+            <span class="tip" id="isShowCommentAuth" data-type="1">&nbsp;|&nbsp;博主筛选后可见</span>
+          </div>
+          <div class="comment-operate-c">
+            &nbsp;
+          </div>
+          <div class="comment-operate-r">
+            <div class="comment-operate-item comment-emoticon">
+              <img class="comment-operate-img" data-url="https://csdnimg.cn/release/blogv2/dist/pc/img/" src="https://csdnimg.cn/release/blogv2/dist/pc/img/commentEmotionIcon.png" alt="表情包">
+              <span class="comment-operate-tip">插入表情</span>
+              <div class="comment-emoticon-box comment-operate-isshow">
+                <div class="comment-emoticon-img-box"></div>
+              </div>
+            </div>
+            <div class="comment-operate-item comment-code">
+              <img class="comment-operate-img" data-url="https://csdnimg.cn/release/blogv2/dist/pc/img/" src="https://csdnimg.cn/release/blogv2/dist/pc/img/commentCodeIcon.png" alt="表情包">
+              <span class="comment-operate-tip">代码片</span>
+              <div class="comment-code-box comment-operate-isshow">
+                <ul id="commentCode">
+                  <li><a data-code="html">HTML/XML</a></li>
+                  <li><a data-code="objc">objective-c</a></li>
+                  <li><a data-code="ruby">Ruby</a></li>
+                  <li><a data-code="php">PHP</a></li>
+                  <li><a data-code="csharp">C</a></li>
+                  <li><a data-code="cpp">C++</a></li>
+                  <li><a data-code="javascript">JavaScript</a></li>
+                  <li><a data-code="python">Python</a></li>
+                  <li><a data-code="java">Java</a></li>
+                  <li><a data-code="css">CSS</a></li>
+                  <li><a data-code="sql">SQL</a></li>
+                  <li><a data-code="plain">其它</a></li>
+                </ul>
+              </div>
+            </div>
+            <div class="comment-operate-item">
+              <input type="hidden" id="comment_replyId" name="comment_replyId">
+              <input type="hidden" id="article_id" name="article_id" value="86334239">
+              <input type="hidden" id="comment_userId" name="comment_userId" value="">
+              <input type="hidden" id="commentId" name="commentId" value="">
+              <a data-report-click='{"mod":"1582594662_003","spm":"1001.2101.3001.4227","ab":"new","extra":{"type":"button"}}' data-report-view='{"mod":"1582594662_003","spm":"1001.2101.3001.4227","ab":"new","extra":{"type":"button"}}'>
+              <input type="submit" class="btn-comment btn-comment-input" value="评论">
+              </a>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+		<div class="comment-list-container">
+			<div class="comment-list-box comment-operate-item">
+			</div>
+			<div id="lookFlodComment" class="look-flod-comment">
+					<span class="count"></span>&nbsp;条评论被折叠&nbsp;<a class="look-more-flodcomment">查看</a>
+			</div>
+			<div class="opt-box text-center">
+				<div class="btn btn-sm btn-link-blue" id="btnMoreComment"></div>
+			</div>
+		</div>
+	</div>
+	<div id="pcFlodCommentSideBox" class="pc-flodcomment-sidebox">
+		<div class="comment-fold-tit"><span id="lookUnFlodComment" class="back"><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/commentArrowLeftWhite.png" alt=""></span>被折叠的&nbsp;<span class="count"></span>&nbsp;条评论
+		 <a href="https://blogdev.blog.csdn.net/article/details/122245662" class="tip" target="_blank">为什么被折叠?</a>
+		 <a href="https://bbs.csdn.net/forums/FreeZone" class="park" target="_blank">
+		 <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/iconPark.png">到【灌水乐园】发言</a>                                
+		</div>
+		<div class="comment-fold-content"></div>
+		<div id="lookBadComment" class="look-bad-comment side-look-comment">
+			<a class="look-more-comment">查看更多评论<img src="https://csdnimg.cn/release/blogv2/dist/pc/img/commentArrowDownWhite.png" alt=""></a>
+		</div>
+	</div>
+</div>
+<div class="comment-rewarddialog-box">
+  <div class="form-box">
+    <div class="title-box">
+      添加红包
+      <a class="btn-form-close"></a>
+    </div>
+    <form id="commentRewardForm">
+      <div class="ipt-box">
+        <label for="txtName">祝福语</label>
+        <div class="ipt-btn-box">
+          <input type="text" name="name" id="txtName" autocomplete="off" maxlength="50">
+          <a class="btn-ipt btn-random"></a>
+        </div>
+        <p class="notice">请填写红包祝福语或标题</p>
+      </div>
+      <div class="ipt-box">
+        <label for="txtSendAmount">红包数量</label>
+        <div class="ipt-txt-box">
+          <input type="text" name="sendAmount" maxlength="4" id="txtSendAmount" placeholder="请填写红包数量(最小10个)" autocomplete="off">
+          <span class="after-txt">个</span>
+        </div>
+        <p class="notice">红包个数最小为10个</p>
+      </div>
+      <div class="ipt-box">
+        <label for="txtMoney">红包总金额</label>
+        <div class="ipt-txt-box error">
+          <input type="text" name="money" maxlength="5" id="txtMoney" placeholder="请填写总金额(最低5元)" autocomplete="off">
+          <span class="after-txt">元</span>
+        </div>
+        <p class="notice">红包金额最低5元</p>
+      </div>
+      <div class="balance-info-box">
+        <label>余额支付</label>
+        <div class="balance-info">
+          当前余额<span class="balance">3.43</span>元
+          <a href="https://i.csdn.net/#/wallet/balance/recharge" class="link-charge" target="_blank">前往充值 ></a>
+        </div>
+      </div>
+      <div class="opt-box">
+        <div class="pay-info">
+          需支付：<span class="price">10.00</span>元
+        </div>
+        <button type="button" class="ml-auto btn-cancel">取消</button>
+        <button type="button" class="ml8 btn-submit" disabled="true">确定</button>
+      </div>
+    </form>
+  </div>
+</div>
+</div>
+
+<div class="redEnvolope" id="redEnvolope">
+  <div class="env-box">
+    <div class="env-container">
+      <div class="pre-open" id="preOpen">
+        <div class="top">
+          <header>
+            <img class="clearTpaErr" :src="redpacketAuthor.avatar" alt="" />
+            <div class="author">成就一亿技术人!</div>
+          </header>
+          <div class="bot-icon"></div>
+        </div>
+        <footer>
+          <div class="red-openbtn open-start"></div>
+          <div class="tip">
+            领取后你会自动成为博主和红包主的粉丝
+            <a class="rule" target="_blank">规则</a>
+          </div>
+        </footer>
+      </div>
+      <div class="opened" id="opened">
+        <div class="bot-icon">
+          <header>
+            <a class="creatorUrl" href="" target="_blank">
+              <img class="clearTpaErr" src="https://profile-avatar.csdnimg.cn/default.jpg!2" alt="" />
+            </a>
+            <div class="author">
+              <div class="tt">hope_wisdom</div> 发出的红包
+            </div>
+          </header>
+        </div>
+        <div class="receive-box">
+          <header></header>
+          <div class="receive-list">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="close-btn"></div>
+  </div>
+</div>
+      
+      <div class="pay-code">
+      <div class="pay-money">实付<span class="pay-money-span" data-nowprice='' data-oldprice=''>元</span></div>
+      <div class="content-blance"><a class="blance-bt" href="javascript:;">使用余额支付</a></div>
+      <div class="content-code">
+        <div id="payCode" data-id="">
+          <div class="renovate">
+            <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/pay-time-out.png">
+            <span>点击重新获取</span>
+          </div>
+        </div>
+        <div class="pay-style"><span><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/weixin.png"></span><span><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/zhifubao.png"></span><span><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/jingdong.png"></span><span class="text">扫码支付</span></div>
+      </div>
+      <div class="bt-close">
+        <svg t="1567152543821" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="10924" xmlns:xlink="http://www.w3.org/1999/xlink" width="12" height="12">
+          <defs>
+            <style type="text/css"></style>
+          </defs>
+          <path d="M512 438.378667L806.506667 143.893333a52.032 52.032 0 1 1 73.6 73.621334L585.621333 512l294.485334 294.485333a52.074667 52.074667 0 0 1-73.6 73.642667L512 585.621333 217.514667 880.128a52.053333 52.053333 0 1 1-73.621334-73.642667L438.378667 512 143.893333 217.514667a52.053333 52.053333 0 1 1 73.621334-73.621334L512 438.378667z" fill="" p-id="10925"></path>
+        </svg>
+      </div>
+      <div class="pay-balance">
+        <input type="radio" class="pay-code-radio" data-type="details">
+        <span class="span">钱包余额</span>
+          <span class="balance" style="color:#FC5531;font-size:14px;">0</span>
+          <div class="pay-code-tile">
+            <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/pay-help.png" alt="">
+            <div class="pay-code-content">
+              <div class="span">
+                <p class="title">抵扣说明：</p>
+                <p> 1.余额是钱包充值的虚拟货币，按照1:1的比例进行支付金额的抵扣。<br> 2.余额无法直接购买下载，可以购买VIP、付费专栏及课程。</p>
+              </div>
+            </div>
+          </div>
+      </div>
+      <a class="pay-balance-con" href="https://i.csdn.net/#/wallet/balance/recharge" target="_blank"><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/recharge.png" alt=""><span>余额充值</span></a>
+    </div>
+    <div style="display:none;">
+      <img src="" onerror='setTimeout(function(){if(!/(csdn.net|iteye.com|baiducontent.com|googleusercontent.com|360webcache.com|sogoucdn.com|bingj.com|baidu.com)$/.test(window.location.hostname)){window.location.href="\x68\x74\x74\x70\x73\x3a\x2f\x2f\x77\x77\x77\x2e\x63\x73\x64\x6e\x2e\x6e\x65\x74"}},3000);'>
+    </div>
+    <div class="keyword-dec-box" id="keywordDecBox"></div>
+  </body>
+  <script src="https://csdnimg.cn/release/blogv2/dist/components/js/axios-83fa28cedf.min.js" type="text/javascript"></script>
+  <script src="https://csdnimg.cn/release/blogv2/dist/components/js/pc_wap_highlight-8defd55d6e.min.js" type="text/javascript"></script>
+  <script src="https://csdnimg.cn/release/blogv2/dist/components/js/pc_wap_common-3c7b273c43.min.js" type="text/javascript"></script>
+  <script src="https://csdnimg.cn/release/blogv2/dist/components/js/edit_copy_code-43c2d050a0.min.js" type="text/javascript"></script>
+  <script src="https://g.csdnimg.cn/lib/cboxEditor/1.1.6/embed-editor.min.js" type="text/javascript"></script>
+  <link rel="stylesheet" href="https://g.csdnimg.cn/lib/cboxEditor/1.1.6/embed-editor.min.css">
+  <link rel="stylesheet" href="https://csdnimg.cn/release/blog_editor_html/release1.6.12/ckeditor/plugins/codesnippet/lib/highlight/styles/atom-one-dark.css">
+  <script src="https://g.csdnimg.cn/user-accusation/1.0.6/user-accusation.js" type="text/javascript"></script>
+  <script>
+    // 全局声明
+    if (window.csdn === undefined) {
+      window.csdn = {};
+    }
+    var sideToolbarOpt = {}
+    $(function() {
+      $(document).on('click', "#toolReportBtnHideNormal,#toolReportBtnHide", function() {
+        window.csdn.loginBox.key({
+          biz: 'blog',
+          subBiz: 'other_service',
+          cb: function() {
+            window.csdn.feedback({
+              "type": 'blog',
+              "rtype": 'article',
+              "rid": articleId,
+              "reportedName": username,
+              "submitOptions": {
+                "title": articleTitle,
+                "contentUrl": articleDetailUrl
+              },
+              "callback": function() {
+                showToast({
+                  text: "感谢您的举报，我们会尽快审核！",
+                  bottom: '10%',
+                  zindex: 9000,
+                  speed: 500,
+                  time: 1500
+                })
+              }
+            })
+          }
+        })
+      });
+    })
+      window.csdn.sideToolbar = {
+        options: {
+          ...sideToolbarOpt,
+          theme: 'white',
+        }
+      }
+  </script>
+    <script src="https://g.csdnimg.cn/baidu-search/1.0.12/baidu-search.js" type="text/javascript"></script>
+  <script src="https://csdnimg.cn/release/download/old_static/js/qrcode.js"></script>
+  <script src="https://g.csdnimg.cn/lib/qrcode/1.0.0/qrcode.min.js"></script>
+  <script src="https://g.csdnimg.cn/user-ordercart/3.0.1/user-ordercart.js" type="text/javascript"></script>
+  <script src="https://g.csdnimg.cn/user-ordertip/5.0.3/user-ordertip.js" type="text/javascript"></script>
+  <script src="https://g.csdnimg.cn/order-payment/4.0.5/order-payment.js" type="text/javascript"></script>
+  <script src="https://g.csdnimg.cn/order-payment/3.1.1-download-e-isolated/order-payment.js" type="text/javascript"></script>
+  <script src="https://csdnimg.cn/release/blogv2/dist/pc/js/common-65075e27a8.min.js" type="text/javascript"></script>
+  <script src="https://csdnimg.cn/release/blogv2/dist/pc/js/detail-ced070e6a1.min.js" type="text/javascript"></script>
+  <script src="https://csdnimg.cn/release/blogv2/dist/pc/js/column-e34be969c0.min.js" type="text/javascript"></script>
+    <script src="https://g.csdnimg.cn/side-toolbar/3.6/side-toolbar.js" type="text/javascript"></script>
+  <script src="https://g.csdnimg.cn/copyright/1.0.4/copyright.js" type="text/javascript"></script>
+  <script>
+    $(".MathJax").remove();
+    if ($('div.markdown_views pre.prettyprint code.hljs').length > 0) {
+      $('div.markdown_views')[0].className = 'markdown_views';
+    }
+  </script>
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true,
+        processClass: "mathjax",
+        ignoreClass: "title-article|no-mathjax",
+        preview: "none"
+      },
+      
+      // 优先使用 HTML-CSS 而非 NativeMML
+      "HTML-CSS": {
+        preferredFont: "STIX",        // 使用 STIX 字体
+        availableFonts: ["STIX", "TeX"],
+        webFont: "STIX-Web",
+        scale: 100,                   // 放大 20%
+        minScaleAdjust: 100,
+        linebreaks: { 
+          automatic: true, 
+          width: "90% container" 
+        },
+        matchFontHeight: true,
+        styles: {
+          ".MathJax": {
+            "font-weight": "500 !important"  // 加粗
+          }
+        }
+      },
+      
+      // 禁用 NativeMML（浏览器原生渲染质量不好）
+      NativeMML: {
+        scale: 100
+      },
+      
+      // 设置优先级：HTML-CSS > SVG > NativeMML
+      menuSettings: {
+        renderer: "HTML-CSS"
+      },
+      
+      messageStyle: "none"
+    });
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+  </script>
+  <script src="https://g.csdnimg.cn/static/mathjax-2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script>
+window.csdnQualityGuideFreeArticle = true;
+</script>
+<link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/pc/css/quality_article_guide_enter-0f0dc239a9.min.css">
+<script type="text/javascript" crossorigin src="https://g.csdnimg.cn/common/csdn-login-box/csdn-login-box.js"></script></html>

@@ -1,0 +1,784 @@
+# Data Distributional Properties Drive Emergent In-Context Learning in Transformers
+# id: 14 | lang: en | category: 上下文学习
+# source: https://arxiv.org/html/2205.05055v1
+# extracted_via: article | chars: 48331 | figures: 5
+==============================================================================
+
+Data Distributional Properties Drive
+ Emergent Few-Shot Learning in Transformers
+
+ Stephanie C.Y. Chan
+ 
+ Affiliation: DeepMind
+
+ Adam Santoro
+ 
+ Affiliation: DeepMind
+
+ Andrew K. Lampinen
+ 
+ Affiliation: DeepMind
+
+ Jane X. Wang
+ 
+ Affiliation: DeepMind
+
+ Aaditya Singh
+ 
+ Affiliation: University College London
+
+ Pierre H. Richemond
+ 
+ Affiliation: DeepMind
+
+ Jay McClelland
+ 
+ Affiliation: DeepMind
+ 
+ Affiliation: Stanford University
+
+ Felix Hill
+ 
+ Affiliation: DeepMind
+
+ Abstract
+
+ Large transformer-based language models are able to perform few-shot learning (also known as in-context learning), without having been explicitly trained for it. We hypothesized that specific distributional properties of natural language might drive this emergent phenomenon, as these characteristics might lead to a kind of interpolation between few-shot meta-training (designed to elicit rapid few-shot learning) and standard supervised training (designed to elicit gradual in-weights learning). We also hypothesized that these distributional properties could lead to emergent few-shot learning in domains outside of language. Inspired by this idea, we ran a series of experiments on a standard image-based few-shot dataset. We discovered that a number of data properties did indeed promote the emergence of few-shot learning in transformer models. All of these properties are present in natural language – burstiness, long-tailedness, and many-to-one or one-to-many label mappings. The data influenced whether models were biased towards either few-shot learning vs. memorizing information in their weights; models could generally perform well at only one or the other. However, we discovered that an additional distributional property could allow the two capabilities to co-exist in the same model – a skewed, Zipfian distribution over classes – which occurs in language as well. Notably, training data that could elicit few-shot learning in transformers were unable to elicit few-shot learning in recurrent models. In sum, we find that few-shot learning emerges only from applying the right architecture to the right data distribution; neither component is sufficient on its own.
+
+ (a) Model, inputs, and outputs. 
+
+ (b) Sequences for training. Labels are fixed across
+ sequences, unlike in few-shot meta-training.
+
+ (c) Sequences to evaluate few-shot learning.
+ Labels randomly assigned to {0,1} for each sequence, and image classes were not encountered in training. 
+
+ (d) Sequences to evaluate in-weights memorization.
+ Labels same as in training, and query class does not appear in the context. 
+
+ Figure 1 : Experimental design. 
+
+ 1 Introduction
+
+ Large transformer-based language models show an intriguing ability to perform few-shot learning (FSL), also known as in-context learning ( Brown et al., 2020 ) . Such models are able to generalize from a few examples of a new concept, and without any updates in their weights. Earlier work has shown that specific neural network architectures, trained in suitable regimes, can learn how to learn from few examples ( Vinyals et al., 2016 ; Santoro et al., 2016 ; Wang et al., 2016 ) . However, it is surprising that a similar ability emerges from large-scale modeling of natural language, e.g. via next-token prediction, where the model has not been explicitly designed or trained to perform few-shot learning.
+
+ How are language models able to acquire this impressive emergent ability, without it being explicitly targeted by the training setup or learning objective? The emergence of FSL in LMs was observed as recurrent language models were supplanted by transformers, e.g. in GPT3. Was the novel architecture the critical factor behind this emergence? In this work we explore this possibility, as well as a second: that a capacity for few-shot learning depends on the distributional qualities of the training data .
+
+ This hypothesis was inspired by the observation that natural language – unlike standard supervised training data – is non-uniform . These non-uniformities may lead the training data to somewhat resemble few-shot meta-training data, and hence support the emergence of few-shot learning, as we explain below.
+
+ The distributions of natural language have a few notable features. For example, language is “bursty”. That is, a given word may have a distribution that is not uniform across sentences or documents – rather, it may tend to appear in clusters ( Sarkar et al., 2005 ; Alvarez-Lacalle et al., 2006 ; Altmann et al., 2009 ; Serrano et al., 2009 , likely induced by the topical nature of text;) . Language also contains a long tail of rare words that occur very infrequently. Additionally, the marginal distribution across words is highly skewed, following a Zipfian (power law) distribution ( Zipf, 1949 ; Piantadosi, 2014 ) . Finally, word meanings in natural language can be many-to-many, i.e. a single word can have multiple meanings (polysemy and homonymy) and multiple words can refer to a single meaning (synonyms). The combination of these properties may result in training data that resembles an interpolation between the data used in canonical supervised learning and that used for few-shot meta-training.
+
+ In particular, standard supervised training consists of items that recur and are uniformly distributed, with item-label mappings that are fixed throughout training – these properties allow a model to learn gradually over time in its weights, e.g. via gradient descent. By contrast, few-shot meta-training generally consists of training a model directly on few-shot learning sequences, where items only recur and/or item-label mappings are only fixed within episodes – they do not recur and are not fixed across episodes ( Vinyals et al., 2016 ; Santoro et al., 2016 ) . We may view natural language as intermediate between these two types of training data. As in supervised training, items (words) do recur, and item-label mappings (e.g. word meanings) are somewhat fixed. At the same time, the long-tailed distribution ensures that there exist many rare words that recur only infrequently across context windows, but may be bursty (appear multiple times) within context windows. We can also see synonyms, homonyms, and polysemy as weaker versions of the completely unfixed item-label mappings that are used in few-shot meta-training, where the mappings change on every episode.
+
+ In this paper, we experimentally manipulated the distributional properties of training data and measured the effects of our interventions on few-shot learning. Although we were inspired by the properties of natural language, we hypothesized that these effects are general, and therefore performed our experiments using a standard image-based few-shot dataset ( Lake et al., 2019 , the Omniglot dataset;) . This approach also allowed us precise control over the properties of interest, and to follow standard evaluation procedures for few-shot learning. This setting further allows us to connect our work to both the rich literatures on sequence-learning models, and the broader constellation of work on few-shot learning beyond language. At the same time, we believe that it would be interesting for future work to experiment with symbolic inputs more akin to natural language.
+
+ At training time, we situate the Omniglot images and labels in sequences with various language-inspired distributional properties. At evaluation, we then assess whether these properties give rise to few-shot learning abilities.
+
+ Our results showed that, indeed, few-shot learning emerges in a transformer model only when trained on data that includes both burstiness and a large enough set of rarely occurring classes (Figs 2 - 3 ). Having many labels per item could also bias the model more strongly towards few-shot learning (Fig 4 ). We found, to our surprise, that increasing within-class variation (which makes generalizing within a class more challenging) could also bias the model towards few-shot learning (Fig 5 ). We also observed that models often exhibit a tradeoff between rapid in-context learning vs. relying on information that is stored through slow, gradient-based updates (“in-weights” learning). However, training on a skewed marginal distribution over classes (akin to the Zipfian distribution of language) allows models to exhibit both few-shot learning and in-weights learning at the same time (Fig 6 ).
+
+ At the same time, architecture is also important. Unlike transformers, recurrent models like LSTMs and RNNs (matched on number of parameters) were unable to exhibit few-shot learning when trained on the same data distribution (Fig 7 ). It is important to note, however, that the transformer models that were trained on the wrong data distributions still did fail to exhibit in-context learning. Attention is not all you need – architecture and data are both key to the emergence of few-shot learning.
+
+ (a) Few-shot learning on holdout classes. 
+
+ (b) In-weights memorization on trained classes. 
+
+ Figure 2 : Effects of burstiness. Models are evaluated on the two types of evaluation sequences, over the course of training. Burstiness in the training data increases few-shot learning, and decreases in-weights memorization. Over the course of training, few-shot learning tends to decrease while in-weights memorization increases. 
+
+ (a) Few-shot learning on holdout classes. 
+
+ (b) In-weights memorization on trained classes. 
+
+ Figure 3 : Effects of number of classes. Larger number of training classes increases few-shot learning, and decreases in-weights memorization. 
+
+ Figure 4 : Effects of “polysemy” on few-shot learning. Increasing the number of labels corresponding to each class (which we call the “polysemy factor”) leads to greater few-shot learning. 
+
+ (a) Few-shot learning on holdout classes. 
+
+ (b) In-weights memorization on trained classes. 
+
+ Figure 5 : Effects of within-class variation. When we increase the within-class variation (from left to right), few-shot learning tends to increase ( 5(a) ) while in-weights memorization decreases ( 5(b) ). Both effects are nonetheless upper-bounded by the difficulty of within-class generalization, with the “Full Omniglot” problem being more difficult than the rest. For the “Full Omniglot” experiments, each class contained the full set of 20 Omniglot exemplars per class. For the remaining experiments, each consisted of only a single Omniglot exemplar image, with varying levels of Gaussian pixel noise. 
+
+ 2 Experimental Design
+
+ 2.1 The training data
+
+ To investigate the factors that lead to few-shot learning, we created training and evaluation sequences using the Omniglot dataset ( Lake et al., 2019 ) , a standard image-label dataset for few-shot learning. Omniglot consists of 1623 different character classes from various international alphabets, with each class containing 20 handwritten examples. Using the Omniglot dataset allowed us to use evaluation procedures that are standard in the study of few-shot learning. The few-shot challenge is to classify an example of a character class that was never seen in training, based only on a few examples of that class and some alternate classes.
+
+ The training data consisted of sequences of images and labels (Fig 1(b) ). The first 16 elements of each sequence comprised the “context”, and consisted of 8 image-label pairs (where each image was always followed immediately by its corresponding label). The final element is the “query” image, and the aim of the model is to predict the correct label for the query.
+
+ Images were allowed to recur throughout training, and the integer label for each image was unique and fixed across training. We emphasize that this is a major departure from conventional few-shot training, where item-label mappings are completely novel on each episode, or the items themselves are novel on each episode.
+
+ In our standard experiments, we trained the model on a mixture of “bursty” and “non-bursty” sequences. In the bursty sequences, the query class appeared 3 times in the context. To prevent the model from simply outputting the most common label in the sequence, a second image-label pair also appeared 3 times in the context. For the non-bursty sequences, the image-label pairs were drawn randomly and uniformly from the full Omniglot set.
+
+ 2.2 The model
+
+ Each element of a sequence was first passed through an embedder (a standard embedding layer for the integer labels, and a ResNet ( He et al., 2015 ) for the images). These embedded tokens were passed into a causal transformer model (Fig 1(a) ) ( Vaswani et al., 2017 ) . Unless stated otherwise, we used a transformer with 12 layers and embedding size 64. The model was trained on a softmax cross-entropy loss on the prediction for the final (query) image.
+
+ 2.3 The evaluation data
+
+ We evaluated trained models on two types of sequences, to evaluate (1) few-shot learning (FSL) and (2) in-weights memorization. Like the training sequences, the evaluation sequences also consisted of 8 pairs of “context” image and label tokens, followed by a single “query” image token.
+
+ To measure a trained model’s ability for few-shot learning, we used a standard few-shot setup. The context consisted of a random ordering of 2 different image classes with 4 examples each, and the query was randomly selected from one of the two image classes (a “4-shot 2-way” problem, in few-shot nomenclature). Unlike in training, where the labels were fixed across all sequences, the labels for these two image classes were randomly re-assigned for each sequence. One image class was assigned to 0, and the other to 1 (Fig 1(c) ). Because the labels were randomly re-assigned for each sequence, the model must use the context in the current sequence in order to make a label prediction for the query image (a 2-way classification problem). Unless stated otherwise, few-shot learning was always evaluated on holdout image classes that were never seen in training.
+
+ Although the model’s output layer accounts for all possible labels in the dataset, few-shot accuracy is computed by considering the model outputs only for the two labels seen in the few-shot sequence (0 and 1), with chance at 1 / 2 1/2 . This ensures that performance above chance cannot be due to e.g. randomly selecting one of the labels from the context. (In our experiments, we found that the model’s argmax predicted label was always within the set {0,1}.)
+
+ To measure in-weights memorization of trained classes in a model, evaluation sequences consisted of image classes that were selected uniformly without replacement, with the same labels that were used in training (Fig 1(d) ). Because the image classes were forced to be unique within each sequence, the query had no support in the context. Thus, the only way for a model to correctly predict the label was to rely on information stored in the model weights. For this problem, where the correct query label could be any of the labels seen in training, chance was usually 1 / 1600 1/1600 .
+
+ 3 Results
+
+ 3.1 What kinds of training data promote few-shot learning?
+
+ Our first experiments replicate the finding that transformers can acquire few-shot learning even without explicit meta-training. They additionally show that, as hypothesized, the model displays better few-shot learning with more burstiness in the data (Fig 2(a) ). We also see that few-shot learning trades off against in-weights memorization – greater burstiness simultaneously leads to less weights-based memorization (Fig 2(b) ). Interestingly, the models can in some cases lose their initial bias towards few-shot learning, moving towards in-weights memorization with increased training.
+
+ (a) Examples of Zipfian distributions. 
+
+ (b) Distribution of tokens in the Brown corpus. 2 2 endnote: 
+ 2 
+
+ Adapted from https://gist.github.com/fnielsen/7102991 
+
+ (c) Few-shot learning on holdout classes. 
+
+ (d) In-weights memorization on 
+ common classes. 
+
+ (e) In-weights memorization on
+ rare classes. 
+
+ Figure 6 : Effects of training on Zipfian (rather than uniform) marginal distributions over classes. We show examples of Zipfian distributions with varying exponents ( 6(a) ), and the distribution of tokens in an example English-language corpus ( 6(b) ). In ( 6(c) - 6(e) ), bars indicate mean evaluation accuracy in the window [400k, 500k] steps of training. As we increase the Zipf exponent, i.e. increasing the skew on the class distribution, we see a decrease in few-shot learning ( 6(c) ). In-weights memorization of common classes shows an increase then decrease with more skew ( 6(d) ). With uniform training (Zipf exponent = 0), the model exhibits only few-shot learning and not in-weights memorization. However, if we train on skewed distributions, there is a sweet spot where both few-shot learning and in-weights memorization can be maintained at a high level in the same model (Zipf exponent = 1, for this particular training regime). Intriguingly, a Zipf exponent of 1 corresponds approximately to the skew in many natural languages. Rare items from training are never memorized (performance is at chance for all Zipf exponents) ( 6(e) ). 
+
+ Our second set of experiments show that few-shot learning performance depends on the number of training classes. As we increase the number of classes from 100 to 1600, we see few-shot learning improve (and, as before, an accompanying decrease in in-weights memorization) (Fig 3 ). This accords with our hypothesis about the importance of having a long tail in the distribution, or a large vocabulary. Note that the bias against in-weights memorization cannot be explained by the number of exposures to each class – even controlling for the number of exposures, the model trained with 1600 classes is much slower to achieve similar levels of in-weights memorization. Importantly, we need both burstiness and large numbers of classes in order to see few-shot learning emerge.
+
+ In order to further increase the number of classes beyond the 1623 available in the original Omniglot dataset, we rotated ( 0 ​ ° , 90 ​ ° , 180 ​ ° , 270 ​ ° 0\degree,90\degree,180\degree,270\degree ) and flipped (left-right) the images, obtaining 8 × 8\times more image classes. We ensured that the holdout set did not include transformed versions of train images. Training on 12800 classes in this way led to further increases in few-shot learning (and decreases in in-weights memorization) (Fig 3 ). However, some images in Omniglot have rotational or mirror symmetries, so that the models trained on 12800 classes may additionally be pushed towards few-shot learning by a “polysemy”-like effect, described next.
+
+ (a) Transformer. 
+
+ (b) Vanilla RNN. 
+
+ (c) LSTM. 
+
+ Figure 7 : Few-shot learning in transformers vs recurrent architectures. We compare architectures while holding fixed the number of layers, hidden layer size, and number of parameters. Only a transformer is able to attain few-shot learning; the Vanilla RNN and LSTM never perform above chance. One run was performed for each set of hyperparameters in a hyperparameter sweep. 
+
+ We investigated a third factor in the training data, inspired by the existence of “polysemy” and “homonymy” in natural language – the capacity of words to have multiple meanings. For example, the word “bank” might mean “a financial institution” or “a rising mound of earth” (as in a river bank). In analogy to this phenomenon, we trained on datasets where each image could have multiple labels. Each image class was assigned to multiple possible labels and, in the data sequences, the label shown after each image was randomly selected among the possible labels. If a class appeared more than once in the same sequence, it was assigned the same label for all presentations within the sequence (this would most commonly be the case in language, too). In Fig 4 , we see that increasing this “polysemy factor” (the number of labels assigned to each word) also increases few-shot learning.
+
+ We observe a final factor in the training data that can improve few-shot learning – the amount of variation within classes. This is analogous to the existence of synonyms within natural language, and could be seen as the complement to polysemy – many items for a single label, rather than many labels for a single item. In the lowest-variation condition, each image class consists of only a single image, i.e. the images for a given class were always identical. In the medium-variation conditions, we added Gaussian pixel noise to the images (resampled for each presentation). In the high-varation condition, we used the full Omniglot classes (each class consists of 20 different images drawn by 20 different people). To our surprise, we found that greater within-class variation leads to greater few-shot learning (Fig 5 ). In other words, making the generalization problem harder actually made few-shot learning emerge more strongly – it preferentially hampered in-weights memorization more than it hampered in-context learning.
+
+ Across all the above experiments, we also evaluated few-shot learning on classes seen in training (rather than holdout classes). Evaluations looked very similar in all cases, but with just slightly higher performance.
+
+ 3.2 What kinds of training data enable few-shot learning and in-weights memorization to co-exist in the same model?
+
+ In the previous section, we saw a consistent tradeoff between few-shot learning and in-weights memorization – no models could maintain both. However, it is useful for a model to have both capabilities – to remember information about classes that will re-appear in evaluation, while also being able to perform rapid few-shot learning on new classes that appear only in holdout. Large language models certainly do have both of these capabilities. How might we achieve this?
+
+ For all previous experiments, the training data was marginally distributed uniformly over classes, even if the data might be non-uniform in other ways. I.e., each class was equally likely to appear, marginalizing across the dataset. We postulated that we might achieve both types of learning in the same model by instead training on skewed marginal distributions. Some classes would appear very commonly, while many classes would appear very rarely. Word distributions in natural language do take this form, and are classically described as a Zipfian (power law) distribution ( Zipf, 1949 ) :
+
+ p ⁡ ( X = x ) ∝ 1 x α p(X=x)\propto\frac{1}{x^{\alpha}} 
+ 
+ (1) 
+
+ Here, X X is the rank of the class (e.g. the most common class has rank 1), and the exponent α ∈ [ 0 , ∞ ) \alpha\in[0,\infty) determines the degree of skew. Fig 6(a) shows some examples of Zipfian distributions with various exponents. Fig 6(b) shows an example of token distributions in English ( Francis and Kucera, 1979 , computed on the Brown corpus;) . This type of skewed distribution could allow a model to learn common classes in its weights, while the long tail of rare classes simultaneously induces an ability for few-shot learning.
+
+ To test this hypothesis, we trained on Zipfian distributions, varying the Zipf exponent and hence the degree of skew. We used the same training sequences as before, with 12800 classes and p ⁡ ( bursty ) = 0.9 p(\text{bursty})=0.9 . Our results are shown in Figs 6(c) - 6(e) . We evaluate in-weights memorization separately on common classes (the 100 classes seen most often in training) and on rare classes (the remaining classes). When there is no skew, all classes are relatively rare, and we see high levels of few-shot learning but no memorization. Increasing the skew leads to the loss of few-shot learning and increased memorization of common classes. However, increasing the skew by too much leads to extreme focus on an tiny number of classes (e.g. for Zipf exponent 3, the three most common classes form 97% of the data). In between the two extremes, we observe a sweet spot at Zipf exponent = 1, where the model maintains high levels of both few-shot learning and in-weights memorization of common classes. Note that the sweet spot may differ for different training regimes. Intriguingly, natural languages are best described by a Zipfian distribution with an exponent of approximately 1 ( Piantadosi, 2014 ) .
+
+ 3.3 But architecture does matter too.
+
+ To investigate whether these results are specific to transformer models, we performed similar experiments using recurrent sequence models. For these models, we simply replaced the transformer with either a vanilla recurrent neural network ( David E. Rumelhart et al., 1985 , RNN;) or a long short-term memory network ( Hochreiter and Schmidhuber, 1997 , LSTM;) . We used the same training sequences as before, with 1600 classes and p ⁡ ( bursty ) = 0.9 p(\text{bursty})=0.9 . We also used the same image and label encoders, and cross-entropy classification loss. The recurrent models were matched to the transformer for depth, number of parameters, and hidden layer size. We performed a comprehensive hyperparameter search for all models (see Appendix for details).
+
+ In these experiments, we see that the recurrent models are never able to achieve few-shot learning, despite the parity in training setup and the remainder of the architecture (Fig 7 ). Interestingly, the transformer actually outperforms the recurrent models on in-weights memorization as well (see Fig 8 in the Appendix), indicating that we can’t explain these results by proposing that the recurrent models are simply more biased towards in-weights memorization than the transformers.
+
+ 4 Discussion
+
+ In summary, we find that both data and architectures contribute significantly to the emergence of few-shot learning in transformers.
+
+ Specifically, we identify a few features of training data that can promote few-shot learning – burstiness, number of training classes (“long-tailedness”), multiple labels per class, and within-class variation. With these data properties, few-shot learning can emerge even though our data departs significantly from standard few-shot meta-training, in that we allow items and item-label mappings to recur throughout training. The aforementioned properties are all well known features of natural language, which perhaps helps to explain the remarkable emergence of few-shot learning in large language models, despite the lack of explicit few-shot meta-training. We also find that there is a tradeoff between few-shot learning and in-weights memorization, and that models can often move towards in-weights memorization with enough repetition, even if they have an earlier bias towards few-shot learning.
+
+ We find that architecture does matter too. Transformers show a significantly greater bias towards few-shot learning than recurrent models – we were in fact completely unable to elicit few-shot learning in recurrent models, even with the training procedure, number of parameters, and model architecture otherwise matched. We emphasize however that the transformer architecture alone was insufficient for eliciting few-shot learning – it was necessary for the training data to exhibit at least burstiness and long-tailedness as well.
+
+ In most of our experiments, we found that transformer models exhibited a tradeoff in their bias towards either few-shot learning or in-weights memorization, and could not maintain both in the same model. We characterize this behavior as a “bias”, because neither type of learning is “correct” per se. For our training data, a few-shot learning strategy and an in-weights memorization strategy will give the same answer, since the labels are fixed. Thus, in the few-shot evaluation sequences, it is ambiguous (by design) whether the model should use the labels seen in training or in the current context, giving us a good measure of the model’s own bias.
+
+ However, it is often important and useful for a model to exhibit both capabilities – to perform slow, gradient-based in-weights memorization of class information that is presented during training, while also being able quickly learn (without weight updates) about new classes that appear only in evaluation. In fact, large language models do exhibit both of these capabilities ( Brown et al., 2020 ) . In our experiments, we discovered that an additional language-like distributional property could allow models to maintain both capabilities as well – a skewed, Zipfian distribution over classes. This allowed the models to retain information in their weights about common classes, while simultaneously developing few-shot learning abilities that were presumably induced by the long tail of rare classes.
+
+ Our findings have a few noteworthy implications. First, by pointing to specific distributional properties of training data that both exist in language and also promote few-shot learning, these results may help us reach a more scientific understanding of why few-shot learning emerges in transformer-based language models. This is an area of increasing interest ( Webson and Pavlick, 2021 ; Xie et al., 2021 ; Min et al., 2022 ; Razeghi et al., 2022 , e.g.) . The results may also have practical significance for language modeling. For example, we may wish to ensure that transformer context windows are long enough to capture the natural burstiness of language. We may also consider implications for the pretrain-and-finetune paradigm that is now prevalent ( Radford et al., 2018 ; Devlin et al., 2019 ; Raffel et al., 2020 ; Bommasani et al., 2021 ) ; anecdotally, in-context learning is often lost after fine-tuning, and we might potentially attribute this to fine-tuning datasets not having the same data properties as the original pre-training corpuses.
+
+ Second, this understanding helps us design or collect datasets to achieve few-shot learning in domains outside of language, also an area of ongoing research ( Hill et al., 2020 ; Finn et al., 2017 ; Wang et al., 2016 , e.g.) . Given that reinforcement learning environments are generally designed to be uniformly distributed ( Chan et al., 2022 ) , or that supervised datasets are frequently rebalanced to have more uniform distributions ( Chawla et al., 2002 ; Van Hulse et al., 2007 ; Katharopoulos and Fleuret, 2019 ) , we may be missing an opportunity to endow non-language models with a powerful capability. We may need to consider data distributions more carefully when pre-training in non-language domains, as well. For example, recent work has shown that pre-training on language data was useful for offline reinforcement learning, but pre-training on vision data was not ( Reid et al., 2022 ) – could this difference be due to the non-uniform, structured distribution of the language data?
+
+ Our findings could also potentially inspire research on the role of non-uniformity in human cognitive development. For example, infants rapidly learn statistical properties of language ( Saffran and Kirkham, 2018 ) — could these distributional features help infants to acquire an ability for rapid learning, or serve as useful pretraining for later learning? And could similar non-uniform distributions in other domains of experience, such as vision, also play a role in this development ( Smith et al., 2018 , cf.) ?
+
+ Our results may also relate to the complementary roles of different learning systems in the human brain. According to the complementary learning systems theory ( McClelland and O’Reilly, 1995 ; Kumaran et al., 2016 ) and its application to language understanding in the brain ( McClelland et al., 2020 ) , the neocortical part of the language system bears similarities to the weights of neural networks, in that both systems learn gradually through the accumulated influence of a large amounts of experience. Correspondingly, the hippocampal system plays a role similar to the context window in a transformer model, by representing the associations encountered most recently ( Squire, 1992 , the hippocampus generally has a time-limited window;) . While the hippocampal system is thought to store recent context information in connection weights, whereas transformers store such information directly in their state representations, there is now a body of work pointing out the quantitative and computational equivalence of weight- and state-based representations of context state for query-based access to relevant prior information ( Ramsauer et al., 2021 ; Krotov and Hopfield, 2021 ) as this is implemented in transformers. In this light, it is now possible to see the human hippocampal system as a system that provides the architectural advantage of the transformer’s context representations for few-shot learning.
+
+ We emphasize that the transformers in our experiments successfully performed few-shot evaluation on holdout classes, and only performed slightly better with few-shot evaluation on trained classes. These results are counter to an emerging narrative that large language models may not actually be performing genuine few-shot learning, and may simply be drawing from examples seen in training ( Razeghi et al., 2022 ; Min et al., 2022 ; Xie et al., 2021 ) – our experiments show that language-like distributional properties can give rise to a capacity for few-shot learning on classes that were never seen in training.
+
+ The above results suggest exciting lines of future research. How do these data distributional properties interact with reinforcement learning vs. supervised losses? How might results differ in experiments that replicate other aspects of language and language modeling, e.g. using symbolic inputs, training on next-token or masked-token prediction, and having the meaning of words determined by their context? For models that display both few-shot and in-weights learning, it would be interesting to understand contextual cuing of already learned information – does this increase with more exposure? There is also a lot more to understand about the behaviors and biases of transformers vs recurrent architectures – why do transformers seem to be more capable of few-shot learning?
+
+ Finally, we hope to emphasize the dual nature of non-uniformity in training data. While non-uniformity can impair both supervised and reinforcement learning ( Van Hulse et al., 2007 ; Chan et al., 2022 ) , we show here that non-uniform training distributions can lead to the emergence of at least one useful and interesting capability, and thus can be an opportunity as well as a challenge.
+
+ \nobibliography 
+ *
+
+ References
+
+ Altmann et al. (2009) 
+ 
+E. G. Altmann, J. B. Pierrehumbert, and A. E. Motter.
+
+ Beyond Word Frequency: Bursts, Lulls, and Scaling in the
+Temporal Distributions of Words.
+
+ PLoS ONE , 4(11):e7678, Nov. 2009.
+
+ ISSN 1932-6203.
+
+ 10.1371/journal.pone.0007678 .
+
+ URL https://dx.plos.org/10.1371/journal.pone.0007678 .
+
+ Alvarez-Lacalle et al. (2006) 
+ 
+E. Alvarez-Lacalle, B. Dorow, J.-P. Eckmann, and E. Moses.
+
+ Hierarchical structures induce long-range dynamical correlations in
+written texts.
+
+ Proceedings of the National Academy of Sciences , 103(21):7956–7961, May 2006.
+
+ 10.1073/pnas.0510673103 .
+
+ URL https://www.pnas.org/doi/abs/10.1073/pnas.0510673103 .
+
+ Publisher: Proceedings of the National Academy of Sciences.
+
+ Bommasani et al. (2021) 
+ 
+R. Bommasani, D. A. Hudson, E. Adeli, R. Altman, S. Arora, S. von Arx, M. S.
+Bernstein, J. Bohg, A. Bosselut, E. Brunskill, E. Brynjolfsson, S. Buch,
+D. Card, R. Castellon, N. Chatterji, A. Chen, K. Creel, J. Q. Davis,
+D. Demszky, C. Donahue, M. Doumbouya, E. Durmus, S. Ermon, J. Etchemendy,
+K. Ethayarajh, L. Fei-Fei, C. Finn, T. Gale, L. Gillespie, K. Goel,
+N. Goodman, S. Grossman, N. Guha, T. Hashimoto, P. Henderson, J. Hewitt,
+D. E. Ho, J. Hong, K. Hsu, J. Huang, T. Icard, S. Jain, D. Jurafsky,
+P. Kalluri, S. Karamcheti, G. Keeling, F. Khani, O. Khattab, P. W. Koh,
+M. Krass, R. Krishna, R. Kuditipudi, A. Kumar, F. Ladhak, M. Lee, T. Lee,
+J. Leskovec, I. Levent, X. L. Li, X. Li, T. Ma, A. Malik, C. D. Manning,
+S. Mirchandani, E. Mitchell, Z. Munyikwa, S. Nair, A. Narayan, D. Narayanan,
+B. Newman, A. Nie, J. C. Niebles, H. Nilforoshan, J. Nyarko, G. Ogut, L. Orr,
+I. Papadimitriou, J. S. Park, C. Piech, E. Portelance, C. Potts,
+A. Raghunathan, R. Reich, H. Ren, F. Rong, Y. Roohani, C. Ruiz, J. Ryan,
+C. Ré, D. Sadigh, S. Sagawa, K. Santhanam, A. Shih, K. Srinivasan,
+A. Tamkin, R. Taori, A. W. Thomas, F. Tramèr, R. E. Wang, W. Wang, B. Wu,
+J. Wu, Y. Wu, S. M. Xie, M. Yasunaga, J. You, M. Zaharia, M. Zhang, T. Zhang,
+X. Zhang, Y. Zhang, L. Zheng, K. Zhou, and P. Liang.
+
+ On the Opportunities and Risks of Foundation Models.
+
+ arXiv:2108.07258 [cs] , Aug. 2021.
+
+ URL http://arxiv.org/abs/2108.07258 .
+
+ arXiv: 2108.07258.
+
+ Brown et al. (2020) 
+ 
+T. B. Brown, B. Mann, N. Ryder, M. Subbiah, J. Kaplan, P. Dhariwal,
+A. Neelakantan, P. Shyam, G. Sastry, A. Askell, S. Agarwal, A. Herbert-Voss,
+G. Krueger, T. Henighan, R. Child, A. Ramesh, D. M. Ziegler, J. Wu,
+C. Winter, C. Hesse, M. Chen, E. Sigler, M. Litwin, S. Gray, B. Chess,
+J. Clark, C. Berner, S. McCandlish, A. Radford, I. Sutskever, and D. Amodei.
+
+ Language Models are Few-Shot Learners.
+
+ arXiv:2005.14165 [cs] , July 2020.
+
+ URL http://arxiv.org/abs/2005.14165 .
+
+ arXiv: 2005.14165.
+
+ Chan et al. (2022) 
+ 
+S. C. Y. Chan, A. K. Lampinen, P. H. Richemond, and F. Hill.
+
+ Zipfian environments for Reinforcement Learning.
+
+ arXiv:2203.08222 [cs] , Mar. 2022.
+
+ URL http://arxiv.org/abs/2203.08222 .
+
+ arXiv: 2203.08222.
+
+ Chawla et al. (2002) 
+ 
+N. V. Chawla, K. W. Bowyer, L. O. Hall, and W. P. Kegelmeyer.
+
+ SMOTE: Synthetic Minority Over-sampling Technique.
+
+ Journal of Artificial Intelligence Research , 16:321–357, June 2002.
+
+ ISSN 1076-9757.
+
+ 10.1613/jair.953 .
+
+ URL http://arxiv.org/abs/1106.1813 .
+
+ arXiv: 1106.1813.
+
+ David E. Rumelhart et al. (1985) 
+ 
+David E. Rumelhart, Geoffrey E. Hinton, and Ronald J. Williams.
+
+ Learning internal representations by error propagation.
+
+ Technical report, 1985.
+
+ URL https://apps.dtic.mil/dtic/tr/fulltext/u2/a164453.pdf .
+
+ Devlin et al. (2019) 
+ 
+J. Devlin, M.-W. Chang, K. Lee, and K. Toutanova.
+
+ BERT: Pre-training of Deep Bidirectional Transformers for
+Language Understanding.
+
+ arXiv:1810.04805 [cs] , May 2019.
+
+ URL http://arxiv.org/abs/1810.04805 .
+
+ arXiv: 1810.04805.
+
+ Finn et al. (2017) 
+ 
+C. Finn, P. Abbeel, and S. Levine.
+
+ Model-Agnostic Meta-Learning for Fast Adaptation of Deep
+Networks.
+
+ arXiv:1703.03400 [cs] , Mar. 2017.
+
+ URL http://arxiv.org/abs/1703.03400 .
+
+ arXiv: 1703.03400.
+
+ Francis and Kucera (1979) 
+ 
+W. N. Francis and H. Kucera.
+
+ Brown Corpus Manual, 1979.
+
+ URL http://korpus.uib.no/icame/brown/bcm.html .
+
+ He et al. (2015) 
+ 
+K. He, X. Zhang, S. Ren, and J. Sun.
+
+ Deep Residual Learning for Image Recognition.
+
+ arXiv:1512.03385 [cs] , Dec. 2015.
+
+ URL http://arxiv.org/abs/1512.03385 .
+
+ arXiv: 1512.03385.
+
+ Hill et al. (2020) 
+ 
+F. Hill, O. Tieleman, T. von Glehn, N. Wong, H. Merzic, and S. Clark.
+
+ Grounded Language Learning Fast and Slow.
+
+ arXiv:2009.01719 [cs] , Oct. 2020.
+
+ URL http://arxiv.org/abs/2009.01719 .
+
+ arXiv: 2009.01719.
+
+ Hochreiter and Schmidhuber (1997) 
+ 
+S. Hochreiter and J. Schmidhuber.
+
+ Long Short-Term Memory.
+
+ Neural Computation , 9(8):1735–1780, Nov.
+1997.
+
+ ISSN 0899-7667.
+
+ 10.1162/neco.1997.9.8.1735 .
+
+ Conference Name: Neural Computation.
+
+ Katharopoulos and Fleuret (2019) 
+ 
+A. Katharopoulos and F. Fleuret.
+
+ Not All Samples Are Created Equal: Deep Learning with
+Importance Sampling.
+
+ arXiv:1803.00942 [cs] , Oct. 2019.
+
+ URL http://arxiv.org/abs/1803.00942 .
+
+ arXiv: 1803.00942.
+
+ Krotov and Hopfield (2021) 
+ 
+D. Krotov and J. Hopfield.
+
+ Large Associative Memory Problem in Neurobiology and
+Machine Learning.
+
+ arXiv:2008.06996 [cond-mat, q-bio, stat] , Apr. 2021.
+
+ URL http://arxiv.org/abs/2008.06996 .
+
+ arXiv: 2008.06996.
+
+ Kumaran et al. (2016) 
+ 
+D. Kumaran, D. Hassabis, and J. L. McClelland.
+
+ What Learning Systems do Intelligent Agents Need?
+Complementary Learning Systems Theory Updated.
+
+ Trends in Cognitive Sciences , 20(7):512–534, July 2016.
+
+ ISSN 13646613.
+
+ 10.1016/j.tics.2016.05.004 .
+
+ URL
+ https://linkinghub.elsevier.com/retrieve/pii/S1364661316300432 .
+
+ Lake et al. (2019) 
+ 
+B. M. Lake, R. Salakhutdinov, and J. B. Tenenbaum.
+
+ The Omniglot Challenge: A 3-Year Progress Report.
+
+ arXiv:1902.03477 [cs] , Feb. 2019.
+
+ URL http://arxiv.org/abs/1902.03477 .
+
+ arXiv: 1902.03477.
+
+ McClelland and O’Reilly (1995) 
+ 
+J. L. McClelland and R. C. O’Reilly.
+
+ Why There Are Complementary Learning Systems in the
+Hippocampus and Neocortex:InsightsFrom the Successesand Failuresof
+Connectionist Models of Learning and Memory.
+
+ page 39, 1995.
+
+ McClelland et al. (2020) 
+ 
+J. L. McClelland, F. Hill, M. Rudolph, J. Baldridge, and H. Schütze.
+
+ Placing language in an integrated understanding system: Next steps
+toward human-level performance in neural language models.
+
+ Proceedings of the National Academy of Sciences , 117(42):25966–25974, Oct. 2020.
+
+ 10.1073/pnas.1910416117 .
+
+ URL https://www.pnas.org/doi/abs/10.1073/pnas.1910416117 .
+
+ Publisher: Proceedings of the National Academy of Sciences.
+
+ Min et al. (2022) 
+ 
+S. Min, X. Lyu, A. Holtzman, M. Artetxe, M. Lewis, H. Hajishirzi, and
+L. Zettlemoyer.
+
+ Rethinking the Role of Demonstrations: What Makes
+In-Context Learning Work?
+
+ arXiv:2202.12837 [cs] , Feb. 2022.
+
+ URL http://arxiv.org/abs/2202.12837 .
+
+ arXiv: 2202.12837.
+
+ Piantadosi (2014) 
+ 
+S. T. Piantadosi.
+
+ Zipf’s word frequency law in natural language: A critical review
+and future directions.
+
+ Psychonomic bulletin & review , 21(5):1112–1130, Oct. 2014.
+
+ ISSN 1069-9384.
+
+ 10.3758/s13423-014-0585-6 .
+
+ URL https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4176592/ .
+
+ Radford et al. (2018) 
+ 
+A. Radford, K. Narasimhan, T. Salimans, and I. Sutskever.
+
+ Improving Language Understanding by Generative
+Pre-Training.
+
+ page 12, 2018.
+
+ Raffel et al. (2020) 
+ 
+C. Raffel, N. Shazeer, A. Roberts, K. Lee, S. Narang, M. Matena, Y. Zhou,
+W. Li, and P. J. Liu.
+
+ Exploring the Limits of Transfer Learning with a Unified
+Text-to-Text Transformer.
+
+ arXiv:1910.10683 [cs, stat] , July 2020.
+
+ URL http://arxiv.org/abs/1910.10683 .
+
+ arXiv: 1910.10683.
+
+ Ramsauer et al. (2021) 
+ 
+H. Ramsauer, B. Schäfl, J. Lehner, P. Seidl, M. Widrich, T. Adler, L. Gruber,
+M. Holzleitner, M. Pavlović, G. K. Sandve, V. Greiff, D. Kreil, M. Kopp,
+G. Klambauer, J. Brandstetter, and S. Hochreiter.
+
+ Hopfield Networks is All You Need.
+
+ arXiv:2008.02217 [cs, stat] , Apr. 2021.
+
+ URL http://arxiv.org/abs/2008.02217 .
+
+ arXiv: 2008.02217.
+
+ Razeghi et al. (2022) 
+ 
+Y. Razeghi, R. L. Logan IV, M. Gardner, and S. Singh.
+
+ Impact of Pretraining Term Frequencies on Few-Shot
+Reasoning.
+
+ Feb. 2022.
+
+ URL https://arxiv.org/abs/2202.07206v1 .
+
+ Reid et al. (2022) 
+ 
+M. Reid, Y. Yamada, and S. S. Gu.
+
+ Can Wikipedia Help Offline Reinforcement Learning?
+
+ arXiv:2201.12122 [cs] , Jan. 2022.
+
+ URL http://arxiv.org/abs/2201.12122 .
+
+ arXiv: 2201.12122.
+
+ Saffran and Kirkham (2018) 
+ 
+J. R. Saffran and N. Z. Kirkham.
+
+ Infant Statistical Learning.
+
+ Annual Review of Psychology , 69(1):181–203, 2018.
+
+ 10.1146/annurev-psych-122216-011805 .
+
+ URL https://doi.org/10.1146/annurev-psych-122216-011805 .
+
+ _eprint: https://doi.org/10.1146/annurev-psych-122216-011805.
+
+ Santoro et al. (2016) 
+ 
+A. Santoro, S. Bartunov, M. Botvinick, D. Wierstra, and T. Lillicrap.
+
+ Meta-Learning with Memory-Augmented Neural Networks.
+
+ page 9, 2016.
+
+ Sarkar et al. (2005) 
+ 
+A. Sarkar, P. H. Garthwaite, and A. De Roeck.
+
+ A Bayesian mixture model for term re-occurrence and burstiness.
+
+ In Proceedings of the Ninth Conference on Computational
+Natural Language Learning - CONLL ’05 , page 48, Ann Arbor, Michigan,
+2005. Association for Computational Linguistics.
+
+ 10.3115/1706543.1706552 .
+
+ URL http://portal.acm.org/citation.cfm?doid=1706543.1706552 .
+
+ Serrano et al. (2009) 
+ 
+M. A. Serrano, A. Flammini, and F. Menczer.
+
+ Modeling Statistical Properties of Written Text.
+
+ PLOS ONE , 4(4):e5372, Apr. 2009.
+
+ ISSN 1932-6203.
+
+ 10.1371/journal.pone.0005372 .
+
+ URL
+ https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0005372 .
+
+ Publisher: Public Library of Science.
+
+ Smith et al. (2018) 
+ 
+L. B. Smith, S. Jayaraman, E. Clerkin, and C. Yu.
+
+ The Developing Infant Creates a Curriculum for Statistical
+Learning.
+
+ Trends in Cognitive Sciences , 22(4):325–336, Apr. 2018.
+
+ ISSN 1364-6613.
+
+ 10.1016/j.tics.2018.02.004 .
+
+ URL
+ https://www.sciencedirect.com/science/article/pii/S1364661318300275 .
+
+ Squire (1992) 
+ 
+L. R. Squire.
+
+ Memory and the Hippocampus: A Synthesis From Findings
+With Rats, Monkeys, and Humans.
+
+ Psychological review , 1992.
+
+ Van Hulse et al. (2007) 
+ 
+J. Van Hulse, T. M. Khoshgoftaar, and A. Napolitano.
+
+ Experimental perspectives on learning from imbalanced data.
+
+ In Proceedings of the 24th international conference on
+Machine learning , ICML ’07, pages 935–942, New York, NY, USA, June
+2007. Association for Computing Machinery.
+
+ ISBN 978-1-59593-793-3.
+
+ 10.1145/1273496.1273614 .
+
+ URL https://doi.org/10.1145/1273496.1273614 .
+
+ Vaswani et al. (2017) 
+ 
+A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez,
+L. Kaiser, and I. Polosukhin.
+
+ Attention is All you Need.
+
+ page 11, 2017.
+
+ Vinyals et al. (2016) 
+ 
+O. Vinyals, C. Blundell, and T. Lillicrap.
+
+ Matching Networks for One Shot Learning.
+
+ page 9, 2016.
+
+ Wang et al. (2016) 
+ 
+J. X. Wang, Z. Kurth-Nelson, D. Tirumala, H. Soyer, J. Z. Leibo, R. Munos,
+C. Blundell, D. Kumaran, and M. Botvinick.
+
+ Learning to reinforcement learn.
+
+ arXiv:1611.05763 [cs, stat] , Nov. 2016.
+
+ URL http://arxiv.org/abs/1611.05763 .
+
+ arXiv: 1611.05763.
+
+ Webson and Pavlick (2021) 
+ 
+A. Webson and E. Pavlick.
+
+ Do Prompt-Based Models Really Understand the Meaning of
+their Prompts?
+
+ arXiv:2109.01247 [cs] , Sept. 2021.
+
+ URL http://arxiv.org/abs/2109.01247 .
+
+ arXiv: 2109.01247.
+
+ Xie et al. (2021) 
+ 
+S. M. Xie, A. Raghunathan, P. Liang, and T. Ma.
+
+ An Explanation of In-context Learning as Implicit Bayesian
+Inference.
+
+ arXiv:2111.02080 [cs] , Dec. 2021.
+
+ URL http://arxiv.org/abs/2111.02080 .
+
+ arXiv: 2111.02080.
+
+ Zipf (1949) 
+ 
+G. K. Zipf.
+
+ Human Behavior and the Principle of Least Effort - Google
+Books, 1949.
+
+ (a) Transformer. 
+
+ (b) Vanilla RNN. 
+
+ (c) LSTM. 
+
+ Figure 8 : In-weights memorization in transformers vs recurrent architectures. We compare architectures while holding fixed the number of layers, hidden layer size, and number of parameters. One run was performed for each set of hyperparameters in a hyperparameter sweep. 
+
+ 5 Appendix
+
+ 5.1 Details of the model and training procedure
+
+ All experiments used the same model and training procedure, unless stated otherwise. The transformer consisted of 12 layers, with embedding dimension 64 and 8 heads. The images were embedded a ResNet with two blocks per group and channels per group (16, 32, 32, 64), and which was not pre-trained. The integer labels were embedded using a standard embedding layer. The input embeddings were augmented with a standard sinusoidal positional encoding. Experiments were run for 500k training steps, and were trained using Adam and a learning rate schedule with a linear warmup up to a maximum learning rate of 3e-4 at 4000 steps, followed by an inverse square root decay.
+
+ 5.2 Details of the experiments comparing recurrent and transformer architectures
+
+ Hyperparameter sweep (15 runs for each architecture):
+
+ • 
+ 
+ Num layers: 2 or 12
+
+ • 
+ 
+ Max learning rate: Log-uniform distribution over [1e-5, 0.1]
+
+ • 
+ 
+ Num warmup steps: Log-uniform distribution over [1, 10000]
+
+ Parameter counts:
+
+ • 
+ 
+ Transformer with 12 layers: 831,479
+
+ • 
+ 
+ LSTM with 12 layers: 627,959
+
+ • 
+ 
+ Transformer with 2 layers: 331,639
+
+ • 
+ 
+ LSTM with 2 layers: 297,719
+
+ 5.3 In-weights memorization of recurrent vs transformer architectures
+
+ Transformers exhibited similar or slightly higher in-weights memorization than the recurrent models (Fig 8 ), indicating that their superior few-shot learning performance (as seen in Fig 7 ) cannot simply be explained by a bias towards few-shot learning and against in-weights learning.
+
+ Acknowledgements
+
+ We would like to thank the following colleagues for helpful feedback and discussion: Kris Cao, Toni Creswell, Kevin Miller, Andrea Banino, Ishita Dasgupta, Kenneth Marino, Irina Higgins, Murray Shanahan, Kyriacos Nikiforou, Richard Evans, Christos Kaplanis, David Reichert, and Dave Abel.

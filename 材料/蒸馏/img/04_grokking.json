@@ -1,0 +1,170 @@
+[
+ {
+  "file": "04_grokking_01.png",
+  "w": 498,
+  "h": 326,
+  "bytes": 35514,
+  "src": "https://arxiv.org/html/2205.10343v1/Add2Dbad400.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "04_grokking_02.png",
+  "w": 498,
+  "h": 326,
+  "bytes": 33148,
+  "src": "https://arxiv.org/html/2205.10343v1/Add2Dgood19900.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "04_grokking_03.png",
+  "w": 498,
+  "h": 326,
+  "bytes": 31498,
+  "src": "https://arxiv.org/html/2205.10343v1/ModAdd2Dbad19900.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "04_grokking_04.png",
+  "w": 498,
+  "h": 326,
+  "bytes": 31608,
+  "src": "https://arxiv.org/html/2205.10343v1/ModAdd2Dgood19990.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "04_grokking_05.png",
+  "w": 873,
+  "h": 843,
+  "bytes": 57123,
+  "src": "https://arxiv.org/html/2205.10343v1/simple_pd_addition_regression_reprlr.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "04_grokking_06.png",
+  "w": 866,
+  "h": 843,
+  "bytes": 52819,
+  "src": "https://arxiv.org/html/2205.10343v1/simple_pd_addition_regression.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "04_grokking_07.png",
+  "w": 851,
+  "h": 843,
+  "bytes": 56196,
+  "src": "https://arxiv.org/html/2205.10343v1/simple_pd_addition_classification.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "04_grokking_08.png",
+  "w": 856,
+  "h": 843,
+  "bytes": 57409,
+  "src": "https://arxiv.org/html/2205.10343v1/simple_pd_permutation_regression.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "04_grokking_09.png",
+  "w": 344,
+  "h": 321,
+  "bytes": 21369,
+  "src": "https://arxiv.org/html/2205.10343v1/phasediagram_transformer.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "04_grokking_10.png",
+  "w": 1659,
+  "h": 458,
+  "bytes": 64460,
+  "src": "https://arxiv.org/html/2205.10343v1/lattice.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "04_grokking_11.png",
+  "w": 2183,
+  "h": 1240,
+  "bytes": 239688,
+  "src": "https://arxiv.org/html/2205.10343v1/dataset2rep.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "04_grokking_12.png",
+  "w": 1412,
+  "h": 611,
+  "bytes": 30664,
+  "src": "https://arxiv.org/html/2205.10343v1/p4_large.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "04_grokking_13.png",
+  "w": 1412,
+  "h": 611,
+  "bytes": 28396,
+  "src": "https://arxiv.org/html/2205.10343v1/p4_small.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "04_grokking_14.png",
+  "w": 839,
+  "h": 893,
+  "bytes": 58669,
+  "src": "https://arxiv.org/html/2205.10343v1/simple_pd_addition_bs_regression.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "04_grokking_15.png",
+  "w": 839,
+  "h": 893,
+  "bytes": 66517,
+  "src": "https://arxiv.org/html/2205.10343v1/simple_pd_addition_bs_classification.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "04_grokking_16.png",
+  "w": 887,
+  "h": 893,
+  "bytes": 47737,
+  "src": "https://arxiv.org/html/2205.10343v1/simple_pd_addition_init_regression.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "04_grokking_17.png",
+  "w": 887,
+  "h": 893,
+  "bytes": 53517,
+  "src": "https://arxiv.org/html/2205.10343v1/simple_pd_addition_init_classification.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "04_grokking_18.png",
+  "w": 873,
+  "h": 893,
+  "bytes": 62837,
+  "src": "https://arxiv.org/html/2205.10343v1/simple_pd_addition_reprwd_regression.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "04_grokking_19.png",
+  "w": 873,
+  "h": 893,
+  "bytes": 71407,
+  "src": "https://arxiv.org/html/2205.10343v1/simple_pd_addition_reprwd_classification.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "04_grokking_20.png",
+  "w": 2373,
+  "h": 1373,
+  "bytes": 278391,
+  "src": "https://arxiv.org/html/2205.10343v1/parallelogram_deduction.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "04_grokking_21.png",
+  "w": 1500,
+  "h": 375,
+  "bytes": 33443,
+  "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+  "alt": "Simons Foundation International"
+ }
+]

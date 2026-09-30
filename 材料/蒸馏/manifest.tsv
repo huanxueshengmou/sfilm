@@ -1,0 +1,23 @@
+id	lang	cat	title	url	kind
+01	en	经典起点	Grokking: Generalization Beyond Overfitting on Small Algorithmic Datasets	https://arxiv.org/abs/2201.02177	arxiv
+02	en	机制可解释性	Progress Measures for Grokking via Mechanistic Interpretability	https://arxiv.org/abs/2301.05217	arxiv
+03	en	有效理论	Omnigrok: Grokking Beyond Algorithmic Data	https://arxiv.org/abs/2210.01117	arxiv
+04	en	有效理论	Towards Understanding Grokking: An Effective Theory of Representation Learning	https://arxiv.org/abs/2205.10343	arxiv
+05	en	隐式进展	Hidden Progress in Deep Learning: SGD Learns Parities Near the Computational Limit	https://arxiv.org/abs/2207.08799	arxiv
+06	en	子网络竞争	A Tale of Two Circuits: Grokking as Competition of Sparse and Dense Subnetworks	https://arxiv.org/abs/2303.11873	arxiv
+07	en	电路效率	Explaining Grokking Through Circuit Efficiency	https://arxiv.org/abs/2309.02390	arxiv
+08	en	与双下降统一	Unifying Grokking and Double Descent	https://arxiv.org/abs/2303.06173	arxiv
+09	en	动力学区制	Grokking as the Transition from Lazy to Rich Training Dynamics	https://arxiv.org/abs/2310.06110	arxiv
+10	en	突降相变	Sudden Drops in the Loss: Syntax Acquisition, Phase Transitions, and Simplicity Bias in MLMs	https://arxiv.org/abs/2309.07311	arxiv
+11	en	真实模型证据	Grokking Explained: A Statistical Phenomenon	https://arxiv.org/abs/2502.01774	arxiv
+12	en	涌现争议	Emergent Abilities of Large Language Models	https://arxiv.org/abs/2206.07682	arxiv
+13	en	涌现争议	Are Emergent Abilities of Large Language Models a Mirage?	https://arxiv.org/abs/2304.15004	arxiv
+14	en	上下文学习	Data Distributional Properties Drive Emergent In-Context Learning in Transformers	https://arxiv.org/abs/2205.05055	arxiv
+15	en	交互科普	Do Machine Learning Models Memorize or Generalize?	https://pair.withgoogle.com/explorables/grokking/	html
+16	en	谱理论	A Spectral Theory of Grokking: Weight Decay Induces Feature Learning	https://arxiv.org/abs/2609.26679	arxiv
+17	en	因果前兆	Circuit Synchronization Precedes Generalization: A Causal Precursor to Grokking	https://arxiv.org/abs/2606.12966	arxiv
+18	en	语言模型迁移	A Pre-Training Analogue of Grokking in Language Models: Delayed Grammatical Generalization	https://arxiv.org/abs/2606.00230	arxiv
+19	en	权重范数	What Does the Weight Norm Control in Grokking? Logit-Scale Mediation under Cross-Entropy	https://arxiv.org/abs/2606.18465	arxiv
+20	en	研究工具	Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization	https://arxiv.org/abs/2609.20166	arxiv
+37	en	训练相变	In-Context Learning and Induction Heads	https://transformer-circuits.pub/2022/in-context-learning-and-induction-heads/index.html	html
+38	en	机制背景	Zoom In: An Introduction to Circuits	https://distill.pub/2020/circuits/zoom-in/	html

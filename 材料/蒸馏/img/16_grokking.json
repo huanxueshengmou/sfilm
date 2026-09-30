@@ -1,0 +1,34 @@
+[
+ {
+  "file": "16_grokking_01.png",
+  "w": 810,
+  "h": 690,
+  "bytes": 321074,
+  "src": "https://arxiv.org/html/2609.26679v1/figure_ntk_accuracy_eigenvectors.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "16_grokking_02.png",
+  "w": 811,
+  "h": 342,
+  "bytes": 88680,
+  "src": "https://arxiv.org/html/2609.26679v1/figure_mlp_phase_and_clock.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "16_grokking_03.png",
+  "w": 810,
+  "h": 306,
+  "bytes": 49848,
+  "src": "https://arxiv.org/html/2609.26679v1/figure_transformer_phase_and_clock.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "16_grokking_04.png",
+  "w": 1500,
+  "h": 375,
+  "bytes": 33443,
+  "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+  "alt": "Simons Foundation International"
+ }
+]

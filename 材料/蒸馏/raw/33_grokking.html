@@ -1,0 +1,2136 @@
+    <!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <link rel="canonical" href="https://blog.csdn.net/weixin_49122920/article/details/165491623"/>
+    <link rel="alternate" type="application/rss+xml" title="至顶头条" href="https://blog.csdn.net/weixin_49122920/rss/map">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="renderer" content="webkit"/>
+    <meta name="force-rendering" content="webkit"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+      <meta name="report" content='{"pid": "blog", "spm":"1001.2101"}'>
+    <meta name="referrer" content="always">
+    <meta http-equiv="Cache-Control" content="no-siteapp" /><link rel="alternate" media="handheld" href="#" />
+    <meta name="shenma-site-verification" content="5a59773ab8077d4a62bf469ab966a63b_1497598848">
+    <meta name="applicable-device" content="pc">
+    <link  href="https://g.csdnimg.cn/static/logo/favicon32.ico"  rel="shortcut icon" type="image/x-icon" />
+    <title>神经网络训练到最后，权重到底经历了什么？-CSDN博客</title>
+    <meta property="og:locale" content="zh_CN">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="神经网络训练到最后，权重到底经历了什么？-CSDN博客">
+    <meta property="og:description" content="文章浏览阅读154次。神经网络训练到最后，权重到底经历了什么？">
+    <meta property="og:url" content="https://blog.csdn.net/weixin_49122920/article/details/165491623">
+    <meta property="og:site_name" content="CSDN博客">
+    <meta property="og:image" content="https://xtsimages001.oss-cn-hangzhou.aliyuncs.com/users-1167642/2026_09_15_22_15_34895389.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="神经网络训练到最后，权重到底经历了什么？">
+    <meta property="article:published_time" content="2026-09-15T22:16:04+08:00">
+    <meta property="article:modified_time" content="2026-09-15T22:16:08+08:00">
+    <meta property="bytedance:published_time" content="2026-09-15T22:16:04+08:00">
+    <meta property="bytedance:lrDate_time" content="2026-09-15T22:16:04+08:00">
+    <meta property="bytedance:updated_time" content="2026-09-15T22:16:04+08:00">
+    <meta property="article:author" content="至顶头条">
+    <meta property="article:section" content="机器学习">
+    <meta property="article:tag" content="机器学习,渗流级联理论,深度学习">
+    <meta name="geo:keywords" content="机器学习,渗流级联理论,深度学习">
+    <meta name="geo:summary" content="神经网络训练到最后，权重到底经历了什么？">
+    <meta name="geo:entity_type" content="Article">
+    <meta name="geo:subject" content="神经网络训练到最后，权重到底经历了什么？">
+    <meta name="geo:key_points" content="机器学习|渗流级联理论|深度学习">
+    <meta name="geo:citation_ready" content="true">
+    <meta name="description:direct_answer" content="神经网络训练到最后，权重到底经历了什么？">
+    <meta name="author:credentials" content="至顶头条">
+    <meta name="author:affiliation" content="csdn">
+    <meta name="geo:source_type" content="original">
+    <meta name="geo:fact_checked" content="true">
+    <meta name="geo:editorial_policy" content="https://passport.csdn.net/service">
+    <meta name="geo:update_frequency" content="daily">
+    <meta name="geo:maintenance_status" content="active">
+        <script type="application/ld+json">
+          {"image":"https://xtsimages001.oss-cn-hangzhou.aliyuncs.com/users-1167642/2026_09_15_22_15_34895389.png","keywords":"机器学习,渗流级联理论,深度学习","@type":"Article","author":[{"@type":"Person","name":"至顶头条","url":"https://blog.csdn.net/weixin_49122920"}],"inLanguage":"zh-CN","description":"文章浏览阅读154次。神经网络训练到最后，权重到底经历了什么？","dateModified":"2026-09-15T22:16:08+08:00","@context":"https://schema.org","url":"https://blog.csdn.net/weixin_49122920/article/details/165491623","datePublished":"2026-09-15T22:16:04+08:00","publisher":{"@type":"Organization","name":"CSDN","logo":{"@type":"ImageObject","url":"https://g.csdnimg.cn/static/logo/favicon32.ico"}},"geoSummary":{"heading":"内容摘要","items":{"主题":"神经网络训练到最后，权重到底经历了什么？","类型":"article","适用场景":"神经网络训练到最后，权重到底经历了什么？","核心功能":"机器学习,渗流级联理论,深度学习","更新日期":"2026-09-15T22:16:08+08:00"},"keyPoints":["机器学习","渗流级联理论","深度学习"],"citationContext":{"authoritySource":"至顶头条","factChecked":true,"lastVerified":"2026-09-15T22:16:08+08:00"}},"headline":"神经网络训练到最后，权重到底经历了什么？","articleSection":"机器学习"}
+        </script>
+    <script>
+    (function(){
+    var el = document.createElement("script");
+    el.src = "https://lf1-cdn-tos.bytegoofy.com/goofy/ttzz/push.js?1abfa13dfe74d72d41d83c86d240de42fa345e1877a4861fa55a00b4f9f2644d3d72cd14f8a76432df3935ab77ec54f830517b3cb210f7fd334f50ccb772134a";
+    el.id = "ttzz";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(el, s);
+    })(window)
+    </script>
+        <meta name="keywords" content="机器学习,渗流级联理论,深度学习">
+    <meta name="description" content="文章浏览阅读154次。神经网络训练到最后，权重到底经历了什么？">
+              <link rel="stylesheet" type="text/css" href="https://csdnimg.cn/release/blogv2/dist/pc/css/detail_enter-811f8e378f.min.css">
+    <style>
+        #content_views pre{
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none; 
+            user-select: none; 
+        }
+        #content_views pre code{
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none; 
+            user-select: none; 
+        }
+    </style>
+    <script type="application/ld+json">{"@context":"https://ziyuan.baidu.com/contexts/cambrian.jsonld","@id":"https://blog.csdn.net/weixin_49122920/article/details/165491623","appid":"1638831770136827","pubDate":"2026-09-15T22:16:04","title":"神经网络训练到最后，权重到底经历了什么？-CSDN博客","upDate":"2026-09-15T22:16:04"}</script>
+        <link rel="stylesheet" type="text/css" href="https://csdnimg.cn/release/blogv2/dist/pc/themesSkin/skin-number/skin-number-2c93789924.min.css">
+    <script src="https://g.csdnimg.cn/lib/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>
+    <script src="https://g.csdnimg.cn/lib/jquery-migrate/1.4.1/jquery-migrate.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        var isCorporate = false;
+        var username =  "weixin_49122920";
+        var skinImg = "white";
+
+        var blog_address = "https://blog.csdn.net/weixin_49122920";
+        var currentUserName = "";
+        var isOwner = false;
+        var loginUrl = "http://passport.csdn.net/account/login?from=https://blog.csdn.net/weixin_49122920/article/details/165491623";
+        var blogUrl = "https://blog.csdn.net/";
+        var starMapUrl = "https://ai.csdn.net";
+        var paymentBalanceUrl = "https://csdnimg.cn/release/vip-business-components/vipPaymentBalance.js?v=2025122501";
+        var avatar = "https://i-avatar.csdnimg.cn/45c16f533ac6499f894290957886342b_weixin_49122920.jpg!1";
+        var isCJBlog = false;
+        var isStarMap = false;
+        var articleTitle = "神经网络训练到最后，权重到底经历了什么？";
+        var articleDesc = "文章浏览阅读154次。神经网络训练到最后，权重到底经历了什么？";
+        var articleTitles = "神经网络训练到最后，权重到底经历了什么？-CSDN博客";
+        var nickName = "至顶头条";
+        var articleDetailUrl = "https://blog.csdn.net/weixin_49122920/article/details/165491623";
+        var vipUrlV = "https://mall.csdn.net/vip?vipSource=learningVip";
+        if(window.location.host.split('.').length == 3) {
+            blog_address = blogUrl + username;
+        }
+        var skinStatus = "White";
+        var isVipSkin = false;
+        var blogStaticHost = "https://csdnimg.cn/release/blogv2/"
+          var payColumn = false
+    </script>
+        <meta name="toolbar" content='{"type":"0","fixModel":"1"}'>
+      <script ript src="https://g.csdnimg.cn/??fixed-sidebar/1.1.7/fixed-sidebar.js" type="text/javascript"></script>
+    <script src='//g.csdnimg.cn/common/csdn-report/report.js' type='text/javascript'></script>
+    <link rel="stylesheet" type="text/css" href="https://csdnimg.cn/public/sandalstrap/1.4/css/sandalstrap.min.css">
+    <style>
+        .MathJax_Message, .MathJax_Preview{
+            display: none !important;
+        }
+    </style>
+    <script src="https://dup.baidustatic.com/js/ds.js"></script>
+      <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "lgtpix6r85");
+      </script>
+    <script src="/cdn_cgi_bs_bot/static/crypto.min.js"></script>
+    <script src="/cdn_cgi_bs_bot/static/bot-score-v1.js"></script>
+
+    <script src="/cdn_cgi_bs_captcha/static/js/waf_captcha_embedded_bs_v6.3.0805.js"></script>
+</head>
+  <body class="nodata  " style="">
+    <div id="toolbarBox" style="min-height: 48px;"></div>
+        <script>
+            var toolbarSearchExt = '{\"id\":165491623,\"landingWord\":[],\"queryWord\":\"\",\"tag\":[\"机器学习\",\"渗流级联理论\",\"深度学习\"],\"title\":\"神经网络训练到最后，权重到底经历了什么？\"}';
+        </script>
+    <script src="https://g.csdnimg.cn/common/csdn-toolbar/csdn-toolbar.js" type="text/javascript"></script>
+    <script>
+    (function(){
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        }
+        else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+    </script>
+
+    <link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/pc/css/blog_code-01256533b5.min.css">
+    <link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/chart-3456820cac.css" />
+    <link rel="stylesheet" href="https://g.csdnimg.cn/lib/swiper/6.0.4/css/swiper.css" />
+    <script src="https://g.csdnimg.cn/lib/swiper/6.0.4/js/swiper.js" async></script>
+    <script>
+      var articleId = 165491623;
+      var annotationModuleBootstrapData = {
+        hasAnnotation: false,
+        totalCount: 0,
+        list: [],
+        categories: []
+      };
+      var annotationFeatureEnabled = false;
+
+
+        var privateEduData = [];
+        var privateData = [];
+      var crytojs = "https://csdnimg.cn/release/blogv2/dist/components/js/crytojs-ca5b8bf6ae.min.js";
+      var commentscount = 0;
+      var commentAuth = 2;
+      var curentUrl = "https://blog.csdn.net/weixin_49122920/article/details/165491623";
+      var myUrl = "https://my.csdn.net/";
+      var isGitCodeBlog = false;
+var vipActivityIcon = "https://i-operation.csdnimg.cn/images/99a45e75b3604261bbe47a0982437719.png";
+var vipActivityIconV2 = {
+  icon: "https://i-operation.csdnimg.cn/images/99a45e75b3604261bbe47a0982437719.png",
+  url: "https://i.csdn.net/#/geek-star-fun-pack?utm_source=260901_vip_blogleftbanner"
+};
+      var isOpenSourceBlog = false;
+      var isVipArticle = false;
+        var highlight = ["机器学习","深度学习","神经网络","最后","级联","权重","训练","渗流","经历","理论","?"];//高亮数组
+        var isRecommendModule = true;
+          var isBaiduPre = true;
+          var baiduCount = 2;
+          var setBaiduJsCount = 10;
+        var viewCountFormat = 154;
+      var share_card_url = "https://app-blog.csdn.net/share?article_id=165491623&username=weixin_49122920"
+      var mallVipUrl = "https://mall.csdn.net/vip?vipSource=article"
+      var vipArticleAbStyle = "t_1"
+      var vipArticleCpStyle = "t_1"
+      var detailheaderAbCommunity = "exp1"
+      var codeAiAbStyle = "control"
+      var runProjectDeepBlogAB = "t_1"
+      var gitcodeHighlightWordAB = "exp1"
+
+      var asideCknowsEntryAB = "con1"
+      var deepblogUrl = ""
+        deepblogUrl = "https://deepblog.net?utm_source=blog_onekey_run";
+      var codeAiAbObjStyle = ""
+        codeAiAbObjStyle = "{\"control\":{\"title\":\"AI写代码\",\"destUrl\":\"https://trae.com.cn?utm_source=community&utm_medium=csdn&utm_campaign=daima\",\"imgUrl\":\"https://i-operation.csdnimg.cn/images/a5fff6f6c9f0464c9a46b130c972952b.png\"},\"exp4\":{\"title\":\"Lobster AI\",\"destUrl\":\"https://lobsterai.youdao.com/#/index?keyfrom=csdn3\",\"imgUrl\":\"https://i-operation.csdnimg.cn/images/2c9d3b91a8ad4956bca5af92918b9e75.png\"},\"exp5\":{\"title\":\"用码道免费领 1 个月 Token\",\"destUrl\":\"https://developer.huaweicloud.com/codeartsco.html?source=dmzntgwltcsdn1&sourcead=dmzntgwltcsdnzn11\",\"imgUrl\":\"https://i-operation.csdnimg.cn/images/7c0190c005ab41659100f583c0791aee.png\"},\"exp6\":{\"title\":\"AI代码解释\",\"destUrl\":\"https://developer.huaweicloud.com/codeartsco.html?source=dmzntgwltcsdn1&sourcead=dmzntgwltcsdncommunity8\",\"imgUrl\":\"https://i-operation.csdnimg.cn/images/7c0190c005ab41659100f583c0791aee.png\"},\"exp7\":{\"title\":\"看看AI怎么写\",\"destUrl\":\"https://developer.huaweicloud.com/codeartsco.html?source=dmzntgwltcsdn1&sourcead=dmzntgwltcsdncommunity9\",\"imgUrl\":\"https://i-operation.csdnimg.cn/images/7c0190c005ab41659100f583c0791aee.png\"},\"exp8\":{\"title\":\"点击领取万元奖金\",\"destUrl\":\"https://builderx.csdn.net/activity-site/madao-activity-page/madao?source=community7\",\"imgUrl\":\"https://i-operation.csdnimg.cn/images/7c0190c005ab41659100f583c0791aee.png\"},\"exp9\":{\"title\":\"复制一句话领 10 元\",\"destUrl\":\"https://builderx.csdn.net/activity-site/madao-activity-page/index?source=community1\",\"imgUrl\":\"https://i-operation.csdnimg.cn/images/7c0190c005ab41659100f583c0791aee.png\"}}";
+      var articleType = 1;
+      var baiduKey = "";
+      var copyPopSwitch = true;
+      var needInsertBaidu = true;
+      var recommendRegularDomainArr = ["blog.csdn.net/.+/article/details/","download.csdn.net/download/","edu.csdn.net/course/detail/","ask.csdn.net/questions/","bbs.csdn.net/topics/","www.csdn.net/gather_.+/"]
+      var codeStyle = "";
+      var baiduSearchType = "";
+      var sharData = "{\"hot\":[{\"id\":1,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/a5f4260710904e538002a6ab337939b3.png\"},{\"id\":2,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/188b37199a2c4b74b1d9ffc39e0d52de.png\"},{\"id\":3,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/14ded358b631444581edd98a256bc5af.png\"},{\"id\":4,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/1470f23a770444d986ad551b9c33c5be.png\"},{\"id\":5,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/c329f5181dc74f6c9bd28c982bb9f91d.png\"},{\"id\":6,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/ccd8a3305e81460f9c505c95b432a65f.png\"},{\"id\":7,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/bc89d8283389440d97fc4d30e30f45e1.png\"},{\"id\":8,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/452d485b4a654f5592390550d2445edf.png\"},{\"id\":9,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/f8b9939db2ed474a8f43a643015fc8b7.png\"},{\"id\":10,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/6de8864187ab4ed3b1db0856369c36ff.png\"},{\"id\":11,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/673cc3470ff74072acba958dc0c46e2d.png\"},{\"id\":12,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/930c119760ac4491804db80f9c6d4e3f.png\"},{\"id\":13,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/15e6befb05a24233bc2b65e96aa8d972.png\"},{\"id\":14,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/2075fd6822184b95a41e214de4daec13.png\"},{\"id\":15,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/859b1552db244eb6891a809263a5c657.png\"},{\"id\":16,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/0be2f920f1f74290a98921974a9613fd.png\"},{\"id\":17,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/2e97e00b43f14afab494ea55ef3f4a6e.png\"},{\"id\":18,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/ff4ab252f46e444686f5135d6ebbfec0.png\"},{\"id\":19,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/ae029bbe99564e79911657912d36524f.png\"},{\"id\":20,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/b3ece39963de440388728e9e7b9bf427.png\"},{\"id\":21,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/6f14651a99ba486e926d63b6fa692997.png\"},{\"id\":22,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/83ceddf050084875a341e32dcceca721.png\"},{\"id\":23,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/b90368b8fd5d4c6c8c79a707d877cf7c.png\"},{\"id\":24,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/aeffae14ecf14e079b2616528c9a393b.png\"},{\"id\":25,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/c5a06b5a13d44d16bed868fc3384897a.png\"},{\"id\":26,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/08b697658b844b318cea3b119e9541ef.png\"},{\"id\":27,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/68ccb0b8d09346ac961d2b5c1a8c77bf.png\"},{\"id\":28,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/a2227a247e37418cbe0ea972ba6a859b.png\"},{\"id\":29,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/3a42825fede748f9993e5bb844ad350d.png\"},{\"id\":30,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/8882abc1dd484224b636966ea38555c3.png\"},{\"id\":31,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/4f6a5f636a3e444d83cf8cc06d87a159.png\"},{\"id\":32,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/1953ef79c56b4407b78d7181bdff11c3.png\"},{\"id\":33,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/c04a2a4f772948ed85b5b0380ed36287.png\"},{\"id\":34,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/5b4fecd05091405ea04d8c0f53e9f2c7.png\"},{\"id\":35,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/b89f576d700344e280d6ceb2a66c2420.png\"},{\"id\":36,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/1c65780e11804bbd9971ebadb3d78bcf.png\"},{\"id\":37,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/d590db2055f345db9706eb68a7ec151a.png\"},{\"id\":38,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/fe602f80700b4f6fb3c4a9e4c135510e.png\"},{\"id\":39,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/39ff2fcd31e04feba301a071976a0ba7.png\"},{\"id\":40,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/f9b61b3d113f436b828631837f89fb39.png\"},{\"id\":41,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/df1aca5f610c4ad48cd16da88c9c8499.png\"},{\"id\":42,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/d7acf73a1e6b41399a77a85040e10961.png\"},{\"id\":43,\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/b7f1b63542524b97962ff649ab4e7e23.png\"}],\"vip\":[{\"id\":1,\"vipUrl\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220920101150.png\",\"url\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220920101154.png\"},{\"id\":2,\"vipUrl\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220920101204.png\",\"url\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220920101208.png\"},{\"id\":3,\"vipUrl\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220920101211.png\",\"url\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220920101215.png\"},{\"id\":4,\"vipUrl\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220920101218.png\",\"url\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220920101220.png\"},{\"id\":5,\"vipUrl\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220920101223.png\",\"url\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220920101226.png\"},{\"id\":6,\"vipUrl\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220922100635.png\",\"url\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220922100639.png\"},{\"id\":7,\"vipUrl\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220922100642.png\",\"url\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220922100644.png\"},{\"id\":8,\"vipUrl\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220922100647.png\",\"url\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220922100649.png\"},{\"id\":9,\"vipUrl\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220922100652.png\",\"url\":\"https:\\/\\/img-home.csdnimg.cn\\/images\\/20220922100655.png\"},{\"id\":10,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/55de67481fde4b04b97ad78f11fe369a.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/bb2418fb537e4d78b10d8765ccd810c5.png\"},{\"id\":11,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/579c713394584d128104ef1044023954.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/f420d9fbcf5548079d31b5e809b6d6cd.png\"},{\"id\":12,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/75b7f3155ba642f5a4cc16b7baf44122.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/a9030f5877be401f8b340b80b0d91e64.png\"},{\"id\":13,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/0903d33cafa54934be3780aa54ae958d.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/2cd8c8929f5a42fca5da2a0aeb456203.png\"},{\"id\":14,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/949fd7c22884439fbfc3c0e9c3b8dee7.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/dafbea9bd9eb4f3b962b48dc41657f89.png\"},{\"id\":15,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/4119cfddd71d4e6a8a27a18dbb74d90e.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/c56310c8b6384d9e85388e4e342ce508.png\"},{\"id\":16,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/121575274da142bcbbbbc2e8243dd411.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/5013993de06542f881018bb9abe2edf7.png\"},{\"id\":17,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/4d97aa6dd4fe4f09a6bef5bdf8a6abcd.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/76f23877b6ad4066ad45ce8e31b4b977.png\"},{\"id\":18,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/fdb619daf21b4c829de63b9ebc78859d.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/a1abe5d27a5441f599adfe662f510243.png\"},{\"id\":19,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/676b7707bb11410f8f56bc0ed2b2345c.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/7ac5b467fbf24e1d8c2de3f3332c4f54.png\"},{\"id\":20,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/0becb8cc227e4723b765bdd69a20fd4a.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/fdec85b26091486b9a89d0b8d45c3749.png\"},{\"id\":21,\"vipUrl\":\"https:\\/\\/img-blog.csdnimg.cn\\/1a6c06235ad44941b38c54cbc25a370c.png\",\"url\":\"https:\\/\\/img-blog.csdnimg.cn\\/410a06cda2d44b0c84578f88275caf70.png\"}],\"map\":{\"hot\":\"热门\",\"vip\":\"VIP\"}}";
+        var commentListModule = ''
+      var canRead = true;
+      var blogMoveHomeArticle = false;
+      var showSearchText = "";
+      var articleSource = 1;
+      var articleReport = '{"pid": "blog", "spm":"1001.2101"}';
+        var baiduSearchChannel = 'pc_relevant'
+        var baiduSearchIdentification = '.235^v43^pc_blog_bottom_relevance_base6'
+        var distRequestId = 'silkroad_1790679951662'
+        var initRewardObject = {
+          giver: currentUserName,
+          anchor: username,
+          articleId: articleId,
+          sign: ''
+        }
+        var isLikeStatus = false;
+        var isUnLikeStatus = false;
+        var studyLearnWord = "";
+        var unUseCount = 0;
+        var codeMaxSize = 0;
+        var overCost = true;
+        var isCurrentUserVip = false;
+        var contentViewsHeight = 0;
+        var contentViewsCount = 0;
+        var contentViewsCountLimit = 5;
+        var isShowConcision = false;
+        var lastTime = 0
+        var postTime = "2026-09-15 22:16:04"
+      var isCookieConcision = false
+      var isHasDirectoryModel = false
+      var isShowSideModel = false
+      var isShowDirectoryModel = true
+      function getCookieConcision(sName){
+        var allCookie = document.cookie.split("; ");
+        for (var i=0; i < allCookie.length; i++){
+          var aCrumb = allCookie[i].split("=");
+          if (sName == aCrumb[0])
+            return aCrumb[1];
+        }
+        return null;
+      }
+      if (getCookieConcision('blog_details_concision') && getCookieConcision('blog_details_concision') == 0){
+        isCookieConcision = true
+        isShowSideModel = true
+        isShowDirectoryModel = false
+      }
+    </script>
+        <div class="main_father clearfix d-flex justify-content-center " style="height:100%;">
+          <div class="container clearfix " id="mainBox">
+          <script>
+          if (!isCookieConcision) {
+            $('.main_father').removeClass('mainfather-concision')
+            $('.main_father .container').removeClass('container-concision')
+          } else {
+            $('#mainBox').css('margin-right', '0')
+          }
+          </script>
+          <main>
+<script type="text/javascript">
+    var resourceId =  "";
+    function getQueryString(name) {   
+      var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象  
+      var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+      if( r != null ) return decodeURIComponent( r[2] ); return '';   
+    }
+    function stripscript(s){ 
+      var pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？%]") 
+      var rs = ""; 
+      for (var i = 0; i < s.length; i++) { 
+        rs = rs+s.substr(i, 1).replace(pattern, ''); 
+      } 
+      return rs;
+    }
+    var blogHotWords = stripscript(getQueryString('utm_term')).length > 1 ? stripscript(getQueryString('utm_term')) : ''
+</script>
+<div class="blog-content-box">
+  <div class="article-header-box" id="article-header-box">
+    <div class="article-header">
+      <div class="article-title-box">
+        <h1 class="title-article" id="articleContentId">神经网络训练到最后，权重到底经历了什么？</h1>
+      </div>
+      <div class="article-info-box">
+          <div class="article-bar-top">
+              <div class="bar-content active">
+              <span class="article-type-text original">原创</span>
+
+              
+                  <span class="time">于&nbsp;2026-09-15 22:16:04&nbsp;发布</span>
+                <span class="border-dian">·</span>
+                <span class="read-count">154 阅读</span>
+                <div class="read-count-box is-like like-ab-new" data-type="top">
+                  <span class="border-dian">·</span>
+                  <img class="article-read-img article-heard-img active" style="display:none" id="is-like-imgactive-new" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newHeart2023Active.png" alt="">
+                  <img class="article-read-img article-heard-img" style="display:block" id="is-like-img-new" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newHeart2023Black.png" alt="">
+                  <span class="read-count" id="blog-digg-num" style="color:;">
+                      0
+                  </span>
+                </div>
+                <span class="border-dian">·</span>
+                <a id="blog_detail_zk_collection" class="un-collection" data-report-click='{"mod":"popu_823","spm":"1001.2101.3001.4232","ab":"new"}'>
+                  <img class="article-collect-img article-heard-img un-collect-status isdefault" style="display:inline-block" src="https://csdnimg.cn/release/blogv2/dist/pc/img/tobarCollect2.png" alt="">
+                  <img class="article-collect-img article-heard-img collect-status isactive" style="display:none" src="https://csdnimg.cn/release/blogv2/dist/pc/img/tobarCollectionActive2.png" alt="">
+                  <span class="get-collection">
+                      4
+                  </span>
+                </a>
+
+                    <span class="border-dian">·</span>
+                    <div class="href-article-edit-new">
+                      <span class="href-article-edit-click">本内容遵循CC 4.0 BY-SA版权协议</span>
+                      <div class="slide-content-box-new">
+                                  版权声明：本文为博主原创文章，遵循<a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"> CC 4.0 BY-SA </a>版权协议，转载请附上原文出处链接和本声明。
+                      </div>
+                    </div>
+                    <a class="geo-detection-btn" href="https://mp.csdn.net/geo?title=%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E8%AE%AD%E7%BB%83%E5%88%B0%E6%9C%80%E5%90%8E%EF%BC%8C%E6%9D%83%E9%87%8D%E5%88%B0%E5%BA%95%E7%BB%8F%E5%8E%86%E4%BA%86%E4%BB%80%E4%B9%88%EF%BC%9F&amp;url=https%3A%2F%2Fblog.csdn.net%2Fweixin_49122920%2Farticle%2Fdetails%2F165491623&amp;utm_source=blog_geo" target="_blank" rel="noopener" data-report-view='{"spm":"3001.11779"}' data-report-click='{"spm":"3001.11779","dest":"https://mp.csdn.net/geo?title=%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E8%AE%AD%E7%BB%83%E5%88%B0%E6%9C%80%E5%90%8E%EF%BC%8C%E6%9D%83%E9%87%8D%E5%88%B0%E5%BA%95%E7%BB%8F%E5%8E%86%E4%BA%86%E4%BB%80%E4%B9%88%EF%BC%9F&amp;url=https%3A%2F%2Fblog.csdn.net%2Fweixin_49122920%2Farticle%2Fdetails%2F165491623&amp;utm_source=blog_geo"}'>
+                      <span class="geo-detection-text">GEO检测</span>
+                      <svg class="geo-detection-arrow" width="4" height="8" viewBox="0 0 4 8" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M0.5 0.5L3.5 4L0.5 7.5" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </a>
+              </div>
+          </div>
+          <div class="blog-tags-box article-header-tags-v2">
+
+<div class="article-header-categories-wrap">
+  <div class="article-header-collect-row">
+    <div class="article-header-category-segment article-header-collect-segment" id="article-header-collect-group" data-column-count="0" style="display:none">
+      <span class="article-header-row-dot" style="display:none">·</span>
+      <div class="article-header-category-group article-header-collect-group">
+        <span class="article-header-label">收录于</span>
+        <div class="article-header-pill-list article-header-collect-list" id="article-header-collect-list">
+          <span class="article-header-community-slot community-name" id="community-name"></span>
+<div class="tag-more-btn collect-more-btn column-collect-more-btn" style="display:none" id="article-header-collect-more-btn" data-report-click='{"spm":"1001.2101.3001.4224"}'>
+  <svg class="more-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+    <circle cx="6" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="18" cy="12" r="2"/>
+  </svg>
+  <div class="column-more-dropdown">
+    <p class="dropdown-title">当前文章被以下社区和专栏收录：</p>
+    <div class="column-more-list" id="article-header-collect-more-list">
+      <div class="dropdown-divider column-more-item-divider"></div>
+    </div>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+          </div>
+      </div>
+    </div>
+  </div>
+    <div id="blogHuaweiyunAdvert"></div>
+
+
+    <article class="baidu_pl">
+        <div id="article_content" class="article_content clearfix">
+        <link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/kdoc_html_views-1a98987dfd.css">
+        <link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/ck_htmledit_views-a50b13a894.css">
+                <div id="content_views" class="htmledit_views atom-one-dark">
+                    <html><head>    <script src="/cdn_cgi_bs_bot/static/crypto.min.js"></script>
+    <script src="/cdn_cgi_bs_bot/static/bot-score-v1.js"></script>
+
+    <script src="/cdn_cgi_bs_captcha/static/js/waf_captcha_embedded_bs_v6.3.0805.js"></script>
+</head><body><p style="text-align: center; position: relative;"><img src="https://i-blog.csdnimg.cn/img_convert/1f4953d05b972aca5eae7795d8054f05.png" width="1200" height="648" /></p><p>先说一个你可能没想到的事实。<br /></p><p>深度学习里有一个现象叫&#34;grokking&#34;&#xff08;延迟泛化&#xff09;&#xff0c;一个网络在训练数据上早就已经完美记住答案了&#xff0c;但泛化能力就是迟迟不出现&#xff0c;非要等上几千个训练轮次,突然某一刻,它就&#34;开窍&#34;了&#xff0c;测试准确率从随机猜测直接跳到接近满分。这不是偶发个例&#xff0c;2022年OpenAI的研究者在模运算任务上系统地观察到了这个现象&#xff0c;而且到今天,没人能给出一个完整的机制解释,说清楚训练过程中到底发生了什么&#xff0c;才导致了这个突然的跳跃。</p><p>这篇论文想做的事情,就是试图打开这个黑箱。而它给出的答案相当出人意料&#xff1a;用物理学里研究导电网络、森林火灾蔓延的渗流理论&#xff0c;来描述神经网络训练时权重的坍缩过程。</p><p>训练到底在&#34;折叠&#34;什么</p><p>要理解这篇论文在说什么&#xff0c;得先搞清楚一个背景。</p><p>深度神经网络有大量参数&#xff0c;但训练完之后&#xff0c;很多参数其实是&#34;多余&#34;的,它们本可以被压缩、合并&#xff0c;网络照样能干同样的事。这背后有个重要原因是架构对称性&#xff1a;比如一层里的两个神经元&#xff0c;如果作用完全等价&#xff0c;那把它们互换位置&#xff0c;网络的输出不会有任何变化。</p><p>架构对称性*&#xff1a;神经网络里由于结构设计&#xff08;比如多个神经元功能等价&#xff09;而天然存在的、不影响输出结果的参数变换方式。</p><p>这种对称性会在参数空间里制造出大片&#34;平坦&#34;的区域&#xff0c;专业说法叫不变集。一旦训练轨迹掉进这些区域&#xff0c;它就再也跑不出去了&#xff0c;因为这片区域里的梯度指向恰好把轨迹困在原地。</p><p>不变集*&#xff1a;一旦参数进入这个区域&#xff0c;无论后续怎么训练&#xff0c;都不会再离开的子空间。</p><p>已有研究&#xff08;Chen等人2023年的工作&#xff09;证明了SGD&#xff08;随机梯度下降&#xff09;确实会把网络推向这些不变集&#xff0c;效果就是网络逐渐收缩成一个更简单的&#34;子网络&#34;&#xff0c;好比原本雇了十个人做一份工作&#xff0c;训练结束后发现其中六个人其实一直在做完全一样的事&#xff0c;可以直接合并成一个岗位。</p><p>但这项研究只告诉你终点在哪&#xff0c;没告诉你路怎么走的。网络到底是怎么一步步从&#34;十个各自为战的神经元&#34;变成&#34;一个统一的等价类&#34;的&#xff1f;合并过程是平滑渐进&#xff0c;还是像多米诺骨牌一样一批批地倒&#xff1f;这就是这篇论文真正要回答的问题。</p><p>用渗流理论给训练&#34;拍X光&#34;</p><p>论文的核心思路是把每个子网络看成一个节点&#xff0c;如果两个子网络的参数轨迹被证明会永远绑定在一起&#xff08;论文里叫吸引子等价&#xff09;&#xff0c;就在它们之间连一条边。随着训练推进&#xff0c;边会越来越多&#xff0c;直到某个时刻&#xff0c;整个网络里绝大部分节点连成了一整块。</p><p>这个过程&#xff0c;跟物理学里的渗流现象一模一样。</p><p>渗流*&#xff1a;描述一个系统中局部连接如何逐渐扩展成全局连通的数学理论&#xff0c;经典例子是往一堆随机分布的导电颗粒里逐个添加连接&#xff0c;某个临界点上&#xff0c;颗粒突然从互不相通变成整体导电。</p><p>论文用一个叫Reeb图的工具&#xff0c;把参数轨迹的合并与分裂过程记录成一张随时间演化的拓扑图&#xff0c;再通过一次&#34;时间尺度分离&#34;的操作&#xff0c;把里面快速抖动的布朗噪声筛掉&#xff0c;只留下缓慢但不可逆的合并趋势。这一步的关键洞察在于&#xff0c;训练存在两种时间尺度&#xff1a;快的是局部抖动&#xff0c;网络在小范围内来回震荡&#xff1b;慢的是宏观趋势&#xff0c;权重实际收缩变小的整体方向。论文证明&#xff0c;只要这两种尺度分得开&#xff0c;局部抖动造成的合并和分裂在统计上会正好抵消&#xff0c;剩下的只有单向的坍缩。</p><p>这就好比看一段延时摄影拍下的城市车流。你如果按正常速度看&#xff0c;车子在红绿灯前来回挪动、变道、又倒回来&#xff0c;看起来乱糟糟一片&#xff0c;根本看不出规律。但如果把镜头拉长成一整天的延时&#xff0c;你会发现每天早晚高峰的车流方向其实清晰又固定。论文做的正是这个&#34;拉长镜头&#34;的操作,把训练中那些看似随机的局部波动过滤掉&#xff0c;只留下真正决定网络走向的宏观趋势。如果不做这一步过滤&#xff0c;你会被那些瞬时的、可逆的噪声干扰所迷惑&#xff0c;误以为网络的坍缩是杂乱无章的&#xff0c;看不出背后其实有一条清晰的、不可逆的坍缩轨迹。</p><p>不是一个个来&#xff0c;是一批一批地塌</p><p>标准渗流理论里&#xff0c;网络的连通性增长通常是平滑的&#xff0c;一条边一条边地加。但这篇论文发现了一个关键的不同点&#xff1a;神经网络的架构对称性会强迫多个子网络同时合并&#xff0c;而不是两两单独合并。</p><p>这个&#34;多个一起&#34;背后的机制叫Sn对称群&#xff0c;简单说就是n个功能完全等价的神经元&#xff0c;它们之间存在完整的置换对称性,不是随便两个互换&#xff0c;是这n个中的任意排列组合都不影响输出。</p><p>Sn对称群*&#xff1a;描述n个完全等价、可以任意排列而不改变系统行为的对象之间对称关系的数学结构。</p><p>这意味着&#xff0c;当这n个子网络要合并进同一个不变集时&#xff0c;它们是同时绑定的,论文管这叫&#34;超凝聚&#34;&#xff0c;用数学表达就是组件规模从1直接跳到n&#xff0c;中间没有过渡态。</p><p>这就像一场婚礼上突然宣布集体注册结婚&#xff0c;而不是情侣们排队一对一登记。如果登记处只能一对一处理&#xff0c;你会看到队伍缓慢但持续地缩短&#xff1b;但如果规定必须凑齐n对新人一起进场&#xff0c;登记处的队伍长度就会保持不变很长时间&#xff0c;然后突然一下子跳崩,一大批人同时完成手续。这个&#34;一起进场&#34;的规则不是可以选择性忽略的细节,它直接决定了整个系统连通性增长曲线的形状&#xff1a;是平滑曲线&#xff0c;还是带着台阶的阶梯。</p><p>论文证明了这种台阶式跳跃是否在网络规模趋于无穷大时依然存在&#xff0c;取决于一个具体条件&#xff1a;合并时那些子网络的规模&#xff0c;相对于整个网络有多大。如果合并的子网络本身已经占了网络相当大的比例&#xff08;论文用Θ(N)表示&#xff0c;也就是规模随网络整体大小成比例增长&#xff09;&#xff0c;这个跳跃就会一直存在&#xff0c;不会随着网络变大而消失。但如果合并的只是零星几个&#xff08;论文用O(1)表示&#xff0c;规模跟网络整体大小无关&#xff09;&#xff0c;跳跃幅度就会随着N变大而被&#34;稀释&#34;掉&#xff0c;趋于平滑。</p><p>这个区分其实回应了渗流理论里一场老争论。2009年有篇论文&#xff08;Achlioptas等人&#xff09;在Science上提出&#34;爆炸性渗流&#34;概念&#xff0c;说某些随机过程会导致连通性突然爆炸式增长&#xff1b;但2011年Riordan和Warnke证明&#xff0c;那类过程在网络规模真正趋于无穷时其实还是连续变化的&#xff0c;之前观察到的&#34;爆炸&#34;只是有限规模下的假象。这篇论文的态度挺诚实&#xff1a;它承认自己的机制在&#34;合并规模小&#34;的情况下&#xff0c;确实会退化成前人说的那种有限规模假象&#xff1b;但只要合并规模足够大&#xff0c;跳跃就是真实存在的&#xff0c;不会消失。这种诚实其实挺难得,很多论文倾向于把自己的发现讲成&#34;绝对成立&#34;&#xff0c;这篇论文选择讲清楚边界条件。</p><p>怎么&#34;看见&#34;这些跳跃&#xff1a;用方差捕捉瞬间</p><p>单独看一次训练的轨迹&#xff0c;你很难精确判断某个合并瞬间到底发生在哪个时刻,因为随机噪声会让不同的训练轮次在稍微不同的时刻发生跳跃&#xff0c;把信号搞得模糊一片。</p><p>论文的解决办法是跑一整个训练集合体&#xff0c;也就是用不同的随机种子重复训练很多次&#xff0c;然后计算网络&#34;最大连通组件占比&#34;这个宏观指标&#xff08;论文称为阶参数&#xff09;在这个集合体里的相对方差。</p><p>阶参数*&#xff1a;衡量网络中已经合并成一体的部分占整体的比例&#xff0c;数值从0&#xff08;完全没合并&#xff09;到1&#xff08;全部合并成一个整体&#xff09;。</p><p>关键的数学直觉是&#xff1a;在合并瞬间发生前后&#xff0c;不同训练轮次会分裂成两群,一群已经跳过去了&#xff0c;一群还没跳。这种&#34;两群并存&#34;的状态叫双峰分布&#xff0c;而双峰分布正好会让方差在这个时间点上出现一个尖锐的峰值。论文严格证明了这个方差峰值的高度&#xff0c;正好和跳跃幅度的平方成正比。</p><p>这就好比统计一群人过马路的时间。如果红灯正常倒数&#xff0c;所有人差不多同时开始走&#xff0c;你测出来的&#34;过马路耗时&#34;分布会很集中。但如果有个瞬间规则突然变化,比如警察哨声一响&#xff0c;一部分人已经冲过去了&#xff0c;另一部分人还在等,这时候你测的这批人过马路的用时&#xff0c;会出现两个截然不同的群体&#xff0c;方差自然会猛地拉高。方差峰值本身&#xff0c;就是&#34;规则突变时刻&#34;的信号灯。</p><p>论文进一步证明&#xff0c;这些方差峰值出现的位置不是随机散布的&#xff0c;而是严格遵循一个几何级数规律,这个现象在物理学里叫离散标度不变性。</p><p>离散标度不变性*&#xff1a;系统只在特定的、成倍数关系的尺度上表现出自相似性&#xff0c;而不是在任意尺度上都自相似&#xff0c;这跟经典的连续标度不变性不同。</p><p>具体来说&#xff0c;如果把n个子网络绑定看作一次&#34;放大&#34;操作&#xff0c;放大倍数是nσ&#xff08;σ是渗流临界指数&#xff09;&#xff0c;那么相邻两次微观转变发生的密度之比&#xff0c;会精确收敛到这个放大倍数的倒数。换句话说&#xff0c;只要你观测到了前两次微观转变发生的时刻&#xff0c;理论上就能推算出整个网络最终彻底崩塌&#xff08;也就是全局连通&#xff09;会发生在什么时候。这就像地震学里的前震序列,专业的地震学家能通过分析连续几次小震的间隔和强度规律&#xff0c;去预测下一次更大地震的时间窗口&#xff0c;虽然精度有限&#xff0c;但这种&#34;从局部规律推全局趋势&#34;的思路是共通的。如果没有这条几何级数规律&#xff0c;你观测到的每次方差峰值就只是孤立事件&#xff0c;完全没法拿来预测什么;正是这个精确的倍数关系&#xff0c;才把一堆孤立的峰值串成了一条可以往前推算的轨迹。</p><p>这个理论预测在论文的实验里得到了相当干净的验证。在一个简化的三参数玩具模型里&#xff0c;理论预测的放大倍数是2.00&#xff0c;实验测出来的正好是2.00,分毫不差。在一个六参数的、不加约束的SGD训练里&#xff0c;同样测出了约2.00的放大倍数。</p><p>Adam和AdamW也逃不过这个规律</p><p>理论讲到这儿&#xff0c;其实还有个现实问题没解决&#xff1a;论文前面所有推导都是针对最朴素的SGD优化器的&#xff0c;但现实里几乎没人纯用SGD训练大模型,大家用的是Adam、AdamW这类自适应优化器。</p><p>Adam和AdamW跟SGD最大的不同&#xff0c;是它们不光记录当前梯度&#xff0c;还维护两个额外的滑动统计量,一阶动量&#xff08;梯度的指数加权平均&#xff09;和二阶动量&#xff08;梯度平方的指数加权平均&#xff09;&#xff0c;并用二阶动量的平方根去给每个参数的更新步长做个性化缩放。</p><p>这个&#34;平方&#34;操作看似不起眼&#xff0c;却会直接破坏之前论文假设的对称性。论文里证明了一个技术细节&#xff1a;一般的正交变换Q&#xff08;比如任意旋转&#xff09;跟&#34;逐元素平方&#34;这个操作不兼容,平方会把不同坐标的信息混在一起&#xff0c;破坏原有的对称结构。但坐标置换&#xff08;也就是单纯交换某几个坐标的位置&#xff0c;不做别的变换&#xff09;却完全兼容,置换和平方谁先谁后都一样。这意味着Adam和AdamW能保留的对称性类别&#xff0c;比SGD原本假设的要窄一些&#xff0c;只能是置换对称&#xff0c;不能是任意正交变换。好消息是&#xff0c;神经元互换所依赖的那种Sn对称性&#xff0c;恰好就属于这个&#34;窄一些&#34;但依然合法的类别&#xff0c;所以整个理论框架不需要推倒重来&#xff0c;只需要在这个更窄的对称类别里重新证明一遍。</p><p>除了对称性收窄&#xff0c;论文还处理了另一个现实问题&#xff1a;真实训练里的梯度噪声往往是重尾分布,极端的梯度尖峰出现的频率&#xff0c;比标准正态分布预测的要高得多&#xff0c;这在使用注意力机制的Transformer架构里已经有专门研究证实过。重尾分布意味着梯度噪声的方差可能是无穷大&#xff0c;这会让Adam维护的二阶动量统计量在数学上变得难以处理。</p><p>论文的解决办法是引入一个截断机制,把超过某个阈值的梯度直接砍掉&#xff0c;用截断后的梯度去计算动量统计量&#xff0c;代价是引入一个可以被精确量化的偏差项。这就好比统计一个班级的平均身高&#xff0c;如果有个数据录入错误显示某个学生身高三米&#xff0c;你不会真的把这个数据算进平均值,你会设一个合理的上限&#xff0c;把明显异常的数值截掉&#xff0c;然后接受&#34;截断后的平均值跟真实平均值会有点微小偏差&#34;这个代价&#xff0c;换来整体统计不被极端值搞崩。</p><p>在这些调整之上&#xff0c;论文证明了一个&#34;条件性&#34;的结论&#xff1a;只要网络处于某个特定阶段&#xff08;论文给出了具体可检验的停止时刻条件&#xff09;&#xff0c;Adam和AdamW训练出来的网络&#xff0c;依然会表现出跟SGD一样的离散标度不变性规律&#xff0c;放大倍数的公式形式完全一致。这个证明不是空对空的数学游戏,论文用一个基于AdamW训练的、真实观察到grokking现象的Transformer模型做了初步的诊断检验&#xff0c;确认了理论假设的停止条件在这个实际案例里是满足的。</p><p>从三个参数到真实的Transformer</p><p>理论说得再漂亮&#xff0c;也得在真实场景里验证。论文的实验分了几个层次&#xff0c;从最简单的可控玩具模型&#xff0c;一路铺到了真实的Transformer训练。</p><p>在最基础的三参数玩具实验里&#xff0c;论文人为设计了一个层级式的合并结构,先两个参数按理论预测的时刻合并&#xff0c;再和第三个参数合并。结果测出来的放大倍数正好是2.00&#xff0c;跟理论预测严丝合缝。这个实验的意义在于排除干扰,真实神经网络训练涉及太多其他因素&#xff0c;用一个刻意简化、只保留核心机制的系统去验证理论&#xff0c;能确认这个数学关系本身是站得住的&#xff0c;不是巧合。</p><p>接着论文换成了一个六参数、完全不加约束的SGD训练&#xff0c;还在训练中途&#xff08;第3000步&#xff09;人为切换了任务目标。有意思的结果出现在这里&#xff1a;任务切换之前&#xff0c;网络确实表现出符合理论预测的合并式坍缩&#xff08;两个方差峰值&#xff0c;放大倍数约2.00&#xff09;;但任务切换之后&#xff0c;网络出现了反向的碎裂,之前已经绑定在一起的参数重新分裂开&#xff0c;对应了另一个方差峰值。这验证了理论里一个不太直观的推论&#xff1a;这种坍缩不是单向不可逆的物理定律&#xff0c;而是取决于噪声和梯度谁更强,如果外部条件突变&#xff0c;让噪声重新压制住梯度的收敛力量&#xff0c;合并过程是可以逆转的。</p><p>这个反转在论文里被称为&#34;反应性碎裂&#34;&#xff0c;它跟grokking现象形成了一个有趣的对照:grokking是网络长期停留在一个次优状态&#xff0c;某个瞬间突然跳到更好的状态;而反应性碎裂展示的是相反方向,系统突然从有序坍缩重新变得无序。两者用的是同一套数学框架描述&#xff0c;只是方向相反。</p><p>再往上是真实数据集上的实验&#xff1a;UCI心脏病数据集、鲍鱼年龄预测数据集、德国信用数据集这几个表格分类任务&#xff0c;FashionMNIST和MNIST这两个图像分类任务&#xff0c;以及一个基于模运算的Transformer grokking任务。</p><p>这里论文遇到了一个测量上的现实问题:真实的大网络里&#xff0c;权重很少会精确塌缩到零&#xff0c;合并更多表现为一种&#34;软性&#34;的???维,一部分参数方向的重要性大幅下降&#xff0c;但不是完全消失。为了捕捉这种软性坍缩&#xff0c;论文换用了谱有效秩这个指标,它通过对权重矩阵做奇异值分解&#xff0c;再计算奇异值分布的香农熵指数&#xff0c;来衡量参数矩阵实际&#34;占用&#34;了多少独立维度。</p><p>谱有效秩*&#xff1a;衡量一个矩阵实际有效维度的连续型指标&#xff0c;即使权重没有精确归零&#xff0c;只要奇异值分布变得集中&#xff0c;这个指标也会相应下降&#xff0c;捕捉&#34;软性&#34;的降维现象。</p><p>用这个连续指标去套用离散标度不变性理论,论文数学上证明了一个很巧妙的关系&#xff1a;如果n个组件在合并前后只占了整体谱方差的一部分&#xff08;记为m&#xff0c;取值在0到1之间&#xff09;&#xff0c;那放大倍数会从整数nσ被压缩成分数nmσ。这个理论桥梁让论文可以反过来&#xff0c;从实测的放大倍数去反推,这次合并大概涉及了多少比例的谱方差。</p><p>数据表格如下&#xff08;部分核心结果&#xff09;&#xff1a;</p><p>在UCI心脏病数据集上&#xff0c;网络检测到4个方差峰值&#xff0c;拟合出的放大倍数是1.71&#xff0c;拟合优度R?达到0.98&#xff0c;通过随机化对照检验&#xff08;虚警率仅4.9%&#xff0c;说明这个信号不太可能是噪声假象&#xff09;。</p><p>在鲍鱼数据集上&#xff0c;检测到6个方差峰值&#xff0c;放大倍数1.28&#xff0c;R?为0.97&#xff0c;虚警率15.6%。</p><p>在德国信用数据集上&#xff0c;虽然也测出4个峰值和不错的R?&#xff08;0.86&#xff09;&#xff0c;但虚警率高达80.2%,这意味着这个信号很可能就是普通优化噪声的假象&#xff0c;论文很坦诚地把它当作一个负面对照案例来呈现&#xff0c;而不是选择性隐瞒。</p><p>在FashionMNIST图像分类上&#xff0c;测出3个峰值&#xff0c;放大倍数1.57&#xff0c;R?达到1.00&#xff0c;虚警率10.7%。</p><p>**最亮眼的结果出现在模运算的Transformer grokking实验上&#xff1a;3个峰值精确排成一条完美的对数线性关系&#xff0c;放大倍数2.11&#xff0c;R?为1.00&#xff0c;虚警率仅0.1%。**</p><p>这个虚警率0.1%的数字值得多说一句。论文用了1000次相位随机化的频谱代理数据去做统计检验,简单说&#xff0c;就是保留原始方差曲线的整体频率成分&#xff0c;但打乱其中的具体时间结构&#xff0c;生成1000个&#34;伪造&#34;的对照序列&#xff0c;看看这种伪造序列里&#xff0c;有多大比例会偶然产生出跟真实数据一样漂亮的对数线性模式。0.1%意味着1000次伪造里只有1次会凑巧产生类似结果,这说明观测到的DSI级联结构&#xff0c;基本可以排除是随机噪声凑巧形成的解释。</p><p>grokking实验里还有个细节特别值得琢磨:这个3峰级联恰好出现在性能突然跳升之前。论文没有过度声称这个级联就是grokking的唯一原因,它说得很谨慎&#xff0c;只说这个结构&#34;与&#34;性能跳升同时出现&#xff0c;而不是&#34;导致了&#34;性能跳升。这种谨慎其实是研究该有的态度,机制解释和相关现象之间隔着一条不小的证据鸿沟&#xff0c;论文没有急着跨过去。</p><p>这套理论跟前人工作是什么关系</p><p>这项研究不是凌空出现的&#xff0c;它踩在几条已有的研究脉络上。</p><p>最直接的基础是Chen等人2023年发表的&#34;随机坍缩&#34;&#xff08;Stochastic Collapse&#xff09;论文&#xff0c;那篇文章首次严格证明了SGD的梯度噪声会把网络推向更简单的子网络结构&#xff0c;本文管这个现象叫&#34;是什么&#34;,而这篇论文接过来问&#34;怎么发生的&#34;&#xff0c;也就是坍缩过程的时间动态和拓扑结构。</p><p>另一条脉络是关于SGD隐式偏置的更早期工作&#xff0c;比如Blanc等人2020年关于隐式正则化的研究&#xff0c;以及一系列关于深度网络&#34;低秩简化偏置&#34;的观察&#xff08;Huh等人2021年、S,ims,ek等人2021年&#xff09;,这些工作共同确立了一个背景事实&#xff1a;SGD训练出来的网络倾向于收敛到结构更简单、秩更低的表示&#xff0c;这不是偶然&#xff0c;而是训练动力学本身的固有倾向。</p><p>再往后看&#xff0c;论文也提到了两条建立在渗流理论本身之上的近期方向。一条是Devlin和Sanders 2025年的工作&#xff0c;用渗流工具去研究dropout训练下的网络连通性;另一条是关于&#34;神经电容&#34;的研究&#xff08;Li等人2022年&#xff09;&#xff0c;试图通过网络边的动态特性去预测模型性能。这篇论文跟它们的区别在于&#xff0c;边的形成机制不是随机删除或者相关性驱动的&#xff0c;而是完全由架构对称性决定的,这是一个更&#34;硬&#34;的、有数学证明支撑的机制&#xff0c;而不是纯经验观察。</p><p>这套框架留下的空白和它带来的启发</p><p>读完这篇论文&#xff0c;有几个地方让人真的会停下来想一想。</p><p>第一个触动我的地方是那个诚实的负面结果,德国信用数据集那组80.2%的虚警率。很多论文在遇到不理想的结果时&#xff0c;倾向于换个数据集重新调参直到数字好看&#xff0c;或者干脆不呈现。这篇论文选择把它明明白白地放进正文的表格里,当作一个负面对照案例摆出来。这个态度本身&#xff0c;比任何单个的正面结果都更能说明这篇论文的可信度。一个理论框架如果只在精心挑选的案例上生效&#xff0c;那它的解释力就值得怀疑;而这篇论文主动展示了自己什么时候不生效&#xff0c;反而让人更信它什么时候生效是真的。</p><p>第二个值得琢磨的地方&#xff0c;是论文对&#34;离散&#34;和&#34;连续&#34;这两个概念关系的处理。经典的物理相变理论里&#xff0c;连续标度不变性是一个近乎信条般的假设,系统在临界点附近的行为&#xff0c;应该在任意尺度上都自相似。这篇论文提出的离散标度不变性&#xff0c;本质上是说&#xff1a;当系统受到某种&#34;硬约束&#34;&#xff08;比如n个东西必须一起动&#xff0c;不能一个个来&#xff09;的时候&#xff0c;这种连续对称性会被打断成一个只在特定倍数上生效的、更弱的对称性。这个思路其实可以推广到很多&#34;必须成群结队才能动&#34;的系统里,不只是神经网络&#xff0c;任何受到离散组合约束的复杂系统&#xff0c;理论上都可能表现出类似的级联结构。这让我想到&#xff0c;也许很多我们习惯用连续曲线去拟合的经验规律&#xff08;比如神经网络的scaling law&#xff09;&#xff0c;背后其实藏着一串被平均掉的离散跳跃,论文的附录里也提到了这个猜测&#xff0c;但没有深入验证。</p><p>第三点是关于Sn到底是多少这个问题。论文在附录里做了一个反推&#xff1a;对于grokking实验测出的2.11倍放大系数&#xff0c;如果假设是简单的两两合并&#xff08;n&#61;2&#xff09;&#xff0c;理论上限是2的1次方&#xff0c;也就是2,可实测的2.11已经超出这个上限。这说明这次坍缩不可能是简单的两两合并&#xff0c;得假设至少是三个一组的合并&#xff08;n&#61;3&#xff09;&#xff0c;这样反推出来&#xff0c;这次合并大概占了68%的谱方差。这个数字本身没什么特别的&#xff0c;但这个反推的逻辑很有意思:它把一个原本只能定性描述的现象&#xff08;&#34;网络在grokking前发生了某种坍缩&#34;&#xff09;&#xff0c;变成了一个可以定量刻画、甚至能推测出具体涉及多少个子结构、卷入多大比例参数的可检验假说。</p><p>这套理论到目前为止&#xff0c;最大的空白应该是&#34;实际网络到底处于哪个渗流区域&#34;这个问题没有答案。论文自己也承认&#xff0c;那个决定跳跃能不能在网络无限大时依然存在的条件,合并的子网络规模是不是跟整体网络规模成比例增长,目前没有给出一个针对真实大模型架构的判定方法。这不是一个小问题&#xff0c;因为它直接决定了这套理论对现实大模型&#xff08;几十亿甚至上万亿参数&#xff09;到底有没有解释力&#xff0c;还是只在小规模玩具实验里成立。</p><p>Q&amp;A</p><p>Q1&#xff1a;什么是离散标度不变性&#xff08;DSI&#xff09;在神经网络训练中的具体表现&#xff1f;</p><p>A&#xff1a;论文发现&#xff0c;由于神经元置换对称性的限制&#xff0c;网络中的子网络合并不是连续渐进的&#xff0c;而是按照几何级数排列的一串离散跳跃发生的&#xff0c;相邻两次跳跃发生的密度之比会固定收敛到一个放大倍数&#xff0c;这个规律在SGD和Adam/AdamW训练中都被观察到。</p><p>Q2&#xff1a;grokking现象和这篇论文的渗流理论有什么关系&#xff1f;</p><p>A&#xff1a;论文在一个基于模运算训练的Transformer上观察到&#xff0c;delayed泛化&#xff08;grokking&#xff09;出现前&#xff0c;网络的谱有效秩经历了一个精确对数线性排列的3峰方差级联&#xff08;放大倍数2.11&#xff0c;拟合优度1.00&#xff09;&#xff0c;说明这个突然的泛化跳跃前存在一系列结构性的拓扑坍缩&#xff0c;但论文谨慎地表示这不是唯一驱动因素。</p><p>Q3&#xff1a;这套理论是否适用于Adam和AdamW优化器&#xff1f;</p><p>A&#xff1a;论文证明了在特定条件下&#xff08;包括重尾梯度噪声假设和非退化性假设&#xff09;&#xff0c;Adam和AdamW训练出的网络依然会表现出跟SGD一致的离散标度不变性级联结构&#xff0c;放大倍数公式形式相同&#xff0c;并用一个真实的AdamW训练grokking案例做了初步验证。</p></body></html>
+                </div>
+        </div>
+    </article>
+
+
+
+
+  <script>
+    $(function() {
+      setTimeout(function () {
+        var mathcodeList = document.querySelectorAll('.htmledit_views img.mathcode');
+        if (mathcodeList.length > 0) {
+          for (let i = 0; i < mathcodeList.length; i++) {
+            if (mathcodeList[i].complete) {
+              if (mathcodeList[i].naturalWidth === 0 || mathcodeList[i].naturalHeight === 0) {
+                var alt = mathcodeList[i].alt;
+                alt = '\\(' + alt + '\\)';
+                var curSpan = $('<span class="img-codecogs"></span>');
+                curSpan.text(alt);
+                $(mathcodeList[i]).before(curSpan);
+                $(mathcodeList[i]).remove();
+              }
+            } else {
+              mathcodeList[i].onerror = function() {
+                var alt = mathcodeList[i].alt;
+                alt = '\\(' + alt + '\\)';
+                var curSpan = $('<span class="img-codecogs"></span>');
+                curSpan.text(alt);
+                $(mathcodeList[i]).before(curSpan);
+                $(mathcodeList[i]).remove();
+              };
+            }
+          }
+          MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+        }
+      }, 500)
+    });
+  </script>
+<div class="article-footer-categories-wrap">
+  <div class="article-footer-category-segment">
+    <div class="article-footer-category-group">
+      <span class="article-footer-label">标签</span>
+      <div class="article-footer-pill-list">
+          <a rel="nofollow" data-report-query="spm=1001.2101.3001.4223" data-report-click='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"机器学习","ab":"new","extra":"{\"searchword\":\"机器学习\"}"}' data-report-view='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"机器学习","ab":"new","extra":"{\"searchword\":\"机器学习\"}"}' class="tag-link-new" href="https://so.csdn.net/so/search/s.do?q=%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0&t=all&o=vip&s=&l=&f=&viparticle=&from_tracking_code=tag_word&from_code=app_blog_art" target="_blank" rel="noopener">#机器学习</a>
+          <a rel="nofollow" data-report-query="spm=1001.2101.3001.4223" data-report-click='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"渗流级联理论","ab":"new","extra":"{\"searchword\":\"渗流级联理论\"}"}' data-report-view='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"渗流级联理论","ab":"new","extra":"{\"searchword\":\"渗流级联理论\"}"}' class="tag-link-new" href="https://so.csdn.net/so/search/s.do?q=%E6%B8%97%E6%B5%81%E7%BA%A7%E8%81%94%E7%90%86%E8%AE%BA&t=all&o=vip&s=&l=&f=&viparticle=&from_tracking_code=tag_word&from_code=app_blog_art" target="_blank" rel="noopener">#渗流级联理论</a>
+          <a rel="nofollow" data-report-query="spm=1001.2101.3001.4223" data-report-click='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"深度学习","ab":"new","extra":"{\"searchword\":\"深度学习\"}"}' data-report-view='{"mod":"popu_626","spm":"1001.2101.3001.4223","strategy":"深度学习","ab":"new","extra":"{\"searchword\":\"深度学习\"}"}' class="tag-link-new" href="https://so.csdn.net/so/search/s.do?q=%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0&t=all&o=vip&s=&l=&f=&viparticle=&from_tracking_code=tag_word&from_code=app_blog_art" target="_blank" rel="noopener">#深度学习</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+<div class="directory-boxshadow-dialog" style="display:none;">
+  <div class="directory-boxshadow-dialog-box">
+  </div>
+   <div class="vip-limited-time-offer-box-new" id="vip-limited-time-offer-box-new">
+      <img class="limited-img limited-img-new" src="https://csdnimg.cn/release/blogv2/dist/pc/img/vip-limited-close-newWhite.png">
+      <div class="vip-limited-time-top">
+        确定要放弃本次机会？
+      </div>
+      <span class="vip-limited-time-text">福利倒计时</span>
+      <div class="limited-time-box-new">
+        <span class="time-hour"></span>
+        <i>:</i>
+        <span class="time-minite"></span>
+        <i>:</i>
+        <span class="time-second"></span>
+      </div>
+      <div class="limited-time-vip-box">
+        <p>
+          <img class="coupon-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/vip-limited-close-roup.png">
+          <span class="def">立减 ¥</span>
+          <span class="active limited-num"></span>
+        </p>
+        <span class="">普通VIP年卡可用</span>
+      </div>
+      <a class="limited-time-btn-new" href="https://mall.csdn.net/vip" data-report-click='{"spm":"1001.2101.3001.9621"}' data-report-query='spm=1001.2101.3001.9621'>立即使用</a>
+  </div>
+</div>
+    <div class="more-toolbox-new more-toolbar" id="toolBarBox">
+      <div class="left-toolbox">
+        <div class="toolbox-left">
+            <div class="profile-box">
+              <a class="profile-href" target="_blank" href="https://blog.csdn.net/weixin_49122920"><img class="profile-img" src="https://i-avatar.csdnimg.cn/45c16f533ac6499f894290957886342b_weixin_49122920.jpg!1">
+                <span class="profile-name">
+                  至顶头条
+                </span>
+              </a>
+            </div>
+            <div class="profile-attend">
+                <a class="tool-attend tool-bt-button tool-bt-attend" href="javascript:;" data-report-view='{"mod":"1592215036_002","spm":"1001.2101.3001.4232","extend1":"关注"}'>关注</a>
+              <a class="tool-item-follow active-animation" style="display:none;">关注</a>
+            </div>
+        </div>
+        <div class="toolbox-middle">
+          <ul class="toolbox-list">
+            <li class="tool-item tool-item-size tool-active is-like" id="is-like" data-type="bottom">
+              <a class="tool-item-href">
+                <img style="display:none;" id="is-like-imgactive-animation-like" class="animation-dom active-animation" src="https://csdnimg.cn/release/blogv2/dist/pc/img/tobarThumbUpactive.png" alt="">
+                <img class="isactive" style="display:none" id="is-like-imgactive" src="https://csdnimg.cn/release/blogv2/dist/pc/img/toolbar/like-active.png" alt="">
+                <img class="isdefault" style="display:block" id="is-like-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/toolbar/like.png" alt="">
+                <span id="spanCount" class="count ">
+                      0
+                </span>
+              </a>
+              <div class="tool-hover-tip"><span class="text space">点赞</span></div>
+            </li>
+            <li class="tool-item tool-item-size tool-active is-unlike" id="is-unlike">
+              <a class="tool-item-href">
+                <img class="isactive" style="margin-right:0px;display:none" id="is-unlike-imgactive" src="https://csdnimg.cn/release/blogv2/dist/pc/img/toolbar/unlike-active.png" alt="">
+                <img class="isdefault" style="margin-right:0px;display:block" id="is-unlike-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/toolbar/unlike.png" alt="">
+                <span id="unlikeCount" class="count "></span>
+              </a>
+              <div class="tool-hover-tip"><span class="text space">踩</span></div>
+            </li>
+            <li class="tool-item tool-item-size tool-active is-collection ">
+              <a class="tool-item-href" href="javascript:;" data-report-click='{"mod":"popu_824","spm":"1001.2101.3001.4130","ab":"new"}'>
+                <img style="display:none" id="is-collection-img-collection" class="animation-dom active-animation" src="https://csdnimg.cn/release/blogv2/dist/pc/img/toolbar/collect-active.png" alt="">
+                <img class="isdefault" id="is-collection-img" style="display:block" src="https://csdnimg.cn/release/blogv2/dist/pc/img/toolbar/collect.png" alt="">
+                <img class="isactive" id="is-collection-imgactive" style="display:none" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newCollectActive.png" alt="">
+                <span class="count get-collection " data-num="4" id="get-collection">
+                    4
+                </span>
+              </a>
+              <div class="tool-hover-tip collect">
+                <div class="collect-operate-box">
+                  <span class="collect-text" id="is-collection">
+                    收藏
+                  </span>
+                </div>
+              </div>
+              <div class="tool-active-list">
+                <div class="text">
+                  觉得还不错?
+                  <span class="collect-text" id="tool-active-list-collection">
+                    一键收藏
+                  </span>
+                 <img id="tool-active-list-close" src="https://csdnimg.cn/release/blogv2/dist/pc/img/collectionCloseWhite.png" alt="">
+                </div>
+              </div>
+            </li>
+            <li class="tool-item tool-item-size tool-active tool-item-comment">
+              <a class="tool-item-href go-side-comment" data-report-click='{"spm":"1001.2101.3001.7009"}'>
+                <img class="isdefault" src="https://csdnimg.cn/release/blogv2/dist/pc/img/toolbar/comment.png" alt="">
+                <span class="count">
+                      0
+                </span>
+              </a>
+              <div class="tool-hover-tip"><span class="text space">评论</span></div>
+            </li>
+            <li class="tool-item tool-item-size tool-active tool-QRcode" data-type="article" id="tool-share">
+              <a class="tool-item-href" href="javascript:;" data-report-view='{"spm":"3001.4129","extra":{"type":"blogdetail"}}'>
+                <img class="isdefault" src="https://csdnimg.cn/release/blogv2/dist/pc/img/toolbar/share.png" alt="">
+                <span class="count">分享</span>
+              </a>
+                <div class="QRcode" id="tool-QRcode">
+                <div class="share-bg-box">
+                  <div class="share-content">
+                    <a id="copyPosterUrl" data-type="link" class="btn-share">复制链接</a>
+                  </div>
+                  <div class="share-content">
+                    <a class="btn-share" data-type="qq">分享到 QQ</a>
+                  </div>
+                  <div class="share-content">
+                    <a class="btn-share" data-type="weibo">分享到新浪微博</a>
+                  </div>
+                  <div class="share-code">
+                    <div class="share-code-box" id='shareCode'></div>
+                    <div class="share-code-text">
+                      <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/share/icon-wechat.png" alt="">扫一扫
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+                <li class="tool-item tool-item-size tool-active tool-item-reward">
+                  <a class="tool-item-href" href="javascript:;" data-report-click='{"mod":"popu_830","spm":"1001.2101.3001.4237","dest":"","ab":"new"}'>
+                    <img class="isdefault reward-bt" id="rewardBtNew" src="https://csdnimg.cn/release/blogv2/dist/pc/img/toolbar/reward.png" alt="打赏">
+                    <span class="count">打赏</span>
+                  </a>
+                  <div class="tool-hover-tip"><span class="text space">打赏</span></div>
+                </li>
+          <li class="tool-item tool-item-size tool-active is-more" id="is-more">
+            <a class="tool-item-href">
+              <img class="isdefault" style="margin-right:0px;display:block" src="https://csdnimg.cn/release/blogv2/dist/pc/img/toolbar/more.png" alt="">
+              <span class="count"></span>
+            </a>
+            <div class="more-opt-box">
+              <div class="mini-box">
+                    <a class="tool-item-href" id="rewardBtNewHide" data-report-click='{"spm":"3001.4237","extra":"{\"type\":\"hide\"}"}'>
+                      <img class="isdefault reward-bt" src="https://csdnimg.cn/release/blogv2/dist/pc/img/toolbar/reward.png" alt="打赏">
+                      <span class="count">打赏</span>
+                    </a>
+                <a class="tool-item-href" id="toolReportBtnHide">
+                  <img class="isdefault" src="https://csdnimg.cn/release/blogv2/dist/pc/img/toolbar/report.png" alt="">
+                  <span class="count">举报</span>
+                </a>
+              </div>
+              <div class="normal-box">
+                <a class="tool-item-href" id="toolReportBtnHideNormal">
+                  <img class="isdefault" src="https://csdnimg.cn/release/blogv2/dist/pc/img/toolbar/report.png" alt="">
+                  <span class="count">举报</span>
+                </a>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="toolbox-right">
+</div>
+</div>
+</div>
+<script type=text/javascript crossorigin src="https://csdnimg.cn/release/phoenix/production/qrcode-7c90a92189.min.js"></script>
+<script type="text/javascript" crossorigin src="https://g.csdnimg.cn/common/csdn-login-box/csdn-login-box.js"></script>
+<script type="text/javascript" crossorigin src="https://g.csdnimg.cn/collection-box/2.1.2/collection-box.js"></script>
+              <div id="dmp_ad_58" style="width:100%;overflow-x:hidden">
+                <div id="kp_box_58" data-pid="58"><iframe  src="https://kunpeng-sc.csdnimg.cn/?timestamp=1645783940/#/preview1/4447258?positionId=58&adBlockFlag=0&adId=1109075&queryWord=神经网络训练到最后，权重到底经历了什么？&spm=1001.2101.3001.5002&articleId=165491623" frameborder="0" width= "100%"  height= "75px" scrolling="no" ></iframe><img class="pre-img-lasy"  data-src="https://kunyu.csdn.net/1.png?p=58&adBlockFlag=0&adId=1109075&a=1109075&c=4447258&k=神经网络训练到最后，权重到底经历了什么？&spm=1001.2101.3001.5002&articleId=165491623&d=1&t=3&u=06108e7011b547c8a374bd73ffd0ebed" style="display: block;width: 0px;height: 0px;"><script src="https://kunpeng-render.csdnimg.cn/publisher/latest/closeAdFrame.js"></script></div>
+              </div>
+            <script src="https://csdnimg.cn/release/blogv2/dist/components/js/pc_wap_commontools-0813aab227.min.js" type="text/javascript" async></script>
+              <div class="second-recommend-box recommend-box ">
+<div class="recommend-item-box type_blog clearfix" data-url="https://blog.csdn.net/weixin_46072771/article/details/108606449"  data-report-view='{"ab":"new","spm":"1001.2101.3001.11989","mod":"popu_871","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant_t1.none-task-blog-2~default~ElasticSearch~Rate-1-108606449-blog-165491623.235^v43^pc_blog_bottom_relevance_base6.t1_cc\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"1","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/weixin_46072771/article/details/108606449"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://blog.csdn.net/weixin_46072771/article/details/108606449" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.11989","mod":"popu_871","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant_t1.none-task-blog-2~default~ElasticSearch~Rate-1-108606449-blog-165491623.235^v43^pc_blog_bottom_relevance_base6.t1_cc\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"1","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/weixin_46072771/article/details/108606449"}'  data-report-query='spm=1001.2101.3001.11989&utm_medium=distribute.pc_relevant_t1.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-1-108606449-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6.t1_cc&depth_1-utm_source=distribute.pc_relevant_t1.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-1-108606449-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+					<div class="left ellipsis-online ellipsis-online-1"><em>深度学习</em> - VGG16介绍及预<em>训练</em><em>神经网络</em>的使用</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/weixin_46072771" target="_blank"><span class="blog-title">壮壮不太胖的学习笔记</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">09-15</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					1万+
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://blog.csdn.net/weixin_46072771/article/details/108606449" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.11989","mod":"popu_871","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant_t1.none-task-blog-2~default~ElasticSearch~Rate-1-108606449-blog-165491623.235^v43^pc_blog_bottom_relevance_base6.t1_cc\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"1","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/weixin_46072771/article/details/108606449"}'  data-report-query='spm=1001.2101.3001.11989&utm_medium=distribute.pc_relevant_t1.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-1-108606449-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6.t1_cc&depth_1-utm_source=distribute.pc_relevant_t1.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-1-108606449-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+				<div class="desc ellipsis-online ellipsis-online-1">这里写自定义目录标题什么是VGG开头<em>神经网络</em>调用预<em>训练</em>模型（代码）加载预<em>训练</em>网络构建完整的模型模型的初步<em>训练</em>（<em>训练</em>自定义层）对模型进行微调（<em>训练</em>部分VGG16层及自定义层）
+官方所有的预<em>训练</em>网络说明：链接<em>?</em><em>?</em><em>?</em><em>?</em>
+在Keras中提供了以下图像分类模型的代码和预<em>训练</em>的<em>权重</em>：
+
+均可以使用keras.applications 模块进行导入：（可以从下边复制）
+from keras.applications.xception import Xception
+from keras.applications.vgg1</div>
+			</a>
+		</div>
+	</div>
+</div>
+              </div>
+<a id="commentBox" name="commentBox"></a>
+  <div id="pcCommentBox" class="comment-box comment-box-new2 login-comment-box-new" style="display:none">
+    <div class="has-comment" style="display:block">
+      <div class="one-line-box">
+        <div class="has-comment-tit go-side-comment">
+          <span class="count">0</span>&nbsp;条评论
+        </div>
+        <div class="has-comment-con comment-operate-item"></div>
+        <a class="has-comment-bt-right go-side-comment focus">写评论</a>
+      </div>
+    </div>
+  </div>
+              <div class="recommend-box insert-baidu-box recommend-box-style ">
+                <div class="recommend-item-box no-index" style="display:none"></div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://blog.csdn.net/qq_45882525/article/details/117871795"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.1","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-1-117871795-blog-165491623.235^v43^pc_blog_bottom_relevance_base6.s0_cc\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"1","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/qq_45882525/article/details/117871795"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://blog.csdn.net/qq_45882525/article/details/117871795" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.1","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-1-117871795-blog-165491623.235^v43^pc_blog_bottom_relevance_base6.s0_cc\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"1","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/qq_45882525/article/details/117871795"}'  data-report-query='spm=1001.2101.3001.6650.1&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-1-117871795-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6.s0_cc&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-1-117871795-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+					<div class="left ellipsis-online ellipsis-online-1">人工智能&mdash;&mdash;<em>神经网络</em></div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/qq_45882525" target="_blank"><span class="blog-title">qq_45882525的博客</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">06-13</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					2378
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://blog.csdn.net/qq_45882525/article/details/117871795" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.1","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-1-117871795-blog-165491623.235^v43^pc_blog_bottom_relevance_base6.s0_cc\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"1","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/qq_45882525/article/details/117871795"}'  data-report-query='spm=1001.2101.3001.6650.1&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-1-117871795-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6.s0_cc&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-1-117871795-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+				<div class="desc ellipsis-online ellipsis-online-1">一、人工智能发展简史
+1950年，英国科学家艾伦图灵发表了论文讨论创造出具有真正智能的机器的可能性，并提出了著名的图灵测试：如果一台机器能够与人类展开对话而不能被辨别出其机器身份，那么称这台机器具有智能。现在活跃于电脑，手机，还有各种硬件上的&ldquo;智能助手&rdquo;在各自的功能领域，通常被大众认为挺有智能的。
+从1956年的达特茅斯会议开始，人工智能（Artificial Intelligence，AI）作为一个专门的研究领域出现，<em>经历</em>了超过半个世纪的起伏，终于在2007年前后，迎来了又一次大发展。
+
+二、人工智能的定</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://blog.csdn.net/frcbob/article/details/121857721"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.2","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~activity-2-121857721-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"2","strategy":"2~default~ElasticSearch~activity","dest":"https://blog.csdn.net/frcbob/article/details/121857721"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://blog.csdn.net/frcbob/article/details/121857721" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.2","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~activity-2-121857721-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"2","strategy":"2~default~ElasticSearch~activity","dest":"https://blog.csdn.net/frcbob/article/details/121857721"}'  data-report-query='spm=1001.2101.3001.6650.2&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-2-121857721-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-2-121857721-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+					<div class="left ellipsis-online ellipsis-online-1">卷积<em>神经网络</em></div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/frcbob" target="_blank"><span class="blog-title">frcbob的博客</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">12-10</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					1921
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://blog.csdn.net/frcbob/article/details/121857721" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.2","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~activity-2-121857721-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"2","strategy":"2~default~ElasticSearch~activity","dest":"https://blog.csdn.net/frcbob/article/details/121857721"}'  data-report-query='spm=1001.2101.3001.6650.2&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-2-121857721-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-2-121857721-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+				<div class="desc ellipsis-online ellipsis-online-1"><em>深度学习</em>与计算机视觉
+
+计算机视觉概述
+
+
+计算机视觉就是让机器去识别摄像机拍摄的图片或视频中的物体，检测出物体所在的位置，并对目标物体进行跟踪，从而理解并描述出图片或视频里的场景和故事，以此来模拟人脑视觉系统。
+
+
+
+
+计算机视觉通常被叫做 机器视觉
+
+图像识别
+
+
+
+
+
+测量空间：彩色图像有RGB三个通道，每一个通道由很多个像素点构成，表示图像的这些数据，我们把他叫做测量空间。
+
+图像识别基本框架：场景识别、目标识别、人脸识别&hellip;&hellip;
+
+
+
+
+	早期图像处理
+
+	
+		用全局的视觉底层特性统计量表示图像
+	</div>
+			</a>
+		</div>
+	</div>
+</div>
+		<dl id="recommend-item-box-tow" class="recommend-item-box type_blog clearfix">
+			
+		</dl>
+<div class="recommend-item-box type_blog clearfix" data-url="https://blog.csdn.net/LIT_Elric/article/details/86477639"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.3","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-3-86477639-blog-165491623.235^v43^pc_blog_bottom_relevance_base6.s3_cc\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"3","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/LIT_Elric/article/details/86477639"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://blog.csdn.net/LIT_Elric/article/details/86477639" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.3","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-3-86477639-blog-165491623.235^v43^pc_blog_bottom_relevance_base6.s3_cc\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"3","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/LIT_Elric/article/details/86477639"}'  data-report-query='spm=1001.2101.3001.6650.3&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-3-86477639-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6.s3_cc&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-3-86477639-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+					<div class="left ellipsis-online ellipsis-online-1">经典<em>神经网络</em>模型的介绍及应用</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/LIT_Elric" target="_blank"><span class="blog-title">LIT_Elric的博客</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">01-14</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					1万+
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://blog.csdn.net/LIT_Elric/article/details/86477639" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.3","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-3-86477639-blog-165491623.235^v43^pc_blog_bottom_relevance_base6.s3_cc\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"3","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/LIT_Elric/article/details/86477639"}'  data-report-query='spm=1001.2101.3001.6650.3&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-3-86477639-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6.s3_cc&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-3-86477639-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+				<div class="desc ellipsis-online ellipsis-online-1">经典<em>神经网络</em>模型的介绍及应用
+摘要：人工智能、<em>深度学习</em>、机器视觉等概念如今充斥我们生活的整个社会，小到小区内的车牌自动识别系统，大到火星探测车的实现都离不开<em>深度学习</em>的应用。读研究生之后一直在学习障碍物的目标识别算法，也走了很多弯路，从传统的基于图像特征的检测算法到现在最新的基于<em>深度学习</em>的目标检测算法，学习过程中也遇到了很多困难，所以也想写一篇学习笔记，涵盖从传统的BP<em>神经网络</em>模型到卷积<em>神经网络</em>分类...</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://blog.csdn.net/weixin_42535423/article/details/108132131"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.4","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~activity-4-108132131-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"4","strategy":"2~default~ElasticSearch~activity","dest":"https://blog.csdn.net/weixin_42535423/article/details/108132131"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://blog.csdn.net/weixin_42535423/article/details/108132131" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.4","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~activity-4-108132131-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"4","strategy":"2~default~ElasticSearch~activity","dest":"https://blog.csdn.net/weixin_42535423/article/details/108132131"}'  data-report-query='spm=1001.2101.3001.6650.4&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-4-108132131-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-4-108132131-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+					<div class="left ellipsis-online ellipsis-online-1"><em>神经网络</em><em>训练</em>常见坑-新手如何优化调整<em>训练</em><em>神经网络</em></div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/weixin_42535423" target="_blank"><span class="blog-title">weixin_42535423的博客</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">08-20</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					5794
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://blog.csdn.net/weixin_42535423/article/details/108132131" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.4","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~activity-4-108132131-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"4","strategy":"2~default~ElasticSearch~activity","dest":"https://blog.csdn.net/weixin_42535423/article/details/108132131"}'  data-report-query='spm=1001.2101.3001.6650.4&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-4-108132131-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-4-108132131-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+				<div class="desc ellipsis-online ellipsis-online-1">文章目录0. 使用指南Ⅰ. 数据集问题Ⅱ. 数据归一化/增强Ⅲ. 实现问题Ⅳ. <em>训练</em>问题
+<em>神经网络</em>已经持续<em>训练</em>了 12 个小时。它看起来很好：梯度在变化，损失也在下降。但是预测结果出来了：全部都是零值，全部都是背景，什么也检测不到。我质问我的计算机：&ldquo;我做错了什么？&rdquo;，它却无法回答。
+如果你的模型正在输出垃圾（比如预测所有输出的平均值，或者它的精确度真的很低），那么你从哪里开始检查呢<em>?</em><em>?</em>
+无法<em>训练</em><em>神经网络</em>的原因有很多。在<em>经历</em>了许多次调试之后，我发现有一些检查是经常做的。这汇总了我的经验以及最好的想法，希望对</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://blog.csdn.net/Polaris47/article/details/94382165"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.5","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-5-94382165-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"5","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/Polaris47/article/details/94382165"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://blog.csdn.net/Polaris47/article/details/94382165" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.5","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-5-94382165-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"5","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/Polaris47/article/details/94382165"}'  data-report-query='spm=1001.2101.3001.6650.5&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-5-94382165-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-5-94382165-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+					<div class="left ellipsis-online ellipsis-online-1"><em>神经网络</em><em>训练</em>常见的37个坑</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/Polaris47" target="_blank"><span class="blog-title">Polaris47</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">07-01</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					7245
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://blog.csdn.net/Polaris47/article/details/94382165" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.5","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-5-94382165-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"5","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/Polaris47/article/details/94382165"}'  data-report-query='spm=1001.2101.3001.6650.5&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-5-94382165-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-5-94382165-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+				<div class="desc ellipsis-online ellipsis-online-1">转自：http://www.infoq.com/cn/articles/37-reasons-why-your-neural-network-is-not-working
+
+
+
+<em>神经网络</em>已经持续<em>训练</em>了 12 个小时。它看起来很好：梯度在变化，损失也在下降。但是预测结果出来了：全部都是零值，全部都是背景，什么也检测不到。我质问我的计算机：&ldquo;我做错了什么？&rdquo;，它却无法回答。
+
+如果你的模型正在输出垃...</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://blog.csdn.net/aifamao2/article/details/126909320"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.6","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-6-126909320-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"6","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/aifamao2/article/details/126909320"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://blog.csdn.net/aifamao2/article/details/126909320" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.6","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-6-126909320-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"6","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/aifamao2/article/details/126909320"}'  data-report-query='spm=1001.2101.3001.6650.6&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-6-126909320-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-6-126909320-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+					<div class="left ellipsis-online ellipsis-online-1">卷积<em>神经网络</em>的<em>训练</em>算法,卷积<em>神经网络</em>算法实现</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/aifamao2" target="_blank"><span class="blog-title">aifamao2的博客</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">09-17</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					724
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://blog.csdn.net/aifamao2/article/details/126909320" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.6","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-6-126909320-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"6","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/aifamao2/article/details/126909320"}'  data-report-query='spm=1001.2101.3001.6650.6&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-6-126909320-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-6-126909320-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+				<div class="desc ellipsis-online ellipsis-online-1">然后要学会梳理自身学习情况，以课本为基础，结合自己做的笔记、试卷、掌握的薄弱环节、存在的问题等，合理的分配时间，有针对性、具体的去一点一点的去攻克、落实。四、迁移与运用：在教学活动中模拟社会实践&ldquo;迁移&rdquo;是经验的扩展与提升，&ldquo;应用&rdquo;是将内化的知识外显化、操作化，也是将间接经验直接化、将符号转化为实体、从抽象到具体的过程，是知识活化的标志，也是学生学习成果的体现。一、联想与结构：经验与知识的相互转化学习学科的基本结构，以联想的、结构的方式去学习，是<em>深度学习</em>的重要特征。<em>深度学习</em>的概念源于人工<em>神经网络</em>的研究。</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://blog.csdn.net/m0_54846070/article/details/126601801"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.7","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-7-126601801-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"7","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/m0_54846070/article/details/126601801"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://blog.csdn.net/m0_54846070/article/details/126601801" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.7","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-7-126601801-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"7","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/m0_54846070/article/details/126601801"}'  data-report-query='spm=1001.2101.3001.6650.7&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-7-126601801-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-7-126601801-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+					<div class="left ellipsis-online ellipsis-online-1">人工<em>神经网络</em>的<em>训练</em>步骤,<em>神经网络</em>常用<em>训练</em>方法</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/m0_54846070" target="_blank"><span class="blog-title">m0_54846070的博客</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">08-30</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					999
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://blog.csdn.net/m0_54846070/article/details/126601801" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.7","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-7-126601801-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"7","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/m0_54846070/article/details/126601801"}'  data-report-query='spm=1001.2101.3001.6650.7&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-7-126601801-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-7-126601801-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+				<div class="desc ellipsis-online ellipsis-online-1"><em>神经网络</em>的学习，也就是<em>训练</em>过程，指的是输入层神经元接收输入信息，传递给中间层神经元，<em>最后</em>传递到输出层神经元，由输出层输出信息处理结果的过程。在这个过程中，<em>神经网络</em>通过不断调整网络的权值和阈值，达到学习、<em>训练</em>的目的，当网络输出的误差减少到可以接受的程度，或者预先设定的学习次数后，学习就可以停止了。<em>神经网络</em>学习由称为神经元的基本处理单元互连而成的平行工作的复杂网络系统,简称<em>神经网络</em>。当已知<em>训练</em>样本的数据加到网络输入端时，网络的学习机制一遍又一遍地调整各神经元的权值，使其输出端达到预定的目标。...</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://weixueai.blog.csdn.net/article/details/130596521"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.8","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-8-130596521-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"8","strategy":"2~default~ElasticSearch~Rate","dest":"https://weixueai.blog.csdn.net/article/details/130596521"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://weixueai.blog.csdn.net/article/details/130596521" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.8","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-8-130596521-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"8","strategy":"2~default~ElasticSearch~Rate","dest":"https://weixueai.blog.csdn.net/article/details/130596521"}'  data-report-query='spm=1001.2101.3001.6650.8&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-8-130596521-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-8-130596521-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+					<div class="left ellipsis-online ellipsis-online-1"><em>深度学习</em>技巧应用13-<em>神经网络</em>中数据并行<em>训练</em>的原理</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/weixin_42878111" target="_blank"><span class="blog-title">微学AI的博客</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">05-10</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					2116
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://weixueai.blog.csdn.net/article/details/130596521" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.8","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-8-130596521-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"8","strategy":"2~default~ElasticSearch~Rate","dest":"https://weixueai.blog.csdn.net/article/details/130596521"}'  data-report-query='spm=1001.2101.3001.6650.8&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-8-130596521-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-8-130596521-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+				<div class="desc ellipsis-online ellipsis-online-1">大家好，我是微学AI，今天给大家介绍一下人工智能基础部分15-<em>神经网络</em>中数据并行<em>训练</em>的原理，在<em>神经网络</em>中，数据并行<em>训练</em>是一种常用的<em>训练</em>技术。它利用多个GPU或多个计算机对同一个模型进行<em>训练</em>，不同的设备处理相同的模型和数据，但会随机选择不同的批次数据，并使用反向传播算法更新梯度，<em>最后</em>将各设备上的梯度结果合并起来，得到新的<em>权重</em>参数。这样的操作是提高模型的<em>训练</em>速度。</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://blog.csdn.net/qq_44272207/article/details/88635762"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.9","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~activity-9-88635762-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"9","strategy":"2~default~ElasticSearch~activity","dest":"https://blog.csdn.net/qq_44272207/article/details/88635762"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://blog.csdn.net/qq_44272207/article/details/88635762" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.9","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~activity-9-88635762-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"9","strategy":"2~default~ElasticSearch~activity","dest":"https://blog.csdn.net/qq_44272207/article/details/88635762"}'  data-report-query='spm=1001.2101.3001.6650.9&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-9-88635762-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-9-88635762-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+					<div class="left ellipsis-online ellipsis-online-1">tensorflow入门&mdash;&mdash;BP<em>神经网络</em>非线性回归最完整过程（含预测）</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/qq_44272207" target="_blank"><span class="blog-title">qq_44272207的博客</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">03-19</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					1万+
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://blog.csdn.net/qq_44272207/article/details/88635762" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.9","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~activity-9-88635762-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"9","strategy":"2~default~ElasticSearch~activity","dest":"https://blog.csdn.net/qq_44272207/article/details/88635762"}'  data-report-query='spm=1001.2101.3001.6650.9&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-9-88635762-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-9-88635762-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+				<div class="desc ellipsis-online ellipsis-online-1">这是吐槽：
+本科土木狗，由于各种经验公式的困扰，突发奇想想用<em>神经网络</em>去<em>训练</em>非线性的数据。然后从网络上查找资料，发现BP<em>神经网络</em>对非线性数据有良好的处理效果。从百度上copy的一句话：其突出优点就是具有很强的非线性映射能力和柔性的网络结构。 总之比人工猜测用公式回归会强很多，如果有同学跟我一样的情况也可以尝试这种非线性回归。对<em>神经网络</em>入门困难的同学，这个也是比mnist手写数字识别更为基础的教程。
+...</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://blog.csdn.net/FY_2018/article/details/119708201"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.10","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-10-119708201-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"10","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/FY_2018/article/details/119708201"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://blog.csdn.net/FY_2018/article/details/119708201" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.10","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-10-119708201-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"10","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/FY_2018/article/details/119708201"}'  data-report-query='spm=1001.2101.3001.6650.10&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-10-119708201-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-10-119708201-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+					<div class="left ellipsis-online ellipsis-online-1"><em>神经网络</em><em>训练</em>常见坑</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/FY_2018" target="_blank"><span class="blog-title">FY_2018的博客</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">08-15</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					3129
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://blog.csdn.net/FY_2018/article/details/119708201" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.10","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-10-119708201-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"10","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/FY_2018/article/details/119708201"}'  data-report-query='spm=1001.2101.3001.6650.10&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-10-119708201-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-10-119708201-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+				<div class="desc ellipsis-online ellipsis-online-1"><em>神经网络</em>已经持续<em>训练</em>了 12 个小时。它看起来很好：梯度在变化，损失也在下降。但是预测结果出来了：全部都是零值，全部都是背景，什么也检测不到。我质问我的计算机：&ldquo;我做错了什么？&rdquo;，它却无法回答。
+
+如果你的模型正在输出垃圾（比如预测所有输出的平均值，或者它的精确度真的很低），那么你从哪里开始检查呢？
+
+无法<em>训练</em><em>神经网络</em>的原因有很多。在<em>经历</em>了许多次调试之后，我发现有一些检查是经常做的。这张列表汇总了我的经验以及最好的想法，希望对读者也有所帮助。
+
+
+
+〇. 使用指南
+
+许多事情都可能出错。但其中有些事情相比于</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://dreamit.blog.csdn.net/article/details/140622794"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.11","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-11-140622794-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"11","strategy":"2~default~ElasticSearch~Rate","dest":"https://dreamit.blog.csdn.net/article/details/140622794"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://dreamit.blog.csdn.net/article/details/140622794" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.11","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-11-140622794-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"11","strategy":"2~default~ElasticSearch~Rate","dest":"https://dreamit.blog.csdn.net/article/details/140622794"}'  data-report-query='spm=1001.2101.3001.6650.11&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-11-140622794-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-11-140622794-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+					<div class="left ellipsis-online ellipsis-online-1">Python<em>深度学习</em>实践：优化<em>神经网络</em>的<em>权重</em>初始化策略</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/universsky2015" target="_blank"><span class="blog-title">AI天才研究院</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">07-23</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					1188
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://dreamit.blog.csdn.net/article/details/140622794" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.11","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-11-140622794-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"11","strategy":"2~default~ElasticSearch~Rate","dest":"https://dreamit.blog.csdn.net/article/details/140622794"}'  data-report-query='spm=1001.2101.3001.6650.11&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-11-140622794-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-11-140622794-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+				<div class="desc ellipsis-online ellipsis-online-1">Python<em>深度学习</em>实践：优化<em>神经网络</em>的<em>权重</em>初始化策略
+作者：禅与计算机程序设计艺术 / Zen and the Art of Computer Programming
+1. 背景介绍
+1.1 问题的由来
+在</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://blog.csdn.net/garlic/article/details/154547108"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.12","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-12-154547108-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"12","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/garlic/article/details/154547108"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://blog.csdn.net/garlic/article/details/154547108" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.12","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-12-154547108-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"12","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/garlic/article/details/154547108"}'  data-report-query='spm=1001.2101.3001.6650.12&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-12-154547108-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-12-154547108-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+					<div class="left ellipsis-online ellipsis-online-1">为什么你的<em>神经网络</em><em>训练</em>不稳定？可能是没搞懂Lipschitz连续性的重要性</div>
+					<div class="tag">最新发布</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/garlic" target="_blank"><span class="blog-title">garlic的博客</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">02-19</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					1013
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://blog.csdn.net/garlic/article/details/154547108" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.12","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-12-154547108-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"12","strategy":"2~default~ElasticSearch~Rate","dest":"https://blog.csdn.net/garlic/article/details/154547108"}'  data-report-query='spm=1001.2101.3001.6650.12&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-12-154547108-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-12-154547108-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+				<div class="desc ellipsis-online ellipsis-online-1">本文深入探讨了<em>神经网络</em><em>训练</em>不稳定的深层原因，指出Lipschitz连续性对梯度下降稳定性和模型泛化能力的关键影响。文章解释了梯度爆炸、GAN模式崩溃等现象与Lipschitz常数的关联，并提供了<em>权重</em>裁剪、谱归一化、梯度惩罚等工程实践方法来约束网络Lipschitz常数，从而提升<em>训练</em>稳定性、对抗鲁棒性和泛化性能。</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://lixiang.blog.csdn.net/article/details/117357206"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.13","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-13-117357206-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"13","strategy":"2~default~ElasticSearch~Rate","dest":"https://lixiang.blog.csdn.net/article/details/117357206"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://lixiang.blog.csdn.net/article/details/117357206" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.13","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-13-117357206-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"13","strategy":"2~default~ElasticSearch~Rate","dest":"https://lixiang.blog.csdn.net/article/details/117357206"}'  data-report-query='spm=1001.2101.3001.6650.13&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-13-117357206-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-13-117357206-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+					<div class="left ellipsis-online ellipsis-online-1">【<em>深度学习</em>】基于深度<em>神经网络</em>进行<em>权重</em>剪枝的算法（二）</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/weixin_43838785" target="_blank"><span class="blog-title">NJU phd 在读。</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">06-10</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					1107
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://lixiang.blog.csdn.net/article/details/117357206" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.13","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~Rate-13-117357206-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"13","strategy":"2~default~ElasticSearch~Rate","dest":"https://lixiang.blog.csdn.net/article/details/117357206"}'  data-report-query='spm=1001.2101.3001.6650.13&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-13-117357206-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7ERate-13-117357206-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+				<div class="desc ellipsis-online ellipsis-online-1">【<em>深度学习</em>】基于深度<em>神经网络</em>进行<em>权重</em>剪枝的算法（二）
+
+文章目录
+1 摘要
+2 介绍
+3 OBD
+4 一个例子
+
+1 摘要
+通过从网络中删除不重要的<em>权重</em>，可以有更好的泛化能力、需求更少的<em>训练</em>样本、更少的学习或分类时间。本文的基础思想是使用二阶导数将一个<em>训练</em>好的网络，删除一半甚至一半以上的<em>权重</em>，最终会和原来的网络性能一样好，甚至更好。最好的泛化能力是在<em>训练</em>误差和网络复杂度平衡的时候。
+2 介绍
+达到这种平衡的一种技术是最小化由两部分组成（原始的<em>训练</em>误差+网络复杂度的度量）的损失函数。
+复杂度评估方法包括VC维</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://blog.csdn.net/wills798/article/details/89510689"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.14","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~activity-14-89510689-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"14","strategy":"2~default~ElasticSearch~activity","dest":"https://blog.csdn.net/wills798/article/details/89510689"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://blog.csdn.net/wills798/article/details/89510689" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.14","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~activity-14-89510689-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"14","strategy":"2~default~ElasticSearch~activity","dest":"https://blog.csdn.net/wills798/article/details/89510689"}'  data-report-query='spm=1001.2101.3001.6650.14&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-14-89510689-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-14-89510689-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+					<div class="left ellipsis-online ellipsis-online-1"><em>训练</em>结果到底好不好【<em>神经网络</em>模型优化】如何根据 <em>训练</em>和验证 准确度 / 损失 曲线诊断优化我们的学习模型</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/wills798" target="_blank"><span class="blog-title">王爷的CSDN</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">04-25</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					2万+
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://blog.csdn.net/wills798/article/details/89510689" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.14","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~activity-14-89510689-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"14","strategy":"2~default~ElasticSearch~activity","dest":"https://blog.csdn.net/wills798/article/details/89510689"}'  data-report-query='spm=1001.2101.3001.6650.14&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-14-89510689-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-14-89510689-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+				<div class="desc ellipsis-online ellipsis-online-1">在进行<em>深度学习</em><em>神经网络</em>的<em>训练</em>过程中，为了提高网络模型的准去度，这里就其中的一些技巧进行概要描述大。
+
+然而在实际中，在原理和方法几乎定型的时候，我们往往需要针对自己的任务和自己设计的<em>神经网络</em>进行debug才能达到不错的效果，这也就是一个不断调试不断改进的一个过程。这其实也类似于制造业里面的制造工艺。
+
+
+
+咱们古人练就长生不老丹，便是典型的调参过程。
+
+（题外话：长生不老丹里面一味非常重要的药材叫...</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://blog.csdn.net/tMb8Z9Vdm66wH68VX1/article/details/92759528"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.15","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~activity-15-92759528-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"15","strategy":"2~default~ElasticSearch~activity","dest":"https://blog.csdn.net/tMb8Z9Vdm66wH68VX1/article/details/92759528"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://blog.csdn.net/tMb8Z9Vdm66wH68VX1/article/details/92759528" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.15","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~activity-15-92759528-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"15","strategy":"2~default~ElasticSearch~activity","dest":"https://blog.csdn.net/tMb8Z9Vdm66wH68VX1/article/details/92759528"}'  data-report-query='spm=1001.2101.3001.6650.15&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-15-92759528-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-15-92759528-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+					<div class="left ellipsis-online ellipsis-online-1">告别<em>深度学习</em>炼丹术！谷歌大脑提出&ldquo;<em>权重</em>无关&rdquo;<em>神经网络</em></div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/tMb8Z9Vdm66wH68VX1" target="_blank"><span class="blog-title">数据派THU</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">06-17</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					478
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://blog.csdn.net/tMb8Z9Vdm66wH68VX1/article/details/92759528" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.15","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~activity-15-92759528-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"15","strategy":"2~default~ElasticSearch~activity","dest":"https://blog.csdn.net/tMb8Z9Vdm66wH68VX1/article/details/92759528"}'  data-report-query='spm=1001.2101.3001.6650.15&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-15-92759528-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-15-92759528-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+				<div class="desc ellipsis-online ellipsis-online-1">来源：新智元本文约5600字，建议阅读10+分钟。无需<em>权重</em><em>训练</em>！谷歌再向<em>深度学习</em>炼丹术发起&ldquo;攻击&rdquo;。[ 导读 ]<em>神经网络</em><em>训练</em>中&ldquo;<em>权重</em>&rdquo;有多重要不言而喻。但现在，可以把<em>权重</em>...</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://blog.csdn.net/weixin_42515340/article/details/149617534"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.16","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~activity-16-149617534-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"16","strategy":"2~default~ElasticSearch~activity","dest":"https://blog.csdn.net/weixin_42515340/article/details/149617534"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://blog.csdn.net/weixin_42515340/article/details/149617534" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.16","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~activity-16-149617534-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"16","strategy":"2~default~ElasticSearch~activity","dest":"https://blog.csdn.net/weixin_42515340/article/details/149617534"}'  data-report-query='spm=1001.2101.3001.6650.16&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-16-149617534-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-16-149617534-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+					<div class="left ellipsis-online ellipsis-online-1">Keras手势识别<em>神经网络</em>从构建到<em>训练</em></div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/weixin_42515340" target="_blank"><span class="blog-title">weixin_42515340的博客</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">07-23</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					1109
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://blog.csdn.net/weixin_42515340/article/details/149617534" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.16","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~activity-16-149617534-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"16","strategy":"2~default~ElasticSearch~activity","dest":"https://blog.csdn.net/weixin_42515340/article/details/149617534"}'  data-report-query='spm=1001.2101.3001.6650.16&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-16-149617534-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-16-149617534-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+				<div class="desc ellipsis-online ellipsis-online-1">手势识别技术作为一种人机交互方式，随着人工智能与计算机视觉技术的进步而迅速发展。手势不仅能够传递信息，还可以作为控制和输入的手段。手势识别系统通过分析人体动作，理解用户的意图，从而使得交互更加直观和自然。本章将带您了解手势识别的基本概念、分类和应用场景，同时为您揭开手势识别技术的神秘面纱，探索其背后的原理。手势识别技术可大致分为基于传感器的方法和基于视觉的方法。基于传感器的方法包括穿戴式设备，如数据手套，而基于视觉的方法则涉及利用计算机视觉技术识别手部位置和形态。</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://blog.csdn.net/login_sonata/article/details/77488383"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.17","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~activity-17-77488383-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"17","strategy":"2~default~ElasticSearch~activity","dest":"https://blog.csdn.net/login_sonata/article/details/77488383"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://blog.csdn.net/login_sonata/article/details/77488383" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.17","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~activity-17-77488383-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"17","strategy":"2~default~ElasticSearch~activity","dest":"https://blog.csdn.net/login_sonata/article/details/77488383"}'  data-report-query='spm=1001.2101.3001.6650.17&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-17-77488383-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-17-77488383-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+					<div class="left ellipsis-online ellipsis-online-1">CNN卷积<em>神经网络</em>和反向传播</div>
+					<div class="tag">热门推荐</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/login_sonata" target="_blank"><span class="blog-title">login_sonata的博客</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">08-26</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					6万+
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://blog.csdn.net/login_sonata/article/details/77488383" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.17","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~activity-17-77488383-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"17","strategy":"2~default~ElasticSearch~activity","dest":"https://blog.csdn.net/login_sonata/article/details/77488383"}'  data-report-query='spm=1001.2101.3001.6650.17&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-17-77488383-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-17-77488383-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+				<div class="desc ellipsis-online ellipsis-online-1">本文内容来自： 
+1，Michael Nielsen的《Neural Networks and Deep Learning》中文翻译 
+2，http://www.cnblogs.com/pinard/p/6494810.html 
+3，http://blog.csdn.net/yunpiao123456/article/details/52437794卷积<em>神经网络</em>基础：首先看一下全连接网络，即神经元</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://blog.csdn.net/weixin_43701189/article/details/107212366"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.18","mod":"popu_387","extra":"{\"utm_medium\":\"distribute.pc_relevant.none-task-blog-pc_relevant_commercial_fallback_v1-18-107212366-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"default","index":"18","strategy":"pc_relevant_commercial_fallback_v1","dest":"https://blog.csdn.net/weixin_43701189/article/details/107212366"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://blog.csdn.net/weixin_43701189/article/details/107212366" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.18","mod":"popu_387","extra":"{\"utm_medium\":\"distribute.pc_relevant.none-task-blog-pc_relevant_commercial_fallback_v1-18-107212366-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"default","index":"18","strategy":"pc_relevant_commercial_fallback_v1","dest":"https://blog.csdn.net/weixin_43701189/article/details/107212366"}'  data-report-query='spm=1001.2101.3001.6650.18&utm_medium=distribute.pc_relevant.none-task-blog-pc_relevant_commercial_fallback_v1-18-107212366-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-pc_relevant_commercial_fallback_v1-18-107212366-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+					<div class="left ellipsis-online ellipsis-online-1">华中农业大学C++考试基础练习题</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/weixin_43701189" target="_blank"><span class="blog-title">雨的博客</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">07-08</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					1万+
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://blog.csdn.net/weixin_43701189/article/details/107212366" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.18","mod":"popu_387","extra":"{\"utm_medium\":\"distribute.pc_relevant.none-task-blog-pc_relevant_commercial_fallback_v1-18-107212366-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"default","index":"18","strategy":"pc_relevant_commercial_fallback_v1","dest":"https://blog.csdn.net/weixin_43701189/article/details/107212366"}'  data-report-query='spm=1001.2101.3001.6650.18&utm_medium=distribute.pc_relevant.none-task-blog-pc_relevant_commercial_fallback_v1-18-107212366-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-pc_relevant_commercial_fallback_v1-18-107212366-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+				<div class="desc ellipsis-online ellipsis-online-1">实验一
+1 通过日期求某月的天数。
+输入日期的年份和月份，求该月有多少天。提示：对于月份为1、3、5、7、8、10、12的月份天数为31，月份为4、6、9、11的月份天数为30，月份为2时要结合年份考虑闰年的情况。
+输入描述
+输入两个正整数y和m分别表示年份和月份。
+输出描述
+如果y和m满足条件：1900&lt;=y&lt;3000，0&lt;m&lt;13，输出该月的天数；否则输出&ldquo;Input error!&rdquo;。
+输入样例
+2010 12
+输出样例
+31
+#include&quot;iostream&quot;
+using n</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div class="recommend-item-box type_blog clearfix" data-url="https://blog.csdn.net/weixin_46846685/article/details/127043113"  data-report-view='{"ab":"new","spm":"1001.2101.3001.6650.19","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~activity-19-127043113-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"19","strategy":"2~default~ElasticSearch~activity","dest":"https://blog.csdn.net/weixin_46846685/article/details/127043113"}'>
+	<div class="content-box">
+		<div class="content-blog display-flex">
+			<div class="title-box">
+				<a href="https://blog.csdn.net/weixin_46846685/article/details/127043113" class="tit" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.19","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~activity-19-127043113-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"19","strategy":"2~default~ElasticSearch~activity","dest":"https://blog.csdn.net/weixin_46846685/article/details/127043113"}'  data-report-query='spm=1001.2101.3001.6650.19&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-19-127043113-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-19-127043113-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+					<div class="left ellipsis-online ellipsis-online-1"><em>神经网络</em>模型<em>训练</em>简记（一）</div>
+				</a>
+			</div>
+			<div class="info-box display-flex">
+				<div class="info">
+					<a href="https://blog.csdn.net/weixin_46846685" target="_blank"><span class="blog-title">weixin_46846685的博客</span></a>
+				</div>
+				<div class="info display-flex">
+					<span class="info-block time">10-01</span>
+					<span class="info-block read"><img class="read-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					2591
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="desc-box">
+			<a href="https://blog.csdn.net/weixin_46846685/article/details/127043113" target="_blank"  data-report-click='{"ab":"new","spm":"1001.2101.3001.6650.19","mod":"popu_387","extra":"{\"highlightScore\":0.0,\"utm_medium\":\"distribute.pc_relevant.none-task-blog-2~default~ElasticSearch~activity-19-127043113-blog-165491623.235^v43^pc_blog_bottom_relevance_base6\",\"dist_request_id\":\"silkroad_1790679951662\"}","dist_request_id":"silkroad_1790679951662","ab_strategy":"landing_bge_commercial_es","index":"19","strategy":"2~default~ElasticSearch~activity","dest":"https://blog.csdn.net/weixin_46846685/article/details/127043113"}'  data-report-query='spm=1001.2101.3001.6650.19&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-19-127043113-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EElasticSearch%7Eactivity-19-127043113-blog-165491623.235%5Ev43%5Epc_blog_bottom_relevance_base6'>
+				<div class="desc ellipsis-online ellipsis-online-1">本文首先记录了<em>神经网络</em>学习中的一些概念，并对四个官方数据集进行了介绍，<em>最后</em>介绍了图像分类任务中经常使用到的11种网络模型。</div>
+			</a>
+		</div>
+	</div>
+</div>
+              </div>
+<div class="blog-footer-bottom" style="margin-top:10px;"></div>
+<script src="https://g.csdnimg.cn/common/csdn-footer/csdn-footer.js" data-isfootertrack="false" type="text/javascript"></script>
+<script type="text/javascript">
+    window.csdn.csdnFooter.options = {
+        el: '.blog-footer-bottom',
+        type: 2
+    }
+</script>          </main>
+<aside class="blog_container_aside">
+<div id="asideProfile" class="aside-box active">
+    <div class="profile-intro d-flex">
+        <div class="avatar-box d-flex justify-content-center flex-column">
+            <a href="https://blog.csdn.net/weixin_49122920" target="_blank" data-report-click='{"mod":"popu_379","spm":"3001.4121","dest":"https://blog.csdn.net/weixin_49122920","ab":"new"}'>
+                <img src="https://i-avatar.csdnimg.cn/45c16f533ac6499f894290957886342b_weixin_49122920.jpg!1" class="avatar_pic">
+            </a>
+        </div>
+        <div class="user-info d-flex flex-column profile-intro-name-box">
+            <div class="profile-intro-name-boxTop">
+                <a href="https://blog.csdn.net/weixin_49122920" target="_blank" class="" id="uid" title="至顶头条" data-report-click='{"mod":"popu_379","spm":"3001.4122","dest":"https://blog.csdn.net/weixin_49122920","ab":"new"}'>
+                    <span class="name" username="weixin_49122920">至顶头条</span>
+                </a>
+            </div>
+            <div class="profile-intro-name-boxFooter-new">
+              <p class="profile-intro-name-leve">
+                <span>
+                  博客等级
+                </span>
+                  <img class="level" src="https://csdnimg.cn/identity/blog8.png">
+              </p>
+                <span class="profile-intro-name-years" title="已加入 CSDN 6年">码龄6年</span>
+               
+            </div>
+        </div>
+    </div>
+    <div class="profile-intro-rank-information">
+      <dl>
+        <a href="https://blog.csdn.net/weixin_49122920" data-report-click='{"mod":"1598321000_001","spm":"3001.4310"}' data-report-query="t=1">  
+            <dd><span >3473</span></dd>
+            <dt>原创</dt>
+        </a>
+      </dl>
+       <dl title="29388">
+        <dd>2万+</dd>
+        <dt>点赞</dt>
+      </dl>
+       <dl title="26230">
+        <dd>2万+</dd>
+        <dt>收藏</dt>
+      </dl>
+      <dl id="fanBox" title="2010">
+        <dd><span id="fan">2010</span></dd>
+        <dt>粉丝</dt>
+      </dl>
+    </div>
+    <div class="profile-intro-name-boxOpration">
+        <div class="opt-letter-watch-box"> 
+            <a class="personal-watch bt-button" id="btnAttent" >关注</a>  
+        </div>
+        <div class="opt-letter-watch-box">
+        <a rel="nofollow" class="bt-button personal-letter" href="https://im.csdn.net/chat/weixin_49122920" target="_blank" rel="noopener">私信</a>
+        </div>
+    </div>
+</div>
+      <div class="swiper-slide-box-remuneration">
+        <a data-report-click='{"spm":"3001.9728","extra":{"index":"0"}}' data-report-view='{"spm":"3001.9728","extra":{"index":"0"}}' href="https://mp.csdn.net/vip?utm_source=902253762" target="_blank">
+          <img src="https://i-operation.csdnimg.cn/images/e6e7a35477544c888a142e19f7080c95.jpeg" alt="">
+        </a>
+      </div>
+<div class="box-shadow mb8" data-pid="blog" >
+    <div class="aside-content text-center" id="cpro_u2734133">
+        <div id="kp_box_56" data-pid="56"><div class="wwads-cn wwads-vertical" data-id="149" style="max-width:300px;margin-top:0;margin-bottom:10px;background-color: #fff;"></div> 
+<style>.wwads-img img {width: 150px; margin-top:10px}</style>
+<script type="text/javascript" charset="UTF-8" src="https://cdn.wwads.cn/js/makemoney.js" async></script><img class="pre-img-lasy" data-src="https://kunyu.csdn.net/1.png?p=56&adId=1100446&adBlockFlag=0&a=1100446&c=0&k=神经网络训练到最后，权重到底经历了什么？&spm=1001.2101.3001.5000&articleId=165491623&d=1&t=3&u=be5d621dffa04d3f9b6c477a14f247cc" style="display: block;width: 0px;height: 0px;"></div>
+    </div>
+</div>
+
+
+
+<div id="asideHotArticle" class="aside-box">
+	<h3 class="aside-title">热门文章</h3>
+	<div class="aside-content">
+		<ul class="hotArticle-list">
+			<li>
+				<a href="https://blog.csdn.net/weixin_49122920/article/details/155300219" target="_blank"  data-report-click='{"mod":"popu_541","spm":"3001.4139","dest":"https://blog.csdn.net/weixin_49122920/article/details/155300219","ab":"new"}'>
+				第五代骁龙8之后，旗舰机有了新的“标准版”
+					<img src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					<span class="read">17042</span>
+                </a>
+			</li>
+			<li>
+				<a href="https://blog.csdn.net/weixin_49122920/article/details/152120328" target="_blank"  data-report-click='{"mod":"popu_541","spm":"3001.4139","dest":"https://blog.csdn.net/weixin_49122920/article/details/152120328","ab":"new"}'>
+				高通带来手机和PC上的最新款骁龙，用AI实例讲芯片的故事
+					<img src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					<span class="read">5627</span>
+                </a>
+			</li>
+			<li>
+				<a href="https://blog.csdn.net/weixin_49122920/article/details/153344501" target="_blank"  data-report-click='{"mod":"popu_541","spm":"3001.4139","dest":"https://blog.csdn.net/weixin_49122920/article/details/153344501","ab":"new"}'>
+				阿里巴巴团队开发聊天式推荐系统：让购物App能听懂你的真心话
+					<img src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					<span class="read">5600</span>
+                </a>
+			</li>
+			<li>
+				<a href="https://blog.csdn.net/weixin_49122920/article/details/149033612" target="_blank"  data-report-click='{"mod":"popu_541","spm":"3001.4139","dest":"https://blog.csdn.net/weixin_49122920/article/details/149033612","ab":"new"}'>
+				AI对就业市场的真实冲击：2025年现状分析
+					<img src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					<span class="read">3195</span>
+                </a>
+			</li>
+			<li>
+				<a href="https://blog.csdn.net/weixin_49122920/article/details/150393414" target="_blank"  data-report-click='{"mod":"popu_541","spm":"3001.4139","dest":"https://blog.csdn.net/weixin_49122920/article/details/150393414","ab":"new"}'>
+				ByteDance研究揭示搜索代理的致命弱点
+					<img src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					<span class="read">2644</span>
+                </a>
+			</li>
+		</ul>
+	</div>
+</div>
+  <div class="article-previous" id="article-previous">
+      <dl data-report-click='{"spm":"3001.10752","extend1":"上一篇"}' data-report-view='{"spm":"3001.10752","extend1":"上一篇"}'>
+          <dt>
+              上一篇：
+          </dt>
+          <dd>
+            <a href="https://blog.csdn.net/weixin_49122920/article/details/165491611" data-report-query="spm=3001.10752">
+              当AI没有标准答案可以对照时，它要怎么学会做对一件事？
+            </a>
+          </dd>
+      </dl>
+      <dl class="next" data-report-click='{"spm":"3001.10796","extend1":"下一篇"}' data-report-view='{"spm":"3001.10796","extend1":"下一篇"}'>
+          <dt>
+            下一篇：
+          </dt>
+          <dd >
+            <a href="https://blog.csdn.net/weixin_49122920/article/details/165491638" data-report-query="spm=3001.10796">
+              让机器读记忆的方式，可能一直都错了
+            </a>
+          </dd>
+      </dl>
+  </div>
+<div id="asideHotArticle" class="aside-box">
+	<h3 class="aside-title">大家在看</h3>
+	<div class="aside-content">
+		<ul class="hotArticle-list">
+			<li>
+				<a href="https://blog.csdn.net/2601_96747699/article/details/166847665" target="_blank"  data-report-click='{"spm":"3001.10093","dest":"https://blog.csdn.net/2601_96747699/article/details/166847665","strategy":"202_1052723-4584602_RCMD","ab":"new"}' data-report-view='{"spm":"3001.10093","dest":"https://blog.csdn.net/2601_96747699/article/details/166847665","strategy":"202_1052723-4584602_RCMD","ab":"new"}'>
+				EG21814 600V半桥栅极驱动芯片
+        </a>
+			</li>
+			<li>
+				<a href="https://blog.csdn.net/m0_63171455/article/details/166845601" target="_blank"  data-report-click='{"spm":"3001.10093","dest":"https://blog.csdn.net/m0_63171455/article/details/166845601","strategy":"202_1052723-4584330_RCMD","ab":"new"}' data-report-view='{"spm":"3001.10093","dest":"https://blog.csdn.net/m0_63171455/article/details/166845601","strategy":"202_1052723-4584330_RCMD","ab":"new"}'>
+				2026 AI Agent核心学习路线
+					<img src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					<span class="read">868</span>
+        </a>
+			</li>
+			<li>
+				<a href="https://blog.csdn.net/design1985/article/details/166847350" target="_blank"  data-report-click='{"spm":"3001.10093","dest":"https://blog.csdn.net/design1985/article/details/166847350","strategy":"202_1052723-4584583_RCMD","ab":"new"}' data-report-view='{"spm":"3001.10093","dest":"https://blog.csdn.net/design1985/article/details/166847350","strategy":"202_1052723-4584583_RCMD","ab":"new"}'>
+				Ego-Lite：代码驱动的AI浏览器代理
+        </a>
+			</li>
+			<li>
+				<a href="https://blog.csdn.net/2501_93582142/article/details/166847820" target="_blank"  data-report-click='{"spm":"3001.10093","dest":"https://blog.csdn.net/2501_93582142/article/details/166847820","strategy":"202_1052723-4584635_RCMD","ab":"new"}' data-report-view='{"spm":"3001.10093","dest":"https://blog.csdn.net/2501_93582142/article/details/166847820","strategy":"202_1052723-4584635_RCMD","ab":"new"}'>
+				openGauss两种部署方式深度对比
+        </a>
+			</li>
+			<li>
+				<a href="https://blog.csdn.net/cdfunlove/article/details/164400323" target="_blank"  data-report-click='{"spm":"3001.10093","dest":"https://blog.csdn.net/cdfunlove/article/details/164400323","strategy":"202_1052723-4584543_RCMD","ab":"new"}' data-report-view='{"spm":"3001.10093","dest":"https://blog.csdn.net/cdfunlove/article/details/164400323","strategy":"202_1052723-4584543_RCMD","ab":"new"}'>
+				以产品为中心的组织架构升级路径
+					<img src="https://csdnimg.cn/release/blogv2/dist/pc/img/readCountWhite.png" alt="">
+					<span class="read">242</span>
+        </a>
+			</li>
+		</ul>
+	</div>
+</div>
+<div id="asideArchive" class="aside-box" style=" width:300px;">
+    <h3 class="aside-title">最新文章</h3>
+    <div class="aside-content">
+        <ul class="inf_list clearfix">
+            <li class="clearfix">
+            <a href="https://blog.csdn.net/weixin_49122920/article/details/166795635" target="_blank" data-report-click='{"mod":"popu_382","spm":"3001.4136","dest":"https://blog.csdn.net/weixin_49122920/article/details/166795635","ab":"left"}' data-report-view='{"mod":"popu_382","spm":"3001.4136","dest":"https://blog.csdn.net/weixin_49122920/article/details/166795635","ab":"left"}'>Cerebras用2400次实验证明，大模型训练也需要这个“老古董“</a>
+            </li>
+            <li class="clearfix">
+            <a href="https://blog.csdn.net/weixin_49122920/article/details/166795629" target="_blank" data-report-click='{"mod":"popu_382","spm":"3001.4136","dest":"https://blog.csdn.net/weixin_49122920/article/details/166795629","ab":"left"}' data-report-view='{"mod":"popu_382","spm":"3001.4136","dest":"https://blog.csdn.net/weixin_49122920/article/details/166795629","ab":"left"}'>AI能不能自己教自己？RISE让模型用昨天的自己训练今天的自己</a>
+            </li>
+            <li class="clearfix">
+            <a href="https://blog.csdn.net/weixin_49122920/article/details/166795618" target="_blank" data-report-click='{"mod":"popu_382","spm":"3001.4136","dest":"https://blog.csdn.net/weixin_49122920/article/details/166795618","ab":"left"}' data-report-view='{"mod":"popu_382","spm":"3001.4136","dest":"https://blog.csdn.net/weixin_49122920/article/details/166795618","ab":"left"}'>当模型修好一个bug，却顺手重写了半个函数</a>
+            </li>
+        </ul>
+        <div class="archive-bar"></div>
+        <div class="archive-box">
+                <div class="archive-title">2026</div> 
+                <div class="archive-content">
+                    <div class="archive-item">
+                        <a href="https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=09" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=09"}'>
+                        <span class="time">09月</span>
+                        <span class="count">189篇</span>
+                        </a>
+                    </div>
+                    <div class="archive-item">
+                        <a href="https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=08" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=08"}'>
+                        <span class="time">08月</span>
+                        <span class="count">190篇</span>
+                        </a>
+                    </div>
+                    <div class="archive-item">
+                        <a href="https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=07" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=07"}'>
+                        <span class="time">07月</span>
+                        <span class="count">225篇</span>
+                        </a>
+                    </div>
+                    <div class="archive-item">
+                        <a href="https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=06" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=06"}'>
+                        <span class="time">06月</span>
+                        <span class="count">214篇</span>
+                        </a>
+                    </div>
+                    <div class="archive-item">
+                        <a href="https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=05" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=05"}'>
+                        <span class="time">05月</span>
+                        <span class="count">181篇</span>
+                        </a>
+                    </div>
+                    <div class="archive-item">
+                        <a href="https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=04" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=04"}'>
+                        <span class="time">04月</span>
+                        <span class="count">209篇</span>
+                        </a>
+                    </div>
+                    <div class="archive-item">
+                        <a href="https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=03" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=03"}'>
+                        <span class="time">03月</span>
+                        <span class="count">221篇</span>
+                        </a>
+                    </div>
+                    <div class="archive-item">
+                        <a href="https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=02" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=02"}'>
+                        <span class="time">02月</span>
+                        <span class="count">171篇</span>
+                        </a>
+                    </div>
+                    <div class="archive-item">
+                        <a href="https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=01" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=01"}'>
+                        <span class="time">01月</span>
+                        <span class="count">213篇</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="archive-list-item"><a href="https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2025&amp;month=12" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2025&amp;month=12"}'><span class="year">2025年</span><span class="num">1660篇</span></a></div>
+        </div>
+    </div>
+</div>
+    <div id="footerRightAds" class="isShowFooterAds">
+      <div class="aside-box">
+        <div id="kp_box_57" data-pid="57"><iframe  src="https://kunpeng-sc.csdnimg.cn/?timestamp=1645783940/#/preview/4492406?positionId=57&adBlockFlag=0&adId=1111640&queryWord=神经网络训练到最后，权重到底经历了什么？&spm=1001.2101.3001.5001&articleId=165491623" frameborder="0" width= "300px"  height= "600px" scrolling="no" ></iframe><img class="pre-img-lasy"  data-src="https://kunyu.csdn.net/1.png?p=57&adBlockFlag=0&adId=1111640&a=1111640&c=4492406&k=神经网络训练到最后，权重到底经历了什么？&spm=1001.2101.3001.5001&articleId=165491623&d=1&t=3&u=ec89183638474fd0b12e27534fb8b3ec" style="display: block;width: 0px;height: 0px;"><script src="https://kunpeng-render.csdnimg.cn/publisher/latest/closeAdFrame.js"></script></div>
+      </div>
+    </div>
+    <!-- 详情页显示目录 -->
+<div class="aside-box cknows-side-card js-aside-cknows">
+  <div class="cknows-side-header">
+    <div class="cknows-side-header-row">
+      <div class="cknows-side-logo-wrap">
+        <img class="cknows-side-logo" src="https://csdnimg.cn/release/blogv2/dist/pc/img/c-blog-slidelogo-White.png" alt="C知道">
+      </div>
+      <p class="cknows-side-brand">· AI 阅读助手</p>
+    </div>
+  </div>
+  <div class="swiper cknows-side-swiper">
+    <div class="swiper-wrapper cknows-swiper-wrapper"></div>
+    <div class="cknows-side-pagination swiper-pagination"></div>
+  </div>
+</div>
+<!--文章目录-->
+<div id="asidedirectory" class="aside-box">
+    <div class='groupfile groupfile-active' id="directory">
+        <h3 class="aside-title">目录</h3>
+        <div class="align-items-stretch group_item" id="align-items-stretch">
+            <div class="pos-box">
+            <div class="scroll-box">
+                <div class="toc-box"></div>
+            </div>
+            </div>
+        </div>
+          <p class="flexible-btn-new" id="flexible-btn-groupfile" data-report-click='{"spm":"3001.10780","strategy":"展开全部"}' data-minheight="117px" data-maxheight="446px" data-fbox="#align-items-stretch"><span class="text">展开全部</span> <img class="look-more" src="https://csdnimg.cn/release/blogv2/dist/pc/img/arrowup-line-bot-White.png" alt=""></p>
+          <p class="flexible-btn-new-close close" data-report-click='{"spm":"3001.10780","strategy":"收起"}'  data-minheight="117px" data-maxheight="446px" data-fbox="#align-items-stretch"><span class="text">收起</span> <img class="look-more" src="https://csdnimg.cn/release/blogv2/dist/pc/img/arrowup-line-top-White.png" alt=""></p>
+    </div>
+</div>
+<div class="gitcode-qc-left-box aside-box" data-report-click='{"spm":"3001.11256", "extra":"{\"position\":\"left\"}"}'></div>
+</aside>
+<script>
+	$("a.flexible-btn").click(function(){
+		$(this).parents('div.aside-box').removeClass('flexible-box');
+		$(this).parents("p.text-center").remove();
+	})
+</script>
+<script type="text/javascript"  src="https://g.csdnimg.cn/user-tooltip/2.7/user-tooltip.js"></script>
+<script type="text/javascript"  src="https://g.csdnimg.cn/user-medal/2.0.0/user-medal.js"></script>
+        </div>
+<div class="recommend-right align-items-stretch clearfix article-component-material-third-column" id="rightAside" data-type="recommend">
+    <aside class="recommend-right_aside">
+            <div class="rightside-fixed-hide">
+              <div class="programmer1Box">
+                  <div id="kp_box_530" data-pid="530"><iframe  src="https://kunpeng-sc.csdnimg.cn/?timestamp=1645783940/#/preview/4502099?positionId=530&adBlockFlag=0&adId=1110527&queryWord=神经网络训练到最后，权重到底经历了什么？&spm=1001.2101.3001.4647&articleId=165491623" frameborder="0" width= "300px"  height= "600px" scrolling="no" ></iframe><img class="pre-img-lasy"  data-src="https://kunyu.csdn.net/1.png?p=530&adBlockFlag=0&adId=1110527&a=1110527&c=4502099&k=神经网络训练到最后，权重到底经历了什么？&spm=1001.2101.3001.4647&articleId=165491623&d=1&t=3&u=6fa48fb01f964a01a91c52688022feec" style="display: block;width: 0px;height: 0px;"><script src="https://kunpeng-render.csdnimg.cn/publisher/latest/closeAdFrame.js"></script></div>
+              </div>
+      </div>
+        <div id="recommend-right" >
+<div class="aside-box cknows-side-card js-aside-cknows">
+  <div class="cknows-side-header">
+    <div class="cknows-side-header-row">
+      <div class="cknows-side-logo-wrap">
+        <img class="cknows-side-logo" src="https://csdnimg.cn/release/blogv2/dist/pc/img/c-blog-slidelogo-White.png" alt="C知道">
+      </div>
+      <p class="cknows-side-brand">· AI 阅读助手</p>
+    </div>
+  </div>
+  <div class="swiper cknows-side-swiper">
+    <div class="swiper-wrapper cknows-swiper-wrapper"></div>
+    <div class="cknows-side-pagination swiper-pagination"></div>
+  </div>
+</div>
+          <div class='flex-column aside-box groupfile groupfile-active ' id="groupfile">
+              <div class="groupfile-div">
+              <h3 class="aside-title">目录</h3>
+              <div class="align-items-stretch group_item" id="align-items-stretch-right">
+                  <div class="pos-box">
+                      <div class="scroll-box">
+                          <div class="toc-box"></div>
+                      </div>
+                  </div>
+              </div>
+                <p class="flexible-btn-new" id="flexible-btn-groupfile" data-report-click='{"spm":"3001.10782","strategy":"展开全部"}' data-traigger="true" data-minheight="117px" data-maxheight="446px" data-fbox="#align-items-stretch-right"><span class="text">展开全部</span> <img class="look-more" src="https://csdnimg.cn/release/blogv2/dist/pc/img/arrowup-line-bot-White.png" alt=""></p>
+                <p class="flexible-btn-new-close close" data-report-click='{"spm":"3001.10782","strategy":"收起"}' data-traigger="true"  data-minheight="117px" data-maxheight="446px" data-fbox="#align-items-stretch-right"><span class="text">收起</span> <img class="look-more" src="https://csdnimg.cn/release/blogv2/dist/pc/img/arrowup-line-top-White.png" alt=""></p>
+              </div>
+          </div>
+          <div class="gitcode-qc-right-box aside-box" data-report-click='{"spm":"3001.11256", "extra":"{\"position\":\"right\"}"}'></div>
+              <div id="recommendAdBox">
+                  <div id="kp_box_479" data-pid="479"><div class="wwads-cn wwads-vertical" data-id="149" style="max-width:300px;margin-top:10px;background-color: #fff;"></div> 
+<style>.wwads-img img {width: 150px; margin-top:10px}</style><img class="pre-img-lasy" data-src="https://kunyu.csdn.net/1.png?p=479&adId=1100447&adBlockFlag=0&a=1100447&c=0&k=神经网络训练到最后，权重到底经历了什么？&spm=1001.2101.3001.4834&articleId=165491623&d=1&t=3&u=92cba69789e7465b826219111c42c769" style="display: block;width: 0px;height: 0px;"></div>
+              </div>
+  <div class="article-previous" id="article">
+      <dl data-report-click='{"spm":"3001.10752","extend1":"上一篇"}' data-report-view='{"spm":"3001.10752","extend1":"上一篇"}'>
+          <dt>
+              上一篇：
+          </dt>
+          <dd>
+            <a href="https://blog.csdn.net/weixin_49122920/article/details/165491611" data-report-query="spm=3001.10752">
+              当AI没有标准答案可以对照时，它要怎么学会做对一件事？
+            </a>
+          </dd>
+      </dl>
+      <dl class="next" data-report-click='{"spm":"3001.10796","extend1":"下一篇"}' data-report-view='{"spm":"3001.10796","extend1":"下一篇"}'>
+          <dt>
+            下一篇：
+          </dt>
+          <dd >
+            <a href="https://blog.csdn.net/weixin_49122920/article/details/165491638" data-report-query="spm=3001.10796">
+              让机器读记忆的方式，可能一直都错了
+            </a>
+          </dd>
+      </dl>
+  </div>
+<div id="asideArchive" class="aside-box" style=" width:300px;">
+    <h3 class="aside-title">最新文章</h3>
+    <div class="aside-content">
+        <ul class="inf_list clearfix">
+            <li class="clearfix">
+            <a href="https://blog.csdn.net/weixin_49122920/article/details/166795635" target="_blank" data-report-click='{"mod":"popu_382","spm":"3001.4136","dest":"https://blog.csdn.net/weixin_49122920/article/details/166795635","ab":"right"}' data-report-view='{"mod":"popu_382","spm":"3001.4136","dest":"https://blog.csdn.net/weixin_49122920/article/details/166795635","ab":"right"}'>Cerebras用2400次实验证明，大模型训练也需要这个“老古董“</a>
+            </li>
+            <li class="clearfix">
+            <a href="https://blog.csdn.net/weixin_49122920/article/details/166795629" target="_blank" data-report-click='{"mod":"popu_382","spm":"3001.4136","dest":"https://blog.csdn.net/weixin_49122920/article/details/166795629","ab":"right"}' data-report-view='{"mod":"popu_382","spm":"3001.4136","dest":"https://blog.csdn.net/weixin_49122920/article/details/166795629","ab":"right"}'>AI能不能自己教自己？RISE让模型用昨天的自己训练今天的自己</a>
+            </li>
+            <li class="clearfix">
+            <a href="https://blog.csdn.net/weixin_49122920/article/details/166795618" target="_blank" data-report-click='{"mod":"popu_382","spm":"3001.4136","dest":"https://blog.csdn.net/weixin_49122920/article/details/166795618","ab":"right"}' data-report-view='{"mod":"popu_382","spm":"3001.4136","dest":"https://blog.csdn.net/weixin_49122920/article/details/166795618","ab":"right"}'>当模型修好一个bug，却顺手重写了半个函数</a>
+            </li>
+        </ul>
+        <div class="archive-bar"></div>
+        <div class="archive-box">
+                <div class="archive-title">2026</div> 
+                <div class="archive-content">
+                    <div class="archive-item">
+                        <a href="https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=09" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=09"}'>
+                        <span class="time">09月</span>
+                        <span class="count">189篇</span>
+                        </a>
+                    </div>
+                    <div class="archive-item">
+                        <a href="https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=08" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=08"}'>
+                        <span class="time">08月</span>
+                        <span class="count">190篇</span>
+                        </a>
+                    </div>
+                    <div class="archive-item">
+                        <a href="https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=07" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=07"}'>
+                        <span class="time">07月</span>
+                        <span class="count">225篇</span>
+                        </a>
+                    </div>
+                    <div class="archive-item">
+                        <a href="https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=06" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=06"}'>
+                        <span class="time">06月</span>
+                        <span class="count">214篇</span>
+                        </a>
+                    </div>
+                    <div class="archive-item">
+                        <a href="https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=05" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=05"}'>
+                        <span class="time">05月</span>
+                        <span class="count">181篇</span>
+                        </a>
+                    </div>
+                    <div class="archive-item">
+                        <a href="https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=04" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=04"}'>
+                        <span class="time">04月</span>
+                        <span class="count">209篇</span>
+                        </a>
+                    </div>
+                    <div class="archive-item">
+                        <a href="https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=03" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=03"}'>
+                        <span class="time">03月</span>
+                        <span class="count">221篇</span>
+                        </a>
+                    </div>
+                    <div class="archive-item">
+                        <a href="https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=02" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=02"}'>
+                        <span class="time">02月</span>
+                        <span class="count">171篇</span>
+                        </a>
+                    </div>
+                    <div class="archive-item">
+                        <a href="https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=01" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2026&amp;month=01"}'>
+                        <span class="time">01月</span>
+                        <span class="count">213篇</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="archive-list-item"><a href="https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2025&amp;month=12" target="_blank" data-report-click='{"mod":"popu_538","spm":"3001.4138","ab":"new","dest":"https://blog.csdn.net/weixin_49122920?type=blog&amp;year=2025&amp;month=12"}'><span class="year">2025年</span><span class="num">1660篇</span></a></div>
+        </div>
+    </div>
+</div>
+        </div>
+    </aside>
+</div>
+<div class="recommend-right1  align-items-stretch clearfix" id="rightAsideConcision" data-type="recommend">
+    <aside class="recommend-right_aside">
+        <div id="recommend-right-concision" >
+            <div class='flex-column aside-box groupfile' id="groupfileConcision">
+                <div class="groupfile-div1">
+                <h3 class="aside-title">目录</h3>
+                <div class="align-items-stretch group_item">
+                    <div class="pos-box">
+                        <div class="scroll-box">
+                            <div class="toc-box"></div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+</div>
+
+      </div>
+      <div class="mask-dark"></div>
+        <script type="text/javascript">
+        var timert = setInterval(function() {
+          sideToolbar = $(".csdn-side-toolbar");
+          if (sideToolbar.length > 0) {
+            sideToolbar.css('cssText', 'bottom:64px !important;')
+            clearInterval(timert);
+          }
+        }, 200);
+        </script>
+      <div class="skin-boxshadow"></div>
+      <div class="directory-boxshadow"></div>
+<div class="comment-side-box-shadow comment-side-tit-close" id="commentSideBoxshadow">
+<div class="comment-side-content">
+	<div class="comment-side-tit">
+		<span class="comment-side-tit-count">评论</span>	
+	<img class="comment-side-tit-close" src="https://csdnimg.cn/release/blogv2/dist/pc/img/closeBt.png"></div>
+  <div id="pcCommentSideBox" class="comment-box comment-box-new2" style="display:block">
+    <div class="comment-edit-box d-flex">
+      <div class="user-img">
+      </div>
+      <form id="commentform">
+        <textarea class="comment-content" name="comment_content" id="comment_content" placeholder="说说你的看法，或者提个问题" maxlength="1000"></textarea>
+        <div class="comment-reward-box" style="background-image: url('https://img-home.csdnimg.cn/images/20230131025301.png');">
+          <a class="btn-remove-reward"></a>
+          <div class="form-reward-box">
+            <div class="info">
+              成就一亿技术人!
+            </div>
+            <div class="price-info">
+              拼手气红包<span class="price">6.0元</span>
+            </div>
+          </div>
+        </div>
+        <div class="comment-operate-box">
+          <div class="comment-operate-l">
+            <span id="tip_comment" class="tip">还能输入<em>1000</em>个字符</span>
+          </div>
+          <div class="comment-operate-c">
+            &nbsp;
+          </div>
+          <div class="comment-operate-r">
+            <div class="comment-operate-item comment-emoticon">
+              <img class="comment-operate-img" data-url="https://csdnimg.cn/release/blogv2/dist/pc/img/" src="https://csdnimg.cn/release/blogv2/dist/pc/img/commentEmotionIcon.png" alt="表情包">
+              <span class="comment-operate-tip">插入表情</span>
+              <div class="comment-emoticon-box comment-operate-isshow">
+                <div class="comment-emoticon-img-box"></div>
+              </div>
+            </div>
+            <div class="comment-operate-item comment-code">
+              <img class="comment-operate-img" data-url="https://csdnimg.cn/release/blogv2/dist/pc/img/" src="https://csdnimg.cn/release/blogv2/dist/pc/img/commentCodeIcon.png" alt="表情包">
+              <span class="comment-operate-tip">代码片</span>
+              <div class="comment-code-box comment-operate-isshow">
+                <ul id="commentCode">
+                  <li><a data-code="html">HTML/XML</a></li>
+                  <li><a data-code="objc">objective-c</a></li>
+                  <li><a data-code="ruby">Ruby</a></li>
+                  <li><a data-code="php">PHP</a></li>
+                  <li><a data-code="csharp">C</a></li>
+                  <li><a data-code="cpp">C++</a></li>
+                  <li><a data-code="javascript">JavaScript</a></li>
+                  <li><a data-code="python">Python</a></li>
+                  <li><a data-code="java">Java</a></li>
+                  <li><a data-code="css">CSS</a></li>
+                  <li><a data-code="sql">SQL</a></li>
+                  <li><a data-code="plain">其它</a></li>
+                </ul>
+              </div>
+            </div>
+            <div class="comment-operate-item">
+              <input type="hidden" id="comment_replyId" name="comment_replyId">
+              <input type="hidden" id="article_id" name="article_id" value="165491623">
+              <input type="hidden" id="comment_userId" name="comment_userId" value="">
+              <input type="hidden" id="commentId" name="commentId" value="">
+              <a data-report-click='{"mod":"1582594662_003","spm":"1001.2101.3001.4227","ab":"new","extra":{"type":"button"}}' data-report-view='{"mod":"1582594662_003","spm":"1001.2101.3001.4227","ab":"new","extra":{"type":"button"}}'>
+              <input type="submit" class="btn-comment btn-comment-input" value="评论">
+              </a>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+		<div class="comment-list-container">
+			<div class="comment-list-box comment-operate-item">
+			</div>
+			<div id="lookFlodComment" class="look-flod-comment">
+					<span class="count"></span>&nbsp;条评论被折叠&nbsp;<a class="look-more-flodcomment">查看</a>
+			</div>
+			<div class="opt-box text-center">
+				<div class="btn btn-sm btn-link-blue" id="btnMoreComment"></div>
+			</div>
+		</div>
+	</div>
+	<div id="pcFlodCommentSideBox" class="pc-flodcomment-sidebox">
+		<div class="comment-fold-tit"><span id="lookUnFlodComment" class="back"><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/commentArrowLeftWhite.png" alt=""></span>被折叠的&nbsp;<span class="count"></span>&nbsp;条评论
+		 <a href="https://blogdev.blog.csdn.net/article/details/122245662" class="tip" target="_blank">为什么被折叠?</a>
+		 <a href="https://bbs.csdn.net/forums/FreeZone" class="park" target="_blank">
+		 <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/iconPark.png">到【灌水乐园】发言</a>                                
+		</div>
+		<div class="comment-fold-content"></div>
+		<div id="lookBadComment" class="look-bad-comment side-look-comment">
+			<a class="look-more-comment">查看更多评论<img src="https://csdnimg.cn/release/blogv2/dist/pc/img/commentArrowDownWhite.png" alt=""></a>
+		</div>
+	</div>
+</div>
+<div class="comment-rewarddialog-box">
+  <div class="form-box">
+    <div class="title-box">
+      添加红包
+      <a class="btn-form-close"></a>
+    </div>
+    <form id="commentRewardForm">
+      <div class="ipt-box">
+        <label for="txtName">祝福语</label>
+        <div class="ipt-btn-box">
+          <input type="text" name="name" id="txtName" autocomplete="off" maxlength="50">
+          <a class="btn-ipt btn-random"></a>
+        </div>
+        <p class="notice">请填写红包祝福语或标题</p>
+      </div>
+      <div class="ipt-box">
+        <label for="txtSendAmount">红包数量</label>
+        <div class="ipt-txt-box">
+          <input type="text" name="sendAmount" maxlength="4" id="txtSendAmount" placeholder="请填写红包数量(最小10个)" autocomplete="off">
+          <span class="after-txt">个</span>
+        </div>
+        <p class="notice">红包个数最小为10个</p>
+      </div>
+      <div class="ipt-box">
+        <label for="txtMoney">红包总金额</label>
+        <div class="ipt-txt-box error">
+          <input type="text" name="money" maxlength="5" id="txtMoney" placeholder="请填写总金额(最低5元)" autocomplete="off">
+          <span class="after-txt">元</span>
+        </div>
+        <p class="notice">红包金额最低5元</p>
+      </div>
+      <div class="balance-info-box">
+        <label>余额支付</label>
+        <div class="balance-info">
+          当前余额<span class="balance">3.43</span>元
+          <a href="https://i.csdn.net/#/wallet/balance/recharge" class="link-charge" target="_blank">前往充值 ></a>
+        </div>
+      </div>
+      <div class="opt-box">
+        <div class="pay-info">
+          需支付：<span class="price">10.00</span>元
+        </div>
+        <button type="button" class="ml-auto btn-cancel">取消</button>
+        <button type="button" class="ml8 btn-submit" disabled="true">确定</button>
+      </div>
+    </form>
+  </div>
+</div>
+</div>
+
+<div class="redEnvolope" id="redEnvolope">
+  <div class="env-box">
+    <div class="env-container">
+      <div class="pre-open" id="preOpen">
+        <div class="top">
+          <header>
+            <img class="clearTpaErr" :src="redpacketAuthor.avatar" alt="" />
+            <div class="author">成就一亿技术人!</div>
+          </header>
+          <div class="bot-icon"></div>
+        </div>
+        <footer>
+          <div class="red-openbtn open-start"></div>
+          <div class="tip">
+            领取后你会自动成为博主和红包主的粉丝
+            <a class="rule" target="_blank">规则</a>
+          </div>
+        </footer>
+      </div>
+      <div class="opened" id="opened">
+        <div class="bot-icon">
+          <header>
+            <a class="creatorUrl" href="" target="_blank">
+              <img class="clearTpaErr" src="https://profile-avatar.csdnimg.cn/default.jpg!2" alt="" />
+            </a>
+            <div class="author">
+              <div class="tt">hope_wisdom</div> 发出的红包
+            </div>
+          </header>
+        </div>
+        <div class="receive-box">
+          <header></header>
+          <div class="receive-list">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="close-btn"></div>
+  </div>
+</div>
+<div id="rewardNew" class="reward-popupbox-new">
+	<p class="rewad-title">打赏作者<span class="reward-close"><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/closeBt.png"></span></p>
+	<dl class="profile-box">
+		<dd>
+		<a href="https://blog.csdn.net/weixin_49122920" data-report-click='{"mod":"popu_379","dest":"https://blog.csdn.net/weixin_49122920","ab":"new"}'>
+			<img src="https://i-avatar.csdnimg.cn/45c16f533ac6499f894290957886342b_weixin_49122920.jpg!1" class="avatar_pic">
+		</a>
+		</dd>
+		<dt>
+			<p class="blog-name">至顶头条</p>
+			<p class="blog-discript">你的鼓励将是我创作的最大动力</p>
+		</dt>
+	</dl>
+	<div class="reward-box-new">
+			<div class="reward-content"><div class="reward-right"></div></div>
+	</div>
+	<div class="money-box">
+    <span class="choose-money choosed" data-id="1">¥1</span>
+    <span class="choose-money " data-id="2">¥2</span>
+    <span class="choose-money " data-id="4">¥4</span>
+    <span class="choose-money " data-id="6">¥6</span>
+    <span class="choose-money " data-id="10">¥10</span>
+    <span class="choose-money " data-id="20">¥20</span>
+	</div>
+	<div class="sure-box">
+		<div class="sure-box-money">
+			<div class="code-box">
+				<div class="code-num-box">
+					<span class="code-name">扫码支付：</span><span class="code-num">¥1</span>
+				</div>
+				<div class="code-img-box">
+					<div class="renovate">
+					<img src="https://csdnimg.cn/release/blogv2/dist/pc/img/pay-time-out.png">
+					<span>获取中</span>
+					</div>
+				</div>
+				<div class="code-pay-box">
+					<img src="https://csdnimg.cn/release/blogv2/dist/pc/img/newWeiXin.png" alt="">
+					<img src="https://csdnimg.cn/release/blogv2/dist/pc/img/newZhiFuBao.png" alt="">
+					<span>扫码支付</span>
+				</div>
+			</div>
+		</div>
+		<div class="sure-box-blance">
+			<p class="tip">您的余额不足，请更换扫码支付或<a target="_blank" data-report-click='{"mod":"1597646289_003","spm":"1001.2101.3001.4302"}' href="https://i.csdn.net/#/wallet/balance/recharge?utm_source=RewardVip" class="go-invest">充值</a></p>
+			<p class="is-have-money"><a class="reward-sure">打赏作者</a></p>
+		</div>
+	</div>
+</div>
+      
+      <div class="pay-code">
+      <div class="pay-money">实付<span class="pay-money-span" data-nowprice='' data-oldprice=''>元</span></div>
+      <div class="content-blance"><a class="blance-bt" href="javascript:;">使用余额支付</a></div>
+      <div class="content-code">
+        <div id="payCode" data-id="">
+          <div class="renovate">
+            <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/pay-time-out.png">
+            <span>点击重新获取</span>
+          </div>
+        </div>
+        <div class="pay-style"><span><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/weixin.png"></span><span><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/zhifubao.png"></span><span><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/jingdong.png"></span><span class="text">扫码支付</span></div>
+      </div>
+      <div class="bt-close">
+        <svg t="1567152543821" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="10924" xmlns:xlink="http://www.w3.org/1999/xlink" width="12" height="12">
+          <defs>
+            <style type="text/css"></style>
+          </defs>
+          <path d="M512 438.378667L806.506667 143.893333a52.032 52.032 0 1 1 73.6 73.621334L585.621333 512l294.485334 294.485333a52.074667 52.074667 0 0 1-73.6 73.642667L512 585.621333 217.514667 880.128a52.053333 52.053333 0 1 1-73.621334-73.642667L438.378667 512 143.893333 217.514667a52.053333 52.053333 0 1 1 73.621334-73.621334L512 438.378667z" fill="" p-id="10925"></path>
+        </svg>
+      </div>
+      <div class="pay-balance">
+        <input type="radio" class="pay-code-radio" data-type="details">
+        <span class="span">钱包余额</span>
+          <span class="balance" style="color:#FC5531;font-size:14px;">0</span>
+          <div class="pay-code-tile">
+            <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/pay-help.png" alt="">
+            <div class="pay-code-content">
+              <div class="span">
+                <p class="title">抵扣说明：</p>
+                <p> 1.余额是钱包充值的虚拟货币，按照1:1的比例进行支付金额的抵扣。<br> 2.余额无法直接购买下载，可以购买VIP、付费专栏及课程。</p>
+              </div>
+            </div>
+          </div>
+      </div>
+      <a class="pay-balance-con" href="https://i.csdn.net/#/wallet/balance/recharge" target="_blank"><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/recharge.png" alt=""><span>余额充值</span></a>
+    </div>
+    <div style="display:none;">
+      <img src="" onerror='setTimeout(function(){if(!/(csdn.net|iteye.com|baiducontent.com|googleusercontent.com|360webcache.com|sogoucdn.com|bingj.com|baidu.com)$/.test(window.location.hostname)){window.location.href="\x68\x74\x74\x70\x73\x3a\x2f\x2f\x77\x77\x77\x2e\x63\x73\x64\x6e\x2e\x6e\x65\x74"}},3000);'>
+    </div>
+    <div class="keyword-dec-box" id="keywordDecBox"></div>
+  </body>
+    <!-- 富文本柱状图  -->
+    <link rel="stylesheet" href="https://csdnimg.cn/release/blog_editor_html/release1.6.12/ckeditor/plugins/chart/chart.css" />
+    <script type="text/javascript" src="https://csdnimg.cn/release/blog_editor_html/release1.6.12/ckeditor/plugins/chart/lib/chart.min.js"></script>
+    <script type="text/javascript" src="https://csdnimg.cn/release/blog_editor_html/release1.6.12/ckeditor/plugins/chart/widget2chart.js"></script>
+  <script src="https://csdnimg.cn/release/blogv2/dist/components/js/axios-83fa28cedf.min.js" type="text/javascript"></script>
+  <script src="https://csdnimg.cn/release/blogv2/dist/components/js/pc_wap_highlight-8defd55d6e.min.js" type="text/javascript"></script>
+  <script src="https://csdnimg.cn/release/blogv2/dist/components/js/pc_wap_common-3c7b273c43.min.js" type="text/javascript"></script>
+  <script src="https://csdnimg.cn/release/blogv2/dist/components/js/edit_copy_code-43c2d050a0.min.js" type="text/javascript"></script>
+  <script src="https://g.csdnimg.cn/lib/cboxEditor/1.1.6/embed-editor.min.js" type="text/javascript"></script>
+  <link rel="stylesheet" href="https://g.csdnimg.cn/lib/cboxEditor/1.1.6/embed-editor.min.css">
+  <link rel="stylesheet" href="https://csdnimg.cn/release/blog_editor_html/release1.6.12/ckeditor/plugins/codesnippet/lib/highlight/styles/atom-one-dark.css">
+  <script src="https://g.csdnimg.cn/user-accusation/1.0.6/user-accusation.js" type="text/javascript"></script>
+  <script>
+    // 全局声明
+    if (window.csdn === undefined) {
+      window.csdn = {};
+    }
+    var sideToolbarOpt = {}
+    $(function() {
+      $(document).on('click', "#toolReportBtnHideNormal,#toolReportBtnHide", function() {
+        window.csdn.loginBox.key({
+          biz: 'blog',
+          subBiz: 'other_service',
+          cb: function() {
+            window.csdn.feedback({
+              "type": 'blog',
+              "rtype": 'article',
+              "rid": articleId,
+              "reportedName": username,
+              "submitOptions": {
+                "title": articleTitle,
+                "contentUrl": articleDetailUrl
+              },
+              "callback": function() {
+                showToast({
+                  text: "感谢您的举报，我们会尽快审核！",
+                  bottom: '10%',
+                  zindex: 9000,
+                  speed: 500,
+                  time: 1500
+                })
+              }
+            })
+          }
+        })
+      });
+    })
+      window.csdn.sideToolbar = {
+        options: {
+          ...sideToolbarOpt,
+          theme: 'white',
+        }
+      }
+  </script>
+    <script src="https://g.csdnimg.cn/baidu-search/1.0.12/baidu-search.js" type="text/javascript"></script>
+  <script src="https://csdnimg.cn/release/download/old_static/js/qrcode.js"></script>
+  <script src="https://g.csdnimg.cn/lib/qrcode/1.0.0/qrcode.min.js"></script>
+  <script src="https://g.csdnimg.cn/user-ordercart/3.0.1/user-ordercart.js" type="text/javascript"></script>
+  <script src="https://g.csdnimg.cn/user-ordertip/5.0.3/user-ordertip.js" type="text/javascript"></script>
+  <script src="https://g.csdnimg.cn/order-payment/4.0.5/order-payment.js" type="text/javascript"></script>
+  <script src="https://g.csdnimg.cn/order-payment/3.1.1-download-e-isolated/order-payment.js" type="text/javascript"></script>
+  <script src="https://csdnimg.cn/release/blogv2/dist/pc/js/common-65075e27a8.min.js" type="text/javascript"></script>
+  <script src="https://csdnimg.cn/release/blogv2/dist/pc/js/detail-ced070e6a1.min.js" type="text/javascript"></script>
+  <script src="https://csdnimg.cn/release/blogv2/dist/pc/js/column-e34be969c0.min.js" type="text/javascript"></script>
+    <script src="https://g.csdnimg.cn/side-toolbar/3.6/side-toolbar.js" type="text/javascript"></script>
+  <script src="https://g.csdnimg.cn/copyright/1.0.4/copyright.js" type="text/javascript"></script>
+  <script>
+    $(".MathJax").remove();
+    if ($('div.markdown_views pre.prettyprint code.hljs').length > 0) {
+      $('div.markdown_views')[0].className = 'markdown_views';
+    }
+  </script>
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true,
+        processClass: "mathjax",
+        ignoreClass: "title-article|no-mathjax",
+        preview: "none"
+      },
+      
+      // 优先使用 HTML-CSS 而非 NativeMML
+      "HTML-CSS": {
+        preferredFont: "STIX",        // 使用 STIX 字体
+        availableFonts: ["STIX", "TeX"],
+        webFont: "STIX-Web",
+        scale: 100,                   // 放大 20%
+        minScaleAdjust: 100,
+        linebreaks: { 
+          automatic: true, 
+          width: "90% container" 
+        },
+        matchFontHeight: true,
+        styles: {
+          ".MathJax": {
+            "font-weight": "500 !important"  // 加粗
+          }
+        }
+      },
+      
+      // 禁用 NativeMML（浏览器原生渲染质量不好）
+      NativeMML: {
+        scale: 100
+      },
+      
+      // 设置优先级：HTML-CSS > SVG > NativeMML
+      menuSettings: {
+        renderer: "HTML-CSS"
+      },
+      
+      messageStyle: "none"
+    });
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+  </script>
+  <script src="https://g.csdnimg.cn/static/mathjax-2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script>
+window.csdnQualityGuideFreeArticle = true;
+</script>
+<link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/pc/css/quality_article_guide_enter-0f0dc239a9.min.css">
+<script type="text/javascript" crossorigin src="https://g.csdnimg.cn/common/csdn-login-box/csdn-login-box.js"></script></html>

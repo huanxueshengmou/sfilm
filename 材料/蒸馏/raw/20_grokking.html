@@ -1,0 +1,1185 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization</title>
+<!--Generated on Mon Aug  3 03:51:57 2026 by LaTeXML (version 0.8.8) http://dlmf.nist.gov/LaTeXML/.-->
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="/static/browse/0.3.4/css/arxiv-html-papers-20260131.css" type="text/css">
+<script src="/static/browse/0.3.4/js/arxiv-html-papers-20260131.js"></script>
+<script>
+  // Restore the saved color scheme preference, or
+  // enact the browser preference if "automatic", 
+  // without expecting DOM load to have completed.
+  //
+  // Also restore any saved readingmode and ToC display preferences.
+  function initializeReadingPreferences() {
+    let saved_theme = localStorage.getItem("ar5iv_theme") || "automatic";
+    if (saved_theme === "automatic") {
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        saved_theme = "dark";
+      }
+    }
+    if (saved_theme == "dark") {
+      document.documentElement.setAttribute("data-theme", "dark");
+    } else {
+      document.documentElement.setAttribute("data-theme", "light");
+    }
+
+    const tocDisplay = localStorage.getItem('arxiv_html_paper_toc_display');
+    if (tocDisplay) {
+      document.documentElement.setAttribute("data-toc-display", tocDisplay);
+    }
+    const readingMode = localStorage.getItem('arxiv_html_paper_reading_mode');
+    if (readingMode) {
+      document.documentElement.setAttribute("data-reading-mode", readingMode);
+    }
+    // Pre-apply spinout-banner dismissal here, before the banner paints, so it
+    // never flashes in only to be hidden later by the deferred arxiv-header.js.
+    // Key matches arxiv-header.js: "arxiv-banner-dismissed:" + data-banner-name.
+    if (localStorage.getItem('arxiv-banner-dismissed:spinout-nonprofit')) {
+      document.documentElement.setAttribute("data-banner-dismissed", "");
+    }
+  }
+  // Run as soon as JS starts, to minimize repainting
+  initializeReadingPreferences();
+</script>
+<link rel="apple-touch-icon" sizes="180x180"
+  href="/static/browse/0.3.4/images/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32"
+  href="/static/browse/0.3.4/images/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16"
+  href="/static/browse/0.3.4/images/icons/favicon-16x16.png">
+<link rel="manifest" href="/static/browse/0.3.4/images/icons/site.webmanifest">
+<link rel="mask-icon" href="/static/browse/0.3.4/images/icons/safari-pinned-tab.svg" color="#5bbad5">
+<link rel="stylesheet" type="text/css" media="screen" href="https://use.typekit.net/utz6mli.css"><link rel="stylesheet" type="text/css" media="screen"
+  href="/static/base/1.0.1/css/arxiv-header-footer.css?v=20260626"><style>
+  /* Banner pre-dismissal (set above before paint -> no flash-then-hide) and
+     reading-mode chrome hiding. */
+  html[data-banner-dismissed] .ds-announcement { display: none; }
+  html[data-reading-mode="enabled"] .ds-announcement,
+  html[data-reading-mode="enabled"] .ds-site-footer { display: none; }
+  /* Keep the announcement text dark on the Open-Blue band in both colour themes
+     (otherwise it inherits the paper's warm-wash text in dark mode and washes out). */
+  .ds-announcement-text { color: var(--arxiv-ink, #1c1a17); }
+</style>
+<script defer src="/static/base/1.0.1/js/arxiv-header.js?v=20260626"></script>
+</head>
+<body>
+<dialog id="modal-form" aria-labelledby="modal-title" closedby="any">
+  <form id="modal-form-content" method="dialog" enctype="multipart/form-data">
+    <header class="modal-header">
+      <h5 id="modal-title" class="modal-title">Report GitHub Issue</h5>
+      <button type="submit" formnovalidate class="modal-close" aria-label="Close">×</button>
+    </header>
+
+    <div class="modal-body">
+      <label for="form_title">Title:</label>
+      <input class="form-control" id="form_title" name="form_title" required placeholder="Enter title">
+
+      <p id="selectedTextModalDescription" hidden>Content selection saved. Describe the issue below:</p>
+
+      <label for="description">Description:</label>
+      <textarea class="form-control" id="description" name="description" required maxlength="500"
+        placeholder="500 characters maximum"></textarea>
+    </div>
+
+    <footer class="modal-footer">
+      <button type="submit" value="internal-report" class="sr-only modal-submit">Submit without GitHub</button>
+      <button type="submit" value="github-report" class="modal-submit">Submit in GitHub</button>
+    </footer>
+  </form>
+</dialog><div class="ds-announcement" id="announcement-banner" role="region" aria-label="Announcement"
+    data-banner-name="spinout-nonprofit">
+    <img class="ds-announcement-glyph" src="/static/base/1.0.1/images/icons/smileybones-small.svg" alt="" aria-hidden="true">
+    <span class="ds-announcement-text">arXiv is now an independent nonprofit!</span>
+    <a class="ds-announcement-link" href="https://info.arxiv.org/about">Learn more</a>
+    <button type="button" class="ds-announcement-close" aria-label="Dismiss announcement">&times;</button>
+  </div>
+
+<header class="arxiv-html-header">
+  <div class="html-header-logo">
+    <a href="/"><img alt="arXiv logo" class="logo desktop-only" width="100"
+        src="/static/base/1.0.1/images/arxiv-logo-primary-light.svg">
+      <span class="sr-only">Back to arXiv</span>
+    </a>
+  </div>
+  <!--TOC, dark mode, links-->
+  <nav class="html-header-nav">
+    <a class="header-button hover-effect desktop-only" href="https://info.arxiv.org/about/accessible_HTML.html"
+      target="_blank">Why HTML?</a>
+    <a class="header-button" title="Report an Issue" href="#" title="Report an issue"
+      onclick="event.preventDefault(); showModalForm();">
+      <svg role="presentation" class="mobile-only toggle-icon" aria-hidden="true" height="1.25rem"
+        viewBox="0 0 640 640">
+        <path
+          d="M224 160C224 107 267 64 320 64C373 64 416 107 416 160L416 163.6C416 179.3 403.3 192 387.6 192L252.5 192C236.8 192 224.1 179.3 224.1 163.6L224.1 160zM569.6 172.8C580.2 186.9 577.3 207 563.2 217.6L465.4 290.9C470.7 299.8 474.7 309.6 477.2 320L576 320C593.7 320 608 334.3 608 352C608 369.7 593.7 384 576 384L480 384L480 416C480 418.6 479.9 421.3 479.8 423.9L563.2 486.4C577.3 497 580.2 517.1 569.6 531.2C559 545.3 538.9 548.2 524.8 537.6L461.7 490.3C438.5 534.5 395.2 566.5 344 574.2L344 344C344 330.7 333.3 320 320 320C306.7 320 296 330.7 296 344L296 574.2C244.8 566.5 201.5 534.5 178.3 490.3L115.2 537.6C101.1 548.2 81 545.3 70.4 531.2C59.8 517.1 62.7 497 76.8 486.4L160.2 423.9C160.1 421.3 160 418.7 160 416L160 384L64 384C46.3 384 32 369.7 32 352C32 334.3 46.3 320 64 320L162.8 320C165.3 309.6 169.3 299.8 174.6 290.9L76.8 217.6C62.7 207 59.8 186.9 70.4 172.8C81 158.7 101.1 155.8 115.2 166.4L224 248C236.3 242.9 249.8 240 264 240L376 240C390.2 240 403.7 242.8 416 248L524.8 166.4C538.9 155.8 559 158.7 569.6 172.8z" />
+      </svg>
+      <span class="desktop-only">Report Issue</span></a>
+    <!--back to abstract-->
+    <a class="header-button" title="Back to abstract page" aria-label="Back to abstract page"
+      href="/abs/2609.20166v1">
+      <svg class="mobile-only toggle-icon" role="presentation" height="1.25rem" viewBox="0 0 512 512" fill="#ffffff"
+        aria-hidden="true">
+        <path
+          d="M502.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L402.7 224 192 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l210.7 0-73.4 73.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l128-128zM160 96c17.7 0 32-14.3 32-32s-14.3-32-32-32L96 32C43 32 0 75 0 128L0 384c0 53 43 96 96 96l64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0c-17.7 0-32-14.3-32-32l0-256c0-17.7 14.3-32 32-32l64 0z">
+        </path>
+      </svg>
+      <span class="desktop-only">Back to Abstract</span>
+    </a>
+    <!-- PDF download link -->
+    <a class="header-button" title="Download PDF" href="/pdf/2609.20166v1"
+      target="_blank">
+      <svg class="mobile-only toggle-icon" role="presentation" height="1.25rem" viewBox="0 0 576 542">
+        <path
+          d="M208 48L96 48c-8.8 0-16 7.2-16 16l0 384c0 8.8 7.2 16 16 16l80 0 0 48-80 0c-35.3 0-64-28.7-64-64L32 64C32 28.7 60.7 0 96 0L229.5 0c17 0 33.3 6.7 45.3 18.7L397.3 141.3c12 12 18.7 28.3 18.7 45.3l0 149.5-48 0 0-128-88 0c-39.8 0-72-32.2-72-72l0-88zM348.1 160L256 67.9 256 136c0 13.3 10.7 24 24 24l68.1 0zM240 380l32 0c33.1 0 60 26.9 60 60s-26.9 60-60 60l-12 0 0 28c0 11-9 20-20 20s-20-9-20-20l0-128c0-11 9-20 20-20zm32 80c11 0 20-9 20-20s-9-20-20-20l-12 0 0 40 12 0zm96-80l32 0c28.7 0 52 23.3 52 52l0 64c0 28.7-23.3 52-52 52l-32 0c-11 0-20-9-20-20l0-128c0-11 9-20 20-20zm32 128c6.6 0 12-5.4 12-12l0-64c0-6.6-5.4-12-12-12l-12 0 0 88 12 0zm76-108c0-11 9-20 20-20l48 0c11 0 20 9 20 20s-9 20-20 20l-28 0 0 24 28 0c11 0 20 9 20 20s-9 20-20 20l-28 0 0 44c0 11-9 20-20 20s-20-9-20-20l0-128z" />
+      </svg>
+      <span class="desktop-only">Download PDF</span></a>
+    <!-- navigational table of contents toggle -->
+    <a class="header-button toggle-icon" href="javascript:toggleNavTOC();" title="Toggle navigation"
+      aria-label="Toggle navigation">
+      <svg height="1.25rem" role="presentation" viewBox="0 0 512 512">
+        <path
+          d="M40 48C26.7 48 16 58.7 16 72v48c0 13.3 10.7 24 24 24H88c13.3 0 24-10.7 24-24V72c0-13.3-10.7-24-24-24H40zM192 64c-17.7 0-32 14.3-32 32s14.3 32 32 32H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zM16 232v48c0 13.3 10.7 24 24 24H88c13.3 0 24-10.7 24-24V232c0-13.3-10.7-24-24-24H40c-13.3 0-24 10.7-24 24zM40 368c-13.3 0-24 10.7-24 24v48c0 13.3 10.7 24 24 24H88c13.3 0 24-10.7 24-24V392c0-13.3-10.7-24-24-24H40z">
+        </path>
+      </svg>
+    </a>
+    <!--- collapsable header / reading mode toggle -->
+    <a class="header-button toggle-icon" href="javascript:toggleReadingMode();"
+      title="Disable reading mode, show header and footer">
+      <svg role="presentation" height="1.25rem"
+        viewBox="0 0 448 512"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.-->
+        <path
+          d="M32 32C14.3 32 0 46.3 0 64l0 96c0 17.7 14.3 32 32 32s32-14.3 32-32l0-64 64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L32 32zM64 352c0-17.7-14.3-32-32-32S0 334.3 0 352l0 96c0 17.7 14.3 32 32 32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0 0-64zM320 32c-17.7 0-32 14.3-32 32s14.3 32 32 32l64 0 0 64c0 17.7 14.3 32 32 32s32-14.3 32-32l0-96c0-17.7-14.3-32-32-32l-96 0zM448 352c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 64-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c17.7 0 32-14.3 32-32l0-96z" />
+      </svg>
+    </a>
+    <!--- colored theme toggle -->
+    <button type="button" class="header-button color-tog" onclick="toggleColorScheme();" title="Toggle dark/light mode" aria-label="Toggle color scheme">
+      <span class="toggle-icon automatic-tog" aria-hidden="true">
+        <svg role="presentation" height="1.25rem" viewBox="0 0 24 24">
+          <path
+            d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9h-1.9M20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69m-9.15 3.96h2.3L12 9l-1.15 3.65Z">
+          </path>
+        </svg>
+      </span>
+      <span class="toggle-icon light-tog" aria-hidden="true">
+        <svg role="presentation" height="1.25rem" viewBox="0 0 24 24">
+          <path
+            d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z">
+          </path>
+        </svg>
+      </span>
+      <span class="toggle-icon dark-tog" aria-hidden="true">
+        <svg role="presentation" height="1.25rem" viewBox="0 0 24 24">
+          <path
+            d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12c0-2.42-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z">
+          </path>
+        </svg>
+      </span>
+    </button>
+  </nav>
+</header><nav class="ltx_page_navbar">
+<nav class="ltx_TOC">
+<ol class="ltx_toclist">
+<li class="ltx_tocentry ltx_tocentry_abstract"><a href="#abstract1" title="In Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_title">Abstract</span></a></li>
+<li class="ltx_tocentry ltx_tocentry_section"><a href="#S1" title="In Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">1 </span>Introduction</span></a></li>
+<li class="ltx_tocentry ltx_tocentry_section">
+<a href="#S2" title="In Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">2 </span>The four capabilities of the fully-enumerable regime</span></a>
+<ol class="ltx_toclist ltx_toclist_section">
+<li class="ltx_tocentry ltx_tocentry_paragraph"><a href="#S2.SS0.SSS0.Px1" title="In 2 The four capabilities of the fully-enumerable regime ‣ Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_title">(a) Theorem-grade ceilings (from enumerability).</span></a></li>
+<li class="ltx_tocentry ltx_tocentry_paragraph"><a href="#S2.SS0.SSS0.Px2" title="In 2 The four capabilities of the fully-enumerable regime ‣ Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_title">(b) Invariant-preserving task surgery (from enumerability).</span></a></li>
+<li class="ltx_tocentry ltx_tocentry_paragraph"><a href="#S2.SS0.SSS0.Px3" title="In 2 The four capabilities of the fully-enumerable regime ‣ Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_title">(c) Full-weight observation (from smallness).</span></a></li>
+<li class="ltx_tocentry ltx_tocentry_paragraph"><a href="#S2.SS0.SSS0.Px4" title="In 2 The four capabilities of the fully-enumerable regime ‣ Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_title">(d) Cheap ensemble statistics (from smallness).</span></a></li>
+</ol>
+</li>
+<li class="ltx_tocentry ltx_tocentry_section">
+<a href="#S3" title="In Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">3 </span>The conservation study</span></a>
+<ol class="ltx_toclist ltx_toclist_section">
+<li class="ltx_tocentry ltx_tocentry_subsection"><a href="#S3.SS1" title="In 3 The conservation study ‣ Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">3.1 </span>Question and stakes</span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsection"><a href="#S3.SS2" title="In 3 The conservation study ‣ Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">3.2 </span>Protocol identity</span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsection">
+<a href="#S3.SS3" title="In 3 The conservation study ‣ Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">3.3 </span>Three laws and frozen verdicts</span></a>
+<ol class="ltx_toclist ltx_toclist_subsection">
+<li class="ltx_tocentry ltx_tocentry_paragraph"><a href="#S3.SS3.SSS0.Px1" title="In 3.3 Three laws and frozen verdicts ‣ 3 The conservation study ‣ Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_title">L1 (recoverability ceiling).</span></a></li>
+<li class="ltx_tocentry ltx_tocentry_paragraph"><a href="#S3.SS3.SSS0.Px2" title="In 3.3 Three laws and frozen verdicts ‣ 3 The conservation study ‣ Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_title">L2 (role-conflict delay).</span></a></li>
+<li class="ltx_tocentry ltx_tocentry_paragraph"><a href="#S3.SS3.SSS0.Px3" title="In 3.3 Three laws and frozen verdicts ‣ 3 The conservation study ‣ Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_title">L3 (weight-decay response).</span></a></li>
+</ol>
+</li>
+</ol>
+</li>
+<li class="ltx_tocentry ltx_tocentry_section">
+<a href="#S4" title="In Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">4 </span>Results</span></a>
+<ol class="ltx_toclist ltx_toclist_section">
+<li class="ltx_tocentry ltx_tocentry_subsection"><a href="#S4.SS1" title="In 4 Results ‣ Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">4.1 </span>L1: conserved</span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsection">
+<a href="#S4.SS2" title="In 4 Results ‣ Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">4.2 </span>L2: conserved, with an informative scale map</span></a>
+<ol class="ltx_toclist ltx_toclist_subsection">
+<li class="ltx_tocentry ltx_tocentry_paragraph"><a href="#S4.SS2.SSS0.Px1" title="In 4.2 L2: conserved, with an informative scale map ‣ 4 Results ‣ Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_title">Controls: neither learning rate nor budget explains the deficit.</span></a></li>
+</ol>
+</li>
+<li class="ltx_tocentry ltx_tocentry_subsection"><a href="#S4.SS3" title="In 4 Results ‣ Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">4.3 </span>L3: deformed</span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsection"><a href="#S4.SS4" title="In 4 Results ‣ Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">4.4 </span>Control: the environment does not move rates</span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsection"><a href="#S4.SS5" title="In 4 Results ‣ Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">4.5 </span>Verdict summary</span></a></li>
+</ol>
+</li>
+<li class="ltx_tocentry ltx_tocentry_section"><a href="#S5" title="In Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">5 </span>What the instrument makes possible</span></a></li>
+<li class="ltx_tocentry ltx_tocentry_section">
+<a href="#S6" title="In Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">6 </span>Related work</span></a>
+<ol class="ltx_toclist ltx_toclist_section">
+<li class="ltx_tocentry ltx_tocentry_paragraph"><a href="#S6.SS0.SSS0.Px1" title="In 6 Related work ‣ Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_title">What we do not claim as new.</span></a></li>
+<li class="ltx_tocentry ltx_tocentry_paragraph"><a href="#S6.SS0.SSS0.Px2" title="In 6 Related work ‣ Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_title">What is new here.</span></a></li>
+</ol>
+</li>
+<li class="ltx_tocentry ltx_tocentry_section"><a href="#S7" title="In Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">7 </span>Limitations</span></a></li>
+<li class="ltx_tocentry ltx_tocentry_bibliography"><a href="#bib" title="In Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_title">References</span></a></li>
+</ol></nav>
+</nav>
+<div class="ltx_page_main">
+<div id="infobox" class="infobox">
+  <a id="license-tr" href="https://info.arxiv.org/help/license/index.html#licenses-available">
+    License: CC BY 4.0
+  </a>
+  <div id="watermark-tr">
+arXiv:2609.20166v1 [cs.LG] 03 Aug 2026</div>
+</div><div class="ltx_page_content">
+<article class="ltx_document ltx_authors_1line">
+<h1 class="ltx_title ltx_title_document">Small Enough to Know Everything:
+<br class="ltx_break">The Fully-Enumerable Transformer as an Instrument
+<br class="ltx_break">for the Science of Delayed Generalization</h1>
+<div class="ltx_authors">
+<span class="ltx_creator ltx_role_author">
+<span class="ltx_personname">Yoshiyuki Ootani
+<br class="ltx_break">Independent Researcher
+<br class="ltx_break"><span id="id1.1.id1" class="ltx_text ltx_font_typewriter">info@ootanl.com</span>
+</span></span>
+</div>
+
+<div id="abstract1" class="ltx_abstract">
+<h6 class="ltx_title ltx_title_abstract">Abstract</h6>
+<p class="ltx_p">Tiny transformers trained on fully-enumerable tasks occupy an unusual position in
+the study of grokking: every input can be evaluated, every generalization ceiling
+can be computed exactly, and hundreds of seeds cost minutes. We argue that this
+regime is best understood not as a scaled-down imitation of large-model training
+but as a <em class="ltx_emph ltx_font_italic">scientific instrument</em> with four capabilities that approximate
+settings cannot offer: (a) theorem-grade generalization ceilings that turn
+“can this split be generalized?” into a computed, falsifiable bound;
+(b) invariant-preserving task surgery, which manipulates a single structural
+variable while provably fixing all others; (c) direct observation of every weight
+without probes; and (d) survival-time statistics over 30–300 seeds that recast
+“does not grok” as a censored observation rather than a failure to replicate.
+The obvious objection is that laws characterized at <math class="ltx_Math" alttext="10^{4}" display="inline" intent=":literal"><semantics><msup><mn>10</mn><mn>4</mn></msup><annotation encoding="application/x-tex">10^{4}</annotation></semantics></math> parameters may not mean
+anything beyond them. We answer it with a preregistered conservation study: three
+task-side laws established at 12K parameters—an exact recoverability-ceiling law,
+a role-conflict delay law, and a weight-decay response law—are re-measured, under
+an identical from-scratch protocol at 12K, 1M, and 50M parameters
+(<math class="ltx_math_unparsed" alttext="4{,}000\times" display="inline" intent=":literal"><semantics><mrow><mn>4</mn><mo>,</mo><mn>000</mn><mo lspace="0.222em">×</mo></mrow><annotation encoding="application/x-tex">4{,}000\times</annotation></semantics></math> span; 360 new runs plus a 44-run preregistered control arm). The ceiling law and the delay law are
+conserved (0/144 Holm-corrected ceiling violations; Spearman <math class="ltx_Math" alttext="\rho\geq 0.75" display="inline" intent=":literal"><semantics><mrow><mi>ρ</mi><mo>≥</mo><mn>0.75</mn></mrow><annotation encoding="application/x-tex">\rho\geq 0.75</annotation></semantics></math>
+between role-conflict distance and grokking onset at every scale, permutation
+<math class="ltx_Math" alttext="p&lt;10^{-4}" display="inline" intent=":literal"><semantics><mrow><mi>p</mi><mo>&lt;</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>4</mn></mrow></msup></mrow><annotation encoding="application/x-tex">p&lt;10^{-4}</annotation></semantics></math>), while the weight-decay law deforms systematically: its response
+steepens with scale in a direction consistent with larger models tolerating
+stronger regularization.
+Conservation was not assumed but tested against criteria frozen before data
+collection, and one law’s deformation shows the test could have failed. Together
+these results license the fully-enumerable transformer as a model organism for
+the task-side laws of delayed generalization: what it measures exactly, larger
+models largely obey—and where they deviate, the deviation is itself lawful
+and measurable.</p>
+</div>
+<section id="S1" class="ltx_section">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section">1 </span>Introduction</h2>
+
+<div id="S1.p1" class="ltx_para">
+<p id="S1.p1.1" class="ltx_p">Grokking—delayed generalization long after training accuracy
+saturates <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib1" title="" class="ltx_ref">1</a>]</cite>—has become a standard lens on how neural
+networks form structured solutions. Most quantitative work in this literature
+already lives in a small, discrete world: modular arithmetic over ten digits,
+permutation groups, sparse parities. What is rarely made explicit is that this
+setting permits a mode of experimentation that is impossible anywhere else in deep
+learning. When the input space has a few hundred cells and the model has <math id="S1.p1.1.m1" class="ltx_Math" alttext="10^{4}" display="inline" intent=":literal"><semantics><msup><mn>10</mn><mn>4</mn></msup><annotation encoding="application/x-tex">10^{4}</annotation></semantics></math>
+parameters, <em id="S1.p1.1.1" class="ltx_emph ltx_font_italic">nothing about the task or the model is hidden</em>: the entire
+input–label table can be enumerated, the Bayes-optimal accuracy of any train/test
+split can be computed exactly, and an experiment with three hundred seeds
+finishes over lunch.</p>
+</div>
+<div id="S1.p2" class="ltx_para">
+<p id="S1.p2.1" class="ltx_p">This paper makes two claims. The first is methodological: the fully-enumerable
+regime should be treated as a scientific <em id="S1.p2.1.1" class="ltx_emph ltx_font_italic">instrument</em>—a microscope for
+delayed generalization—with four capabilities that we state precisely in
+Section <a href="#S2" title="2 The four capabilities of the fully-enumerable regime ‣ Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_tag">2</span></a> and that degrade or vanish the moment enumeration is
+lost. Two of these capabilities (exact ceilings and task surgery) come from
+enumerability of the task; the other two (full-weight observation and cheap
+ensemble statistics) come from smallness of the model. The combination is what
+makes the instrument: exact predictions on one side, exact measurements on the
+other.</p>
+</div>
+<div id="S1.p3" class="ltx_para">
+<p id="S1.p3.1" class="ltx_p">The second claim is empirical and answers the objection the first claim invites:
+<em id="S1.p3.1.1" class="ltx_emph ltx_font_italic">does anything measured at <math id="S1.p3.1.1.m1" class="ltx_Math" alttext="10^{4}" display="inline" intent=":literal"><semantics><msup><mn>10</mn><mn>4</mn></msup><annotation encoding="application/x-tex">10^{4}</annotation></semantics></math> parameters constrain models three orders of
+magnitude larger?</em> We formalize this as a conservation study
+(Section <a href="#S3" title="3 The conservation study ‣ Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_tag">3</span></a>). Three laws characterized at 12K
+parameters <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib2" title="" class="ltx_ref">2</a>]</cite>—(L1) an exact recoverability-ceiling law,
+(L2) a role-conflict delay law, and (L3) a non-monotone weight-decay response—are
+re-measured at 12K, 1M, and 50M parameters under a single identical protocol:
+same tasks, same splits, same tokenization, same optimizer, same budget, same
+multi-seed survival analysis, all from scratch (the 12K arm is a
+matched-protocol replication, not a reuse of the prior records). For each law we froze, before collecting any
+cross-scale data, a three-way verdict rule: <em id="S1.p3.1.2" class="ltx_emph ltx_font_italic">conserved</em>, <em id="S1.p3.1.3" class="ltx_emph ltx_font_italic">deformed</em> (the
+ordering survives but the quantitative form shifts systematically), or
+<em id="S1.p3.1.4" class="ltx_emph ltx_font_italic">broken</em>.</p>
+</div>
+<div id="S1.p4" class="ltx_para">
+<p id="S1.p4.2" class="ltx_p">The results (Section <a href="#S4" title="4 Results ‣ Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_tag">4</span></a>) are: L1 conserved—the exact ceiling is
+never exceeded in 144 Holm-corrected tests and the ceiling-ordering of grok rates
+is monotone at every scale; L2 conserved—role-conflict distance predicts
+grokking onset with Spearman <math id="S1.p4.1.m1" class="ltx_Math" alttext="\rho\geq 0.75" display="inline" intent=":literal"><semantics><mrow><mi>ρ</mi><mo>≥</mo><mn>0.75</mn></mrow><annotation encoding="application/x-tex">\rho\geq 0.75</annotation></semantics></math> at every scale;
+L3 deformed—the weight-decay response steepens with scale and its descending
+branch lies beyond the tested range throughout this from-scratch series. A 12K
+control arm run on GPU confirms that the CPU<math id="S1.p4.2.m2" class="ltx_Math" alttext="\to" display="inline" intent=":literal"><semantics><mo stretchy="false">→</mo><annotation encoding="application/x-tex">\to</annotation></semantics></math>GPU environment change does not
+move rates, isolating scale as the manipulated variable.</p>
+</div>
+<div id="S1.p5" class="ltx_para">
+<p id="S1.p5.1" class="ltx_p">We emphasize what conservation buys. It does not claim that a 50M model is a big
+12K model; mechanisms may differ, and our L2 scale map (larger models are
+<em id="S1.p5.1.1" class="ltx_emph ltx_font_italic">less</em> tolerant of role conflict, not more) shows the mapping is not identity.
+It claims something more useful: <em id="S1.p5.1.2" class="ltx_emph ltx_font_italic">task-side quantities computed exactly in the
+enumerable regime remain predictive at scales where they can no longer be
+computed</em>. That is the license under which a microscope earns its place in a lab.</p>
+</div>
+</section>
+<section id="S2" class="ltx_section">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section">2 </span>The four capabilities of the fully-enumerable regime</h2>
+
+<div id="S2.p1" class="ltx_para">
+<p id="S2.p1.6" class="ltx_p">Throughout, a task is a finite table <math id="S2.p1.1.m1" class="ltx_Math" alttext="T\colon X\to Y" display="inline" intent=":literal"><semantics><mrow><mi>T</mi><mo lspace="0.278em" rspace="0.278em">:</mo><mrow><mi>X</mi><mo stretchy="false">→</mo><mi>Y</mi></mrow></mrow><annotation encoding="application/x-tex">T\colon X\to Y</annotation></semantics></math> with <math id="S2.p1.2.m2" class="ltx_Math" alttext="|X|\sim 10^{2}" display="inline" intent=":literal"><semantics><mrow><mrow><mo stretchy="false">|</mo><mi>X</mi><mo stretchy="false">|</mo></mrow><mo>∼</mo><msup><mn>10</mn><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">|X|\sim 10^{2}</annotation></semantics></math>,
+presented to a decoder-only transformer through a tokenization <math id="S2.p1.3.m3" class="ltx_Math" alttext="E" display="inline" intent=":literal"><semantics><mi>E</mi><annotation encoding="application/x-tex">E</annotation></semantics></math>, split into
+train/test cells <math id="S2.p1.4.m4" class="ltx_Math" alttext="S" display="inline" intent=":literal"><semantics><mi>S</mi><annotation encoding="application/x-tex">S</annotation></semantics></math>, and trained with a fixed optimizer to a budget <math id="S2.p1.5.m5" class="ltx_Math" alttext="B" display="inline" intent=":literal"><semantics><mi>B</mi><annotation encoding="application/x-tex">B</annotation></semantics></math>.
+“Fully enumerable” means every element of <math id="S2.p1.6.m6" class="ltx_Math" alttext="X" display="inline" intent=":literal"><semantics><mi>X</mi><annotation encoding="application/x-tex">X</annotation></semantics></math> is evaluated at every
+checkpoint—there is no sampling in the measurement. The four capabilities, each
+with a one-line empirical demonstration from prior
+work <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib2" title="" class="ltx_ref">2</a>]</cite>, are:</p>
+</div>
+<section id="S2.SS0.SSS0.Px1" class="ltx_paragraph">
+<h4 class="ltx_title ltx_title_paragraph">(a) Theorem-grade ceilings (from enumerability).</h4>
+
+<div id="S2.SS0.SSS0.Px1.p1" class="ltx_para">
+<p id="S2.SS0.SSS0.Px1.p1.1" class="ltx_p">For a declared hypothesis class, the version space consistent with any training
+split can be enumerated, so the expected accuracy of the Bayes-optimal predictor
+on the held-out cells—the <em id="S2.SS0.SSS0.Px1.p1.1.1" class="ltx_emph ltx_font_italic">recoverability ceiling</em>, the best accuracy any
+predictor could achieve given what the split reveals—is a computed number,
+not an estimate. Ceilings turn “the model failed to generalize” into a
+decidable claim: either the split was information-theoretically closed, or the
+model underperformed an attainable bound. At 12K parameters, converged accuracy
+tracks the computed ceiling with <math id="S2.SS0.SSS0.Px1.p1.1.m1" class="ltx_Math" alttext="r=0.95" display="inline" intent=":literal"><semantics><mrow><mi>r</mi><mo>=</mo><mn>0.95</mn></mrow><annotation encoding="application/x-tex">r=0.95</annotation></semantics></math> across graded task families, with zero
+violations in 36 capacity-varied runs.</p>
+</div>
+</section>
+<section id="S2.SS0.SSS0.Px2" class="ltx_paragraph">
+<h4 class="ltx_title ltx_title_paragraph">(b) Invariant-preserving task surgery (from enumerability).</h4>
+
+<div id="S2.SS0.SSS0.Px2.p1" class="ltx_para">
+<p id="S2.SS0.SSS0.Px2.p1.8" class="ltx_p">Because the task is a finite object in code, structural interventions can be
+proven to change exactly one variable. Two examples: intercalated-swap
+corruptions that provably preserve Latin-square structure while destroying an
+additive-potential decomposition; and the <em id="S2.SS0.SSS0.Px2.p1.8.1" class="ltx_emph ltx_font_italic">rolex</em> construction used here,
+which sets the two operand codebooks to permutations <math id="S2.SS0.SSS0.Px2.p1.1.m1" class="ltx_Math" alttext="\pi_{a}" display="inline" intent=":literal"><semantics><msub><mi>π</mi><mi>a</mi></msub><annotation encoding="application/x-tex">\pi_{a}</annotation></semantics></math> and
+<math id="S2.SS0.SSS0.Px2.p1.2.m2" class="ltx_Math" alttext="\pi_{b}=\pi_{a}\circ\sigma" display="inline" intent=":literal"><semantics><mrow><msub><mi>π</mi><mi>b</mi></msub><mo>=</mo><mrow><msub><mi>π</mi><mi>a</mi></msub><mo lspace="0.222em" rspace="0.222em">∘</mo><mi>σ</mi></mrow></mrow><annotation encoding="application/x-tex">\pi_{b}=\pi_{a}\circ\sigma</annotation></semantics></math> for a random <math id="S2.SS0.SSS0.Px2.p1.3.m3" class="ltx_Math" alttext="(D{+}1)" display="inline" intent=":literal"><semantics><mrow><mo stretchy="false">(</mo><mrow><mi>D</mi><mo>+</mo><mn>1</mn></mrow><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(D{+}1)</annotation></semantics></math>-cycle <math id="S2.SS0.SSS0.Px2.p1.4.m4" class="ltx_Math" alttext="\sigma" display="inline" intent=":literal"><semantics><mi>σ</mi><annotation encoding="application/x-tex">\sigma</annotation></semantics></math>, fixing both
+marginal distributions while setting the role-conflict distance
+<math id="S2.SS0.SSS0.Px2.p1.5.m5" class="ltx_Math" alttext="D_{\mathrm{role}}=d_{\mathrm{Cayley}}(\pi_{a},\pi_{b})" display="inline" intent=":literal"><semantics><mrow><msub><mi>D</mi><mi>role</mi></msub><mo>=</mo><mrow><msub><mi>d</mi><mi>Cayley</mi></msub><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><msub><mi>π</mi><mi>a</mi></msub><mo>,</mo><msub><mi>π</mi><mi>b</mi></msub><mo stretchy="false">)</mo></mrow></mrow></mrow><annotation encoding="application/x-tex">D_{\mathrm{role}}=d_{\mathrm{Cayley}}(\pi_{a},\pi_{b})</annotation></semantics></math>—how far the two
+operands’ codebooks are from agreeing—exactly. Under this surgery,
+<math id="S2.SS0.SSS0.Px2.p1.6.m6" class="ltx_Math" alttext="D_{\mathrm{role}}" display="inline" intent=":literal"><semantics><msub><mi>D</mi><mi>role</mi></msub><annotation encoding="application/x-tex">D_{\mathrm{role}}</annotation></semantics></math> predicts grokking onset with <math id="S2.SS0.SSS0.Px2.p1.7.m7" class="ltx_Math" alttext="\rho=0.77" display="inline" intent=":literal"><semantics><mrow><mi>ρ</mi><mo>=</mo><mn>0.77</mn></mrow><annotation encoding="application/x-tex">\rho=0.77</annotation></semantics></math> (<math id="S2.SS0.SSS0.Px2.p1.8.m8" class="ltx_Math" alttext="n{=}60" display="inline" intent=":literal"><semantics><mrow><mi>n</mi><mo>=</mo><mn>60</mn></mrow><annotation encoding="application/x-tex">n{=}60</annotation></semantics></math>).</p>
+</div>
+</section>
+<section id="S2.SS0.SSS0.Px3" class="ltx_paragraph">
+<h4 class="ltx_title ltx_title_paragraph">(c) Full-weight observation (from smallness).</h4>
+
+<div id="S2.SS0.SSS0.Px3.p1" class="ltx_para">
+<p id="S2.SS0.SSS0.Px3.p1.1" class="ltx_p">A <math id="S2.SS0.SSS0.Px3.p1.1.m1" class="ltx_Math" alttext="10^{4}" display="inline" intent=":literal"><semantics><msup><mn>10</mn><mn>4</mn></msup><annotation encoding="application/x-tex">10^{4}</annotation></semantics></math>-parameter model can be read in its entirety—every attention map on
+every input, every neuron on the full input space—so hypotheses about internal
+structure are checked by exhaustion rather than by probe proxies. This is the
+regime in which complete mechanistic accounts of modular addition were first
+obtained <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib3" title="" class="ltx_ref">3</a>, <a href="#bib.bib4" title="" class="ltx_ref">4</a>]</cite>; enumerability removes the
+last sampling step from such analyses.</p>
+</div>
+</section>
+<section id="S2.SS0.SSS0.Px4" class="ltx_paragraph">
+<h4 class="ltx_title ltx_title_paragraph">(d) Cheap ensemble statistics (from smallness).</h4>
+
+<div id="S2.SS0.SSS0.Px4.p1" class="ltx_para">
+<p id="S2.SS0.SSS0.Px4.p1.2" class="ltx_p">At minutes per run, grokking becomes a <em id="S2.SS0.SSS0.Px4.p1.2.1" class="ltx_emph ltx_font_italic">rate</em> science: Kaplan–Meier
+survival curves over onset epochs, Wilson intervals over grok rates, and
+right-censoring for runs that do not grok within budget—“does not grok” is a
+censored observation, not an anomaly. This matters because individual
+trajectories are provably fragile: changing only the floating-point environment
+flips the grok/no-grok outcome of <math id="S2.SS0.SSS0.Px4.p1.1.m1" class="ltx_Math" alttext="16" display="inline" intent=":literal"><semantics><mn>16</mn><annotation encoding="application/x-tex">16</annotation></semantics></math>–<math id="S2.SS0.SSS0.Px4.p1.2.m2" class="ltx_Math" alttext="19\%" display="inline" intent=":literal"><semantics><mrow><mn>19</mn><mo>%</mo></mrow><annotation encoding="application/x-tex">19\%</annotation></semantics></math> of seeds while leaving ensemble
+rates statistically unchanged. Claims below the rate level do not replicate; the
+instrument is calibrated to the level at which they do.</p>
+</div>
+<div id="S2.SS0.SSS0.Px4.p2" class="ltx_para">
+<p id="S2.SS0.SSS0.Px4.p2.1" class="ltx_p">None of these capabilities is new in isolation; Section <a href="#S6" title="6 Related work ‣ Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_tag">6</span></a>
+delineates what is. The point is their conjunction—and the fact that the
+conjunction is exclusive to this regime. Approximate any one ingredient (sample
+the input space, grow the model, run three seeds) and the corresponding
+capability degrades from theorem to estimate.</p>
+</div>
+</section>
+</section>
+<section id="S3" class="ltx_section">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section">3 </span>The conservation study</h2>
+
+<section id="S3.SS1" class="ltx_subsection">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection">3.1 </span>Question and stakes</h3>
+
+<div id="S3.SS1.p1" class="ltx_para">
+<p id="S3.SS1.p1.1" class="ltx_p">The instrument is only interesting if its readings mean something outside it. We
+therefore test: <em id="S3.SS1.p1.1.1" class="ltx_emph ltx_font_italic">do task-side laws characterized at 12K parameters survive,
+under an identical protocol, a <math id="S3.SS1.p1.1.1.m1" class="ltx_math_unparsed" alttext="4{,}000\times" display="inline" intent=":literal"><semantics><mrow><mn>4</mn><mo>,</mo><mn>000</mn><mo lspace="0.222em">×</mo></mrow><annotation encoding="application/x-tex">4{,}000\times</annotation></semantics></math> scale increase?</em> A positive answer
+licenses the enumerable regime as a model organism—playing for the laws of
+delayed generalization the role that muP-style transfer plays for
+hyperparameters <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib5" title="" class="ltx_ref">5</a>]</cite>. A negative answer, under preregistered criteria,
+would itself be a finding: the breaking point of task-side prediction.</p>
+</div>
+</section>
+<section id="S3.SS2" class="ltx_subsection">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection">3.2 </span>Protocol identity</h3>
+
+<div id="S3.SS2.p1" class="ltx_para">
+<p id="S3.SS2.p1.6" class="ltx_p">Everything except model size is held fixed across scales: the task tables, the
+per-seed splits, the word-level digit tokenization, batch size 16, AdamW at
+learning rate <math id="S3.SS2.p1.1.m1" class="ltx_Math" alttext="3\times 10^{-3}" display="inline" intent=":literal"><semantics><mrow><mn>3</mn><mo lspace="0.222em" rspace="0.222em">×</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>3</mn></mrow></msup></mrow><annotation encoding="application/x-tex">3\times 10^{-3}</annotation></semantics></math>, weight decay <math id="S3.SS2.p1.2.m2" class="ltx_Math" alttext="0.1" display="inline" intent=":literal"><semantics><mn>0.1</mn><annotation encoding="application/x-tex">0.1</annotation></semantics></math> (except in L3, where weight
+decay is the manipulated variable), a budget of <math id="S3.SS2.p1.3.m3" class="ltx_Math" alttext="15{,}000" display="inline" intent=":literal"><semantics><mrow><mn>15</mn><mo>,</mo><mn>000</mn></mrow><annotation encoding="application/x-tex">15{,}000</annotation></semantics></math> epochs, and a
+<em id="S3.SS2.p1.6.1" class="ltx_emph ltx_font_italic">sustained</em> grokking criterion (test accuracy <math id="S3.SS2.p1.4.m4" class="ltx_Math" alttext="\geq 0.70" display="inline" intent=":literal"><semantics><mrow><mi></mi><mo>≥</mo><mn>0.70</mn></mrow><annotation encoding="application/x-tex">\geq 0.70</annotation></semantics></math> on two consecutive
+full-space evaluations; the first such epoch is the onset). All runs are trained
+from scratch, eliminating pretraining as a confound. Model configurations follow
+a standard Llama-style stack at three sizes: 12K (hidden 16, 2 layers),
+1M (hidden 128, 4 layers), and 50M (hidden 512, 12 layers). Each cell
+receives <math id="S3.SS2.p1.5.m5" class="ltx_Math" alttext="n{=}12" display="inline" intent=":literal"><semantics><mrow><mi>n</mi><mo>=</mo><mn>12</mn></mrow><annotation encoding="application/x-tex">n{=}12</annotation></semantics></math> seeds (L2: 3 task instances <math id="S3.SS2.p1.6.m6" class="ltx_Math" alttext="\times" display="inline" intent=":literal"><semantics><mo>×</mo><annotation encoding="application/x-tex">\times</annotation></semantics></math> 4 seeds). The cross-scale
+series comprises 360 runs; per-seed JSON records, including full evaluation
+trajectories, are released with the paper.</p>
+</div>
+<div id="S3.SS2.p2" class="ltx_para">
+<p id="S3.SS2.p2.1" class="ltx_p">The prior study’s 12K records were collected on CPU, while all arms of the
+conservation series (including its 12K arm) run on GPU. A control compares 12K
+GPU cells against the CPU records at matched budget. This matters because
+floating-point environment changes are known to flip individual
+seeds <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib2" title="" class="ltx_ref">2</a>]</cite>; the control confirms they do not move
+<em id="S3.SS2.p2.1.1" class="ltx_emph ltx_font_italic">rates</em> (Section <a href="#S4" title="4 Results ‣ Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_tag">4</span></a>).</p>
+</div>
+</section>
+<section id="S3.SS3" class="ltx_subsection">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection">3.3 </span>Three laws and frozen verdicts</h3>
+
+<section id="S3.SS3.SSS0.Px1" class="ltx_paragraph">
+<h4 class="ltx_title ltx_title_paragraph">L1 (recoverability ceiling).</h4>
+
+<div id="S3.SS3.SSS0.Px1.p1" class="ltx_para">
+<p id="S3.SS3.SSS0.Px1.p1.10" class="ltx_p">Task family <span id="S3.SS3.SSS0.Px1.p1.1.1" class="ltx_text ltx_font_typewriter">addpotc<math id="S3.SS3.SSS0.Px1.p1.1.1.m1" class="ltx_Math" alttext="K" display="inline" intent=":literal"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math></span>:
+modular addition with <math id="S3.SS3.SSS0.Px1.p1.2.m1" class="ltx_Math" alttext="K\in\{0,1,2,3\}" display="inline" intent=":literal"><semantics><mrow><mi>K</mi><mo>∈</mo><mrow><mo stretchy="false">{</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mn>3</mn><mo stretchy="false">}</mo></mrow></mrow><annotation encoding="application/x-tex">K\in\{0,1,2,3\}</annotation></semantics></math> operand rows fully held out. Holding
+out <math id="S3.SS3.SSS0.Px1.p1.3.m2" class="ltx_Math" alttext="K" display="inline" intent=":literal"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math> rows makes their <math id="S3.SS3.SSS0.Px1.p1.4.m3" class="ltx_Math" alttext="10\times K" display="inline" intent=":literal"><semantics><mrow><mn>10</mn><mo lspace="0.222em" rspace="0.222em">×</mo><mi>K</mi></mrow><annotation encoding="application/x-tex">10\times K</annotation></semantics></math> test cells provably unrecoverable, giving exact
+per-split ceilings <math id="S3.SS3.SSS0.Px1.p1.5.m4" class="ltx_Math" alttext="1.00,0.71,0.43,0.14" display="inline" intent=":literal"><semantics><mrow><mn>1.00</mn><mo>,</mo><mn>0.71</mn><mo>,</mo><mn>0.43</mn><mo>,</mo><mn>0.14</mn></mrow><annotation encoding="application/x-tex">1.00,0.71,0.43,0.14</annotation></semantics></math> on the 30-cell test set.
+<em id="S3.SS3.SSS0.Px1.p1.10.2" class="ltx_emph ltx_font_italic">Frozen predictions:</em> (i) no run exceeds its ceiling at any scale (the
+ceiling is an information-theoretic quantity, hence model-independent);
+(ii) grok rates order monotonically in the ceiling at every scale;
+(iii) attainment—how closely runs approach the ceiling—declines with
+capacity, extrapolating the decline observed across <math id="S3.SS3.SSS0.Px1.p1.6.m5" class="ltx_math_unparsed" alttext="6.5\times" display="inline" intent=":literal"><semantics><mrow><mn>6.5</mn><mo lspace="0.222em">×</mo></mrow><annotation encoding="application/x-tex">6.5\times</annotation></semantics></math> capacity at 12K.
+<em id="S3.SS3.SSS0.Px1.p1.10.3" class="ltx_emph ltx_font_italic">Verdicts:</em> conserved <math id="S3.SS3.SSS0.Px1.p1.7.m6" class="ltx_Math" alttext="=" display="inline" intent=":literal"><semantics><mo>=</mo><annotation encoding="application/x-tex">=</annotation></semantics></math> (i)<math id="S3.SS3.SSS0.Px1.p1.8.m7" class="ltx_Math" alttext="\wedge" display="inline" intent=":literal"><semantics><mo>∧</mo><annotation encoding="application/x-tex">\wedge</annotation></semantics></math>(ii); deformed <math id="S3.SS3.SSS0.Px1.p1.9.m8" class="ltx_Math" alttext="=" display="inline" intent=":literal"><semantics><mo>=</mo><annotation encoding="application/x-tex">=</annotation></semantics></math> (i) with a
+systematic distortion of (ii); broken <math id="S3.SS3.SSS0.Px1.p1.10.m9" class="ltx_Math" alttext="=" display="inline" intent=":literal"><semantics><mo>=</mo><annotation encoding="application/x-tex">=</annotation></semantics></math> any Wilson-significant excess.</p>
+</div>
+</section>
+<section id="S3.SS3.SSS0.Px2" class="ltx_paragraph">
+<h4 class="ltx_title ltx_title_paragraph">L2 (role-conflict delay).</h4>
+
+<div id="S3.SS3.SSS0.Px2.p1" class="ltx_para">
+<p id="S3.SS3.SSS0.Px2.p1.9" class="ltx_p">Task family <span id="S3.SS3.SSS0.Px2.p1.1.1" class="ltx_text ltx_font_typewriter">rolex<math id="S3.SS3.SSS0.Px2.p1.1.1.m1" class="ltx_Math" alttext="D" display="inline" intent=":literal"><semantics><mi>D</mi><annotation encoding="application/x-tex">D</annotation></semantics></math></span> with
+<math id="S3.SS3.SSS0.Px2.p1.2.m1" class="ltx_Math" alttext="D\in\{0,4,8\}" display="inline" intent=":literal"><semantics><mrow><mi>D</mi><mo>∈</mo><mrow><mo stretchy="false">{</mo><mn>0</mn><mo>,</mo><mn>4</mn><mo>,</mo><mn>8</mn><mo stretchy="false">}</mo></mrow></mrow><annotation encoding="application/x-tex">D\in\{0,4,8\}</annotation></semantics></math>, three instances each: exact Cayley distance between operand
+codebooks, marginals fixed by construction. <em id="S3.SS3.SSS0.Px2.p1.9.2" class="ltx_emph ltx_font_italic">Frozen predictions:</em> the
+ordering of onsets by <math id="S3.SS3.SSS0.Px2.p1.3.m2" class="ltx_Math" alttext="D_{\mathrm{role}}" display="inline" intent=":literal"><semantics><msub><mi>D</mi><mi>role</mi></msub><annotation encoding="application/x-tex">D_{\mathrm{role}}</annotation></semantics></math> is conserved within each scale
+(Spearman <math id="S3.SS3.SSS0.Px2.p1.4.m3" class="ltx_Math" alttext="\rho\geq 0.5" display="inline" intent=":literal"><semantics><mrow><mi>ρ</mi><mo>≥</mo><mn>0.5</mn></mrow><annotation encoding="application/x-tex">\rho\geq 0.5</annotation></semantics></math>, censored runs ranked at budget); the absolute delay
+may shift with scale, and estimating that shift—the scale map—is part of the
+study’s value. <em id="S3.SS3.SSS0.Px2.p1.9.3" class="ltx_emph ltx_font_italic">Verdicts:</em> conserved <math id="S3.SS3.SSS0.Px2.p1.5.m4" class="ltx_Math" alttext="=" display="inline" intent=":literal"><semantics><mo>=</mo><annotation encoding="application/x-tex">=</annotation></semantics></math> within-scale <math id="S3.SS3.SSS0.Px2.p1.6.m5" class="ltx_Math" alttext="\rho\geq 0.5" display="inline" intent=":literal"><semantics><mrow><mi>ρ</mi><mo>≥</mo><mn>0.5</mn></mrow><annotation encoding="application/x-tex">\rho\geq 0.5</annotation></semantics></math>;
+deformed <math id="S3.SS3.SSS0.Px2.p1.7.m6" class="ltx_Math" alttext="=" display="inline" intent=":literal"><semantics><mo>=</mo><annotation encoding="application/x-tex">=</annotation></semantics></math> ordering intact with systematic absolute shift; broken <math id="S3.SS3.SSS0.Px2.p1.8.m7" class="ltx_Math" alttext="=" display="inline" intent=":literal"><semantics><mo>=</mo><annotation encoding="application/x-tex">=</annotation></semantics></math> <math id="S3.SS3.SSS0.Px2.p1.9.m8" class="ltx_Math" alttext="\rho" display="inline" intent=":literal"><semantics><mi>ρ</mi><annotation encoding="application/x-tex">\rho</annotation></semantics></math>
+confidence interval crossing zero.</p>
+</div>
+</section>
+<section id="S3.SS3.SSS0.Px3" class="ltx_paragraph">
+<h4 class="ltx_title ltx_title_paragraph">L3 (weight-decay response).</h4>
+
+<div id="S3.SS3.SSS0.Px3.p1" class="ltx_para">
+<p id="S3.SS3.SSS0.Px3.p1.4" class="ltx_p">Task <span id="S3.SS3.SSS0.Px3.p1.4.1" class="ltx_text ltx_font_typewriter">add</span> at weight decay
+<math id="S3.SS3.SSS0.Px3.p1.1.m1" class="ltx_Math" alttext="\in\{0.01,0.1,0.3\}" display="inline" intent=":literal"><semantics><mrow><mi></mi><mo>∈</mo><mrow><mo stretchy="false">{</mo><mn>0.01</mn><mo>,</mo><mn>0.1</mn><mo>,</mo><mn>0.3</mn><mo stretchy="false">}</mo></mrow></mrow><annotation encoding="application/x-tex">\in\{0.01,0.1,0.3\}</annotation></semantics></math>, a three-point coarse-graining of the inverted-U
+response established at 12K, where intermediate weight decay maximizes the grok
+rate. <em id="S3.SS3.SSS0.Px3.p1.4.2" class="ltx_emph ltx_font_italic">Frozen predictions:</em> the inverted-U shape is conserved; its peak may
+shift. <em id="S3.SS3.SSS0.Px3.p1.4.3" class="ltx_emph ltx_font_italic">Verdicts:</em> conserved <math id="S3.SS3.SSS0.Px3.p1.2.m2" class="ltx_Math" alttext="=" display="inline" intent=":literal"><semantics><mo>=</mo><annotation encoding="application/x-tex">=</annotation></semantics></math> the middle point exceeds both ends with
+Wilson separation; deformed <math id="S3.SS3.SSS0.Px3.p1.3.m3" class="ltx_Math" alttext="=" display="inline" intent=":literal"><semantics><mo>=</mo><annotation encoding="application/x-tex">=</annotation></semantics></math> the response becomes monotone over the tested
+range while rates stay positive; broken <math id="S3.SS3.SSS0.Px3.p1.4.m4" class="ltx_Math" alttext="=" display="inline" intent=":literal"><semantics><mo>=</mo><annotation encoding="application/x-tex">=</annotation></semantics></math> zero rates everywhere or an inverted
+ordering.</p>
+</div>
+<div id="S3.SS3.SSS0.Px3.p2" class="ltx_para">
+<p id="S3.SS3.SSS0.Px3.p2.1" class="ltx_p">All criteria, cell lists, and predictions were frozen in a design document
+committed (with hash) before any cross-scale run was launched.</p>
+</div>
+</section>
+</section>
+</section>
+<section id="S4" class="ltx_section">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section">4 </span>Results</h2>
+
+<figure id="S4.F1" class="ltx_figure"><img src="2609.20166v1/x1.png" id="S4.F1.g1" class="ltx_graphics ltx_centering ltx_img_landscape" width="830" height="284" alt="Refer to caption">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure">Figure 1: </span>The conservation map. <span id="S4.F1.14.1" class="ltx_text ltx_font_bold">Left (L1):</span> grok rate versus number of
+held-out rows <math id="S4.F1.6.m1" class="ltx_Math" alttext="K" display="inline" intent=":literal"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math> (exact ceiling in parentheses) at 12K, 1M, and 50M parameters.
+The ceiling-ordering is monotone at every scale, and rates beneath the ceiling
+are statistically flat across scales. <span id="S4.F1.15.2" class="ltx_text ltx_font_bold">Middle (L2):</span>
+Kaplan–Meier curves of grokking onset for role-conflict distance <math id="S4.F1.7.m2" class="ltx_Math" alttext="D\in\{0,4,8\}" display="inline" intent=":literal"><semantics><mrow><mi>D</mi><mo>∈</mo><mrow><mo stretchy="false">{</mo><mn>0</mn><mo>,</mo><mn>4</mn><mo>,</mo><mn>8</mn><mo stretchy="false">}</mo></mrow></mrow><annotation encoding="application/x-tex">D\in\{0,4,8\}</annotation></semantics></math>. <math id="S4.F1.8.m3" class="ltx_Math" alttext="D{=}0" display="inline" intent=":literal"><semantics><mrow><mi>D</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">D{=}0</annotation></semantics></math> groks at every scale; <math id="S4.F1.9.m4" class="ltx_Math" alttext="D\geq 4" display="inline" intent=":literal"><semantics><mrow><mi>D</mi><mo>≥</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">D\geq 4</annotation></semantics></math> is censored at the 15K-epoch
+budget at 1M and 50M. <span id="S4.F1.16.3" class="ltx_text ltx_font_bold">Right (L3):</span> grok rate versus weight decay. The
+left arm of the weight-decay response sharpens with scale; the descending
+arm has moved beyond <math id="S4.F1.10.m5" class="ltx_Math" alttext="\mathrm{wd}{=}0.3" display="inline" intent=":literal"><semantics><mrow><mi>wd</mi><mo>=</mo><mn>0.3</mn></mrow><annotation encoding="application/x-tex">\mathrm{wd}{=}0.3</annotation></semantics></math>, a systematic deformation.</figcaption>
+</figure>
+<figure id="S4.F2" class="ltx_figure"><img src="2609.20166v1/x2.png" id="S4.F2.g1" class="ltx_graphics ltx_centering ltx_img_landscape" width="415" height="331" alt="Refer to caption">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure">Figure 2: </span>Ceiling tracking across three orders of magnitude. Each point is one
+run’s converged (final) test accuracy against its split’s exact recoverability
+ceiling. No point lies significantly above the diagonal: 0 violations in 144
+Holm-corrected exact binomial tests across 12K, 1M, and 50M (prior
+capacity-sweep reference: 0/36).</figcaption>
+</figure>
+<section id="S4.SS1" class="ltx_subsection">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection">4.1 </span>L1: conserved</h3>
+
+<div id="S4.SS1.p1" class="ltx_para">
+<p id="S4.SS1.p1.9" class="ltx_p">The exact ceiling is never exceeded. Testing every run’s converged accuracy
+against its split’s ceiling with exact binomial tests (Holm-corrected across
+all 144 runs of the from-scratch 12K/1M/50M series) yields zero violations
+(Figure <a href="#S4.F2" title="Figure 2 ‣ 4 Results ‣ Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_tag">2</span></a>), extending the earlier capacity-sweep record of
+0/36. (The homogeneous binomial null is conservative here: the
+true per-cell success probabilities are heterogeneous, and the matching
+Poisson-binomial has smaller upper-tail mass, so the test can only under-report
+excess—which strengthens a zero-violation finding.) The grok-rate ordering is
+monotone in the ceiling at every scale (Figure <a href="#S4.F1" title="Figure 1 ‣ 4 Results ‣ Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_tag">1</span></a>, left): for
+<math id="S4.SS1.p1.1.m1" class="ltx_Math" alttext="K=0\to 3" display="inline" intent=":literal"><semantics><mrow><mi>K</mi><mo>=</mo><mn>0</mn><mo stretchy="false">→</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">K=0\to 3</annotation></semantics></math>, <math id="S4.SS1.p1.2.m2" class="ltx_Math" alttext="12/12\to 2/12\to 1/12\to 0/12" display="inline" intent=":literal"><semantics><mrow><mrow><mn>12</mn><mo>/</mo><mn>12</mn></mrow><mo stretchy="false">→</mo><mrow><mn>2</mn><mo>/</mo><mn>12</mn></mrow><mo stretchy="false">→</mo><mrow><mn>1</mn><mo>/</mo><mn>12</mn></mrow><mo stretchy="false">→</mo><mrow><mn>0</mn><mo>/</mo><mn>12</mn></mrow></mrow><annotation encoding="application/x-tex">12/12\to 2/12\to 1/12\to 0/12</annotation></semantics></math> at 12K,
+<math id="S4.SS1.p1.3.m3" class="ltx_Math" alttext="12/12\to 3/12\to 0/12\to 0/12" display="inline" intent=":literal"><semantics><mrow><mrow><mn>12</mn><mo>/</mo><mn>12</mn></mrow><mo stretchy="false">→</mo><mrow><mn>3</mn><mo>/</mo><mn>12</mn></mrow><mo stretchy="false">→</mo><mrow><mn>0</mn><mo>/</mo><mn>12</mn></mrow><mo stretchy="false">→</mo><mrow><mn>0</mn><mo>/</mo><mn>12</mn></mrow></mrow><annotation encoding="application/x-tex">12/12\to 3/12\to 0/12\to 0/12</annotation></semantics></math> at 1M, and
+<math id="S4.SS1.p1.4.m4" class="ltx_Math" alttext="12/12\to 2/12\to 0/12\to 0/12" display="inline" intent=":literal"><semantics><mrow><mrow><mn>12</mn><mo>/</mo><mn>12</mn></mrow><mo stretchy="false">→</mo><mrow><mn>2</mn><mo>/</mo><mn>12</mn></mrow><mo stretchy="false">→</mo><mrow><mn>0</mn><mo>/</mo><mn>12</mn></mrow><mo stretchy="false">→</mo><mrow><mn>0</mn><mo>/</mo><mn>12</mn></mrow></mrow><annotation encoding="application/x-tex">12/12\to 2/12\to 0/12\to 0/12</annotation></semantics></math> at 50M. Prediction (iii), by contrast, is
+<em id="S4.SS1.p1.9.1" class="ltx_emph ltx_font_italic">not</em> confirmed: at fixed <math id="S4.SS1.p1.5.m5" class="ltx_Math" alttext="K{=}1" display="inline" intent=":literal"><semantics><mrow><mi>K</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">K{=}1</annotation></semantics></math> the grok rates (<math id="S4.SS1.p1.6.m6" class="ltx_Math" alttext="2/12" display="inline" intent=":literal"><semantics><mrow><mn>2</mn><mo>/</mo><mn>12</mn></mrow><annotation encoding="application/x-tex">2/12</annotation></semantics></math>, <math id="S4.SS1.p1.7.m7" class="ltx_Math" alttext="3/12" display="inline" intent=":literal"><semantics><mrow><mn>3</mn><mo>/</mo><mn>12</mn></mrow><annotation encoding="application/x-tex">3/12</annotation></semantics></math>, <math id="S4.SS1.p1.8.m8" class="ltx_Math" alttext="2/12" display="inline" intent=":literal"><semantics><mrow><mn>2</mn><mo>/</mo><mn>12</mn></mrow><annotation encoding="application/x-tex">2/12</annotation></semantics></math>)
+are statistically indistinguishable across scales, so the capacity-driven
+attainment decline extrapolated from the 12K capacity sweep does not appear in
+this series at <math id="S4.SS1.p1.9.m9" class="ltx_Math" alttext="n{=}12" display="inline" intent=":literal"><semantics><mrow><mi>n</mi><mo>=</mo><mn>12</mn></mrow><annotation encoding="application/x-tex">n{=}12</annotation></semantics></math> resolution. We report the miss as the preregistration
+requires; the conserved content of L1 is the exact bound and the ordering, and
+capacity neither buys anything against the bound nor measurably costs
+attainment beneath it here.</p>
+</div>
+<div id="S4.SS1.p2" class="ltx_para">
+<p id="S4.SS1.p2.2" class="ltx_p">A methodological note worth one paragraph: if the excess test is run against the
+<em id="S4.SS1.p2.2.1" class="ltx_emph ltx_font_italic">best</em> accuracy over the trajectory rather than the converged accuracy, four
+spurious “violations” appear, all in the <math id="S4.SS1.p2.1.m1" class="ltx_Math" alttext="K{=}3" display="inline" intent=":literal"><semantics><mrow><mi>K</mi><mo>=</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">K{=}3</annotation></semantics></math> cells where the test set is
+noisiest. The best-over-trajectory statistic takes a maximum over <math id="S4.SS1.p2.2.m2" class="ltx_Math" alttext="\sim" display="inline" intent=":literal"><semantics><mo>∼</mo><annotation encoding="application/x-tex">\sim</annotation></semantics></math>150
+evaluations of a 30-cell test set, and its null distribution is not the single-look
+binomial; the sustained criterion and converged-accuracy testing exist precisely
+to remove this multiple-looks inflation. Small-test-set grokking claims based on
+peak accuracy should be read with this failure mode in mind—a concern
+formalized independently by the measurement-validity audit of
+<cite class="ltx_cite ltx_citemacro_citet">Khanh [<a href="#bib.bib6" title="" class="ltx_ref">6</a>]</cite>.</p>
+</div>
+</section>
+<section id="S4.SS2" class="ltx_subsection">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection">4.2 </span>L2: conserved, with an informative scale map</h3>
+
+<div id="S4.SS2.p1" class="ltx_para">
+<p id="S4.SS2.p1.11" class="ltx_p">Within-scale Spearman correlation between <math id="S4.SS2.p1.1.m1" class="ltx_Math" alttext="D_{\mathrm{role}}" display="inline" intent=":literal"><semantics><msub><mi>D</mi><mi>role</mi></msub><annotation encoding="application/x-tex">D_{\mathrm{role}}</annotation></semantics></math> and onset
+(censored runs at budget rank) is <math id="S4.SS2.p1.2.m2" class="ltx_Math" alttext="\rho=0.75" display="inline" intent=":literal"><semantics><mrow><mi>ρ</mi><mo>=</mo><mn>0.75</mn></mrow><annotation encoding="application/x-tex">\rho=0.75</annotation></semantics></math> at 12K, <math id="S4.SS2.p1.3.m3" class="ltx_Math" alttext="\rho=0.85" display="inline" intent=":literal"><semantics><mrow><mi>ρ</mi><mo>=</mo><mn>0.85</mn></mrow><annotation encoding="application/x-tex">\rho=0.85</annotation></semantics></math> at 1M,
+and <math id="S4.SS2.p1.4.m4" class="ltx_Math" alttext="\rho=0.84" display="inline" intent=":literal"><semantics><mrow><mi>ρ</mi><mo>=</mo><mn>0.84</mn></mrow><annotation encoding="application/x-tex">\rho=0.84</annotation></semantics></math> at 50M (<math id="S4.SS2.p1.5.m5" class="ltx_Math" alttext="n{=}36" display="inline" intent=":literal"><semantics><mrow><mi>n</mi><mo>=</mo><mn>36</mn></mrow><annotation encoding="application/x-tex">n{=}36</annotation></semantics></math> each; permutation <math id="S4.SS2.p1.6.m6" class="ltx_Math" alttext="p&lt;10^{-4}" display="inline" intent=":literal"><semantics><mrow><mi>p</mi><mo>&lt;</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>4</mn></mrow></msup></mrow><annotation encoding="application/x-tex">p&lt;10^{-4}</annotation></semantics></math> at every
+scale, <math id="S4.SS2.p1.7.m7" class="ltx_Math" alttext="10^{5}" display="inline" intent=":literal"><semantics><msup><mn>10</mn><mn>5</mn></msup><annotation encoding="application/x-tex">10^{5}</annotation></semantics></math> label permutations—the asymptotic normal approximation is
+invalid under this degree of censoring-induced tying, so we do not use it).
+All three comfortably clear the frozen <math id="S4.SS2.p1.8.m8" class="ltx_Math" alttext="\rho\geq 0.5" display="inline" intent=":literal"><semantics><mrow><mi>ρ</mi><mo>≥</mo><mn>0.5</mn></mrow><annotation encoding="application/x-tex">\rho\geq 0.5</annotation></semantics></math> criterion. (The earlier
+12K measurement of <math id="S4.SS2.p1.9.m9" class="ltx_Math" alttext="\rho=0.77" display="inline" intent=":literal"><semantics><mrow><mi>ρ</mi><mo>=</mo><mn>0.77</mn></mrow><annotation encoding="application/x-tex">\rho=0.77</annotation></semantics></math> on a five-level <math id="S4.SS2.p1.10.m10" class="ltx_Math" alttext="D" display="inline" intent=":literal"><semantics><mi>D</mi><annotation encoding="application/x-tex">D</annotation></semantics></math>-grid is not directly
+comparable to these three-level-grid values; the <math id="S4.SS2.p1.11.m11" class="ltx_Math" alttext="\rho=0.75" display="inline" intent=":literal"><semantics><mrow><mi>ρ</mi><mo>=</mo><mn>0.75</mn></mrow><annotation encoding="application/x-tex">\rho=0.75</annotation></semantics></math> above is the
+matched-protocol replication.)</p>
+</div>
+<div id="S4.SS2.p2" class="ltx_para">
+<p id="S4.SS2.p2.10" class="ltx_p">The scale map is the second finding (Figure <a href="#S4.F1" title="Figure 1 ‣ 4 Results ‣ Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_tag">1</span></a>, middle). At
+<math id="S4.SS2.p2.1.m1" class="ltx_Math" alttext="D{=}0" display="inline" intent=":literal"><semantics><mrow><mi>D</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">D{=}0</annotation></semantics></math>, the Kaplan–Meier median onset grows with scale (12K: 700 epochs;
+1M: 900; 50M: 2,300). Away from <math id="S4.SS2.p2.2.m2" class="ltx_Math" alttext="D{=}0" display="inline" intent=":literal"><semantics><mrow><mi>D</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">D{=}0</annotation></semantics></math> the same direction appears as
+collapsing rates: at <math id="S4.SS2.p2.3.m3" class="ltx_Math" alttext="D{=}4" display="inline" intent=":literal"><semantics><mrow><mi>D</mi><mo>=</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">D{=}4</annotation></semantics></math> the grok rate falls from <math id="S4.SS2.p2.4.m4" class="ltx_Math" alttext="7/12" display="inline" intent=":literal"><semantics><mrow><mn>7</mn><mo>/</mo><mn>12</mn></mrow><annotation encoding="application/x-tex">7/12</annotation></semantics></math> at 12K (KM median
+<math id="S4.SS2.p2.5.m5" class="ltx_Math" alttext="14{,}200" display="inline" intent=":literal"><semantics><mrow><mn>14</mn><mo>,</mo><mn>200</mn></mrow><annotation encoding="application/x-tex">14{,}200</annotation></semantics></math>, barely inside budget) to <math id="S4.SS2.p2.6.m6" class="ltx_Math" alttext="2/12" display="inline" intent=":literal"><semantics><mrow><mn>2</mn><mo>/</mo><mn>12</mn></mrow><annotation encoding="application/x-tex">2/12</annotation></semantics></math> at 1M and <math id="S4.SS2.p2.7.m7" class="ltx_Math" alttext="0/12" display="inline" intent=":literal"><semantics><mrow><mn>0</mn><mo>/</mo><mn>12</mn></mrow><annotation encoding="application/x-tex">0/12</annotation></semantics></math> at 50M; at
+<math id="S4.SS2.p2.8.m8" class="ltx_Math" alttext="D{=}8" display="inline" intent=":literal"><semantics><mrow><mi>D</mi><mo>=</mo><mn>8</mn></mrow><annotation encoding="application/x-tex">D{=}8</annotation></semantics></math>, from <math id="S4.SS2.p2.9.m9" class="ltx_Math" alttext="6/12" display="inline" intent=":literal"><semantics><mrow><mn>6</mn><mo>/</mo><mn>12</mn></mrow><annotation encoding="application/x-tex">6/12</annotation></semantics></math> at 12K to <math id="S4.SS2.p2.10.m10" class="ltx_Math" alttext="0/12" display="inline" intent=":literal"><semantics><mrow><mn>0</mn><mo>/</mo><mn>12</mn></mrow><annotation encoding="application/x-tex">0/12</annotation></semantics></math> at both larger scales. Larger models are
+less, not more, tolerant of role conflict per epoch of training. Whatever
+intuition says scale should wash out a representational obstruction, the data
+say the obstruction’s cost grows.</p>
+</div>
+<section id="S4.SS2.SSS0.Px1" class="ltx_paragraph">
+<h4 class="ltx_title ltx_title_paragraph">Controls: neither learning rate nor budget explains the deficit.</h4>
+
+<div id="S4.SS2.SSS0.Px1.p1" class="ltx_para">
+<p id="S4.SS2.SSS0.Px1.p1.19" class="ltx_p">The natural objection is that the fixed protocol (learning rate
+<math id="S4.SS2.SSS0.Px1.p1.1.m1" class="ltx_Math" alttext="3\times 10^{-3}" display="inline" intent=":literal"><semantics><mrow><mn>3</mn><mo lspace="0.222em" rspace="0.222em">×</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>3</mn></mrow></msup></mrow><annotation encoding="application/x-tex">3\times 10^{-3}</annotation></semantics></math>, 15K epochs, chosen at 12K) is simply wrong for 50M, and the
+<math id="S4.SS2.SSS0.Px1.p1.2.m2" class="ltx_Math" alttext="D{=}4" display="inline" intent=":literal"><semantics><mrow><mi>D</mi><mo>=</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">D{=}4</annotation></semantics></math> failure is an optimization artifact rather than a scale effect. We
+preregistered a control arm (design and verdict criteria frozen before the
+runs): at 50M, <span id="S4.SS2.SSS0.Px1.p1.19.1" class="ltx_text ltx_font_typewriter">rolex4</span> was re-run at learning rates <math id="S4.SS2.SSS0.Px1.p1.3.m3" class="ltx_Math" alttext="10^{-3}" display="inline" intent=":literal"><semantics><msup><mn>10</mn><mrow><mo>−</mo><mn>3</mn></mrow></msup><annotation encoding="application/x-tex">10^{-3}</annotation></semantics></math> and
+<math id="S4.SS2.SSS0.Px1.p1.4.m4" class="ltx_Math" alttext="3\times 10^{-4}" display="inline" intent=":literal"><semantics><mrow><mn>3</mn><mo lspace="0.222em" rspace="0.222em">×</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>4</mn></mrow></msup></mrow><annotation encoding="application/x-tex">3\times 10^{-4}</annotation></semantics></math> (the direction muP-style scaling would favor for a wider
+model; <math id="S4.SS2.SSS0.Px1.p1.5.m5" class="ltx_Math" alttext="n{=}12" display="inline" intent=":literal"><semantics><mrow><mi>n</mi><mo>=</mo><mn>12</mn></mrow><annotation encoding="application/x-tex">n{=}12</annotation></semantics></math> each, with <math id="S4.SS2.SSS0.Px1.p1.6.m6" class="ltx_Math" alttext="D{=}0" display="inline" intent=":literal"><semantics><mrow><mi>D</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">D{=}0</annotation></semantics></math> sanity cells), and separately at a
+<math id="S4.SS2.SSS0.Px1.p1.7.m7" class="ltx_math_unparsed" alttext="3\times" display="inline" intent=":literal"><semantics><mrow><mn>3</mn><mo lspace="0.222em">×</mo></mrow><annotation encoding="application/x-tex">3\times</annotation></semantics></math> budget of 45,000 epochs (<math id="S4.SS2.SSS0.Px1.p1.8.m8" class="ltx_Math" alttext="n{=}12" display="inline" intent=":literal"><semantics><mrow><mi>n</mi><mo>=</mo><mn>12</mn></mrow><annotation encoding="application/x-tex">n{=}12</annotation></semantics></math>). At both alternative learning
+rates the <math id="S4.SS2.SSS0.Px1.p1.9.m9" class="ltx_Math" alttext="D{=}0" display="inline" intent=":literal"><semantics><mrow><mi>D</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">D{=}0</annotation></semantics></math> cells grok (<math id="S4.SS2.SSS0.Px1.p1.10.m10" class="ltx_Math" alttext="4/4" display="inline" intent=":literal"><semantics><mrow><mn>4</mn><mo>/</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">4/4</annotation></semantics></math> and <math id="S4.SS2.SSS0.Px1.p1.11.m11" class="ltx_Math" alttext="4/4" display="inline" intent=":literal"><semantics><mrow><mn>4</mn><mo>/</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">4/4</annotation></semantics></math>) and training accuracy
+saturates, yet <math id="S4.SS2.SSS0.Px1.p1.12.m12" class="ltx_Math" alttext="D{=}4" display="inline" intent=":literal"><semantics><mrow><mi>D</mi><mo>=</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">D{=}4</annotation></semantics></math> remains at <math id="S4.SS2.SSS0.Px1.p1.13.m13" class="ltx_Math" alttext="1/12" display="inline" intent=":literal"><semantics><mrow><mn>1</mn><mo>/</mo><mn>12</mn></mrow><annotation encoding="application/x-tex">1/12</annotation></semantics></math> and <math id="S4.SS2.SSS0.Px1.p1.14.m14" class="ltx_Math" alttext="0/12" display="inline" intent=":literal"><semantics><mrow><mn>0</mn><mo>/</mo><mn>12</mn></mrow><annotation encoding="application/x-tex">0/12</annotation></semantics></math>—below the 12K rate of
+<math id="S4.SS2.SSS0.Px1.p1.15.m15" class="ltx_Math" alttext="7/12" display="inline" intent=":literal"><semantics><mrow><mn>7</mn><mo>/</mo><mn>12</mn></mrow><annotation encoding="application/x-tex">7/12</annotation></semantics></math> everywhere. At the tripled budget, <math id="S4.SS2.SSS0.Px1.p1.16.m16" class="ltx_Math" alttext="D{=}4" display="inline" intent=":literal"><semantics><mrow><mi>D</mi><mo>=</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">D{=}4</annotation></semantics></math> is <math id="S4.SS2.SSS0.Px1.p1.17.m17" class="ltx_Math" alttext="0/12" display="inline" intent=":literal"><semantics><mrow><mn>0</mn><mo>/</mo><mn>12</mn></mrow><annotation encoding="application/x-tex">0/12</annotation></semantics></math> (best accuracy
+<math id="S4.SS2.SSS0.Px1.p1.18.m18" class="ltx_Math" alttext="\leq 0.65" display="inline" intent=":literal"><semantics><mrow><mi></mi><mo>≤</mo><mn>0.65</mn></mrow><annotation encoding="application/x-tex">\leq 0.65</annotation></semantics></math>). Under the frozen criteria, the scale map stands: the 50M
+role-conflict deficit survives learning-rate adjustment and a <math id="S4.SS2.SSS0.Px1.p1.19.m19" class="ltx_math_unparsed" alttext="3\times" display="inline" intent=":literal"><semantics><mrow><mn>3</mn><mo lspace="0.222em">×</mo></mrow><annotation encoding="application/x-tex">3\times</annotation></semantics></math>
+budget extension, and is not an optimization-mismatch artifact within the
+tested range.</p>
+</div>
+<div id="S4.SS2.SSS0.Px1.p2" class="ltx_para">
+<p id="S4.SS2.SSS0.Px1.p2.6" class="ltx_p">The decisive comparison here is the within-scale differential rather than the
+learning-rate sweep on its own. Relaxation accounts of grokking predict a delay
+that <em id="S4.SS2.SSS0.Px1.p2.6.1" class="ltx_emph ltx_font_italic">lengthens</em> as the learning rate falls (a clock scaling as
+<math id="S4.SS2.SSS0.Px1.p2.1.m1" class="ltx_Math" alttext="1/(\eta\lambda)" display="inline" intent=":literal"><semantics><mrow><mn>1</mn><mo>/</mo><mrow><mo stretchy="false">(</mo><mrow><mi>η</mi><mo lspace="0em" rspace="0em">​</mo><mi>λ</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><annotation encoding="application/x-tex">1/(\eta\lambda)</annotation></semantics></math> in the regime analyzed by <cite class="ltx_cite ltx_citemacro_citet">Kim [<a href="#bib.bib7" title="" class="ltx_ref">7</a>]</cite>), so failure
+at a smaller <math id="S4.SS2.SSS0.Px1.p2.2.m2" class="ltx_Math" alttext="\eta" display="inline" intent=":literal"><semantics><mi>η</mi><annotation encoding="application/x-tex">\eta</annotation></semantics></math> is partly expected and cannot by itself exclude a different
+optimal setting for 50M. What no fixed clock can produce is the gap we measure
+at <em id="S4.SS2.SSS0.Px1.p2.6.2" class="ltx_emph ltx_font_italic">identical</em> optimizer, learning rate, weight decay, and budget: <math id="S4.SS2.SSS0.Px1.p2.3.m3" class="ltx_Math" alttext="D{=}0" display="inline" intent=":literal"><semantics><mrow><mi>D</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">D{=}0</annotation></semantics></math>
+groks in all seeds run (<math id="S4.SS2.SSS0.Px1.p2.4.m4" class="ltx_Math" alttext="12/12" display="inline" intent=":literal"><semantics><mrow><mn>12</mn><mo>/</mo><mn>12</mn></mrow><annotation encoding="application/x-tex">12/12</annotation></semantics></math> at the base rate and <math id="S4.SS2.SSS0.Px1.p2.5.m5" class="ltx_Math" alttext="4/4" display="inline" intent=":literal"><semantics><mrow><mn>4</mn><mo>/</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">4/4</annotation></semantics></math> in each sanity
+cell) while <math id="S4.SS2.SSS0.Px1.p2.6.m6" class="ltx_Math" alttext="D{=}4" display="inline" intent=":literal"><semantics><mrow><mi>D</mi><mo>=</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">D{=}4</annotation></semantics></math> groks in at most one of twelve, at every learning rate
+tested. The obstruction is task-side, and it is the gap—not the absolute
+delay—that the scale map tracks.</p>
+</div>
+</section>
+</section>
+<section id="S4.SS3" class="ltx_subsection">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection">4.3 </span>L3: deformed</h3>
+
+<div id="S4.SS3.p1" class="ltx_para">
+<p id="S4.SS3.p1.8" class="ltx_p">The frozen conservation criterion fails, and fails informatively
+(Figure <a href="#S4.F1" title="Figure 1 ‣ 4 Results ‣ Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_tag">1</span></a>, right). The left arm sharpens monotonically with scale:
+at <math id="S4.SS3.p1.1.m1" class="ltx_Math" alttext="\mathrm{wd}{=}0.01" display="inline" intent=":literal"><semantics><mrow><mi>wd</mi><mo>=</mo><mn>0.01</mn></mrow><annotation encoding="application/x-tex">\mathrm{wd}{=}0.01</annotation></semantics></math> the grok rate falls <math id="S4.SS3.p1.2.m2" class="ltx_Math" alttext="10/12\to 8/12\to 1/12" display="inline" intent=":literal"><semantics><mrow><mrow><mn>10</mn><mo>/</mo><mn>12</mn></mrow><mo stretchy="false">→</mo><mrow><mn>8</mn><mo>/</mo><mn>12</mn></mrow><mo stretchy="false">→</mo><mrow><mn>1</mn><mo>/</mo><mn>12</mn></mrow></mrow><annotation encoding="application/x-tex">10/12\to 8/12\to 1/12</annotation></semantics></math> from 12K
+through 50M. But the descending right arm—reported at 12K under the prior
+study’s protocol <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib2" title="" class="ltx_ref">2</a>]</cite>—does not appear by
+<math id="S4.SS3.p1.3.m3" class="ltx_Math" alttext="\mathrm{wd}{=}0.3" display="inline" intent=":literal"><semantics><mrow><mi>wd</mi><mo>=</mo><mn>0.3</mn></mrow><annotation encoding="application/x-tex">\mathrm{wd}{=}0.3</annotation></semantics></math> at <em id="S4.SS3.p1.8.1" class="ltx_emph ltx_font_italic">any</em> scale in this from-scratch series (<math id="S4.SS3.p1.4.m4" class="ltx_Math" alttext="12/12" display="inline" intent=":literal"><semantics><mrow><mn>12</mn><mo>/</mo><mn>12</mn></mrow><annotation encoding="application/x-tex">12/12</annotation></semantics></math> at
+both <math id="S4.SS3.p1.5.m5" class="ltx_Math" alttext="\mathrm{wd}{=}0.1" display="inline" intent=":literal"><semantics><mrow><mi>wd</mi><mo>=</mo><mn>0.1</mn></mrow><annotation encoding="application/x-tex">\mathrm{wd}{=}0.1</annotation></semantics></math> and <math id="S4.SS3.p1.6.m6" class="ltx_Math" alttext="0.3" display="inline" intent=":literal"><semantics><mn>0.3</mn><annotation encoding="application/x-tex">0.3</annotation></semantics></math> everywhere). Under the frozen rules the
+verdict is <em id="S4.SS3.p1.8.2" class="ltx_emph ltx_font_italic">deformed</em> at all three scales, including the matched-protocol
+12K arm: the response stays non-negative and ordered, but the peak has widened
+or shifted right. The two components of the deformation should be kept
+apart: the right arm’s absence appears already at 12K and is therefore
+protocol-driven (from-scratch versus the prior study’s setting), whereas the
+left arm’s sharpening is the genuinely scale-lawful signal. The data are consistent with larger models tolerating stronger weight decay for
+delayed generalization within a fixed budget, though over a three-point grid
+with both upper cells saturated at <math id="S4.SS3.p1.7.m7" class="ltx_Math" alttext="12/12" display="inline" intent=":literal"><semantics><mrow><mn>12</mn><mo>/</mo><mn>12</mn></mrow><annotation encoding="application/x-tex">12/12</annotation></semantics></math> they cannot distinguish a
+right-shifted peak from a true plateau—saturated cells at <math id="S4.SS3.p1.8.m8" class="ltx_Math" alttext="n{=}12" display="inline" intent=":literal"><semantics><mrow><mi>n</mi><mo>=</mo><mn>12</mn></mrow><annotation encoding="application/x-tex">n{=}12</annotation></semantics></math> carry no
+power for that comparison. Pinning the peak’s location and scaling requires a
+finer weight-decay grid, which we leave preregistered for the follow-up
+(Section <a href="#S5" title="5 What the instrument makes possible ‣ Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_tag">5</span></a>).</p>
+</div>
+<div id="S4.SS3.p2" class="ltx_para">
+<p id="S4.SS3.p2.4" class="ltx_p">The left arm has a natural mechanistic reading in terms of the late-time
+relaxation account of <cite class="ltx_cite ltx_citemacro_citet">Kim [<a href="#bib.bib7" title="" class="ltx_ref">7</a>]</cite>, whose clock is inversely
+proportional to <math id="S4.SS3.p2.1.m1" class="ltx_Math" alttext="\eta\lambda" display="inline" intent=":literal"><semantics><mrow><mi>η</mi><mo lspace="0em" rspace="0em">​</mo><mi>λ</mi></mrow><annotation encoding="application/x-tex">\eta\lambda</annotation></semantics></math> in the weak-regularization regime: at
+<math id="S4.SS3.p2.2.m2" class="ltx_Math" alttext="\lambda{=}0.01" display="inline" intent=":literal"><semantics><mrow><mi>λ</mi><mo>=</mo><mn>0.01</mn></mrow><annotation encoding="application/x-tex">\lambda{=}0.01</annotation></semantics></math> relaxation is an order of magnitude slower than at
+<math id="S4.SS3.p2.3.m3" class="ltx_Math" alttext="\lambda{=}0.1" display="inline" intent=":literal"><semantics><mrow><mi>λ</mi><mo>=</mo><mn>0.1</mn></mrow><annotation encoding="application/x-tex">\lambda{=}0.1</annotation></semantics></math>, so runs at the smallest weight decay are plausibly
+right-censored by the 15K-epoch budget rather than incapable of generalizing.
+Two caveats keep this interpretive rather than quantitative. The result is
+derived for full-batch heavy-ball dynamics on linear (or locally quadratic)
+models, whereas our runs use mini-batch AdamW on a transformer—a gap that
+account itself flags as able to change the clock—and it describes the
+late-time loss tail rather than the abrupt accuracy transition our sustained
+criterion measures. Nor does it explain the missing right arm: a clock
+monotone in <math id="S4.SS3.p2.4.m4" class="ltx_Math" alttext="\lambda" display="inline" intent=":literal"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math> supplies no mechanism for one, but the prior study
+observed a descending arm at 12K over this same grid, so that difference
+remains protocol-driven. What the clock does supply is a model-side factor
+orthogonal to the task-side quantities L1 and L2 measure; the two compose, and
+separating them is part of what the instrument is for.</p>
+</div>
+</section>
+<section id="S4.SS4" class="ltx_subsection">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection">4.4 </span>Control: the environment does not move rates</h3>
+
+<div id="S4.SS4.p1" class="ltx_para">
+<p id="S4.SS4.p1.5" class="ltx_p">Re-running 12K cells on GPU (matched budget) reproduces the CPU rates within
+overlapping Wilson intervals (<span id="S4.SS4.p1.5.1" class="ltx_text ltx_font_typewriter">addpotc0</span>: <math id="S4.SS4.p1.1.m1" class="ltx_Math" alttext="12/12" display="inline" intent=":literal"><semantics><mrow><mn>12</mn><mo>/</mo><mn>12</mn></mrow><annotation encoding="application/x-tex">12/12</annotation></semantics></math> GPU vs. <math id="S4.SS4.p1.2.m2" class="ltx_Math" alttext="3/3" display="inline" intent=":literal"><semantics><mrow><mn>3</mn><mo>/</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">3/3</annotation></semantics></math> CPU;
+<span id="S4.SS4.p1.5.2" class="ltx_text ltx_font_typewriter">addpotc2</span>: <math id="S4.SS4.p1.3.m3" class="ltx_Math" alttext="1/12" display="inline" intent=":literal"><semantics><mrow><mn>1</mn><mo>/</mo><mn>12</mn></mrow><annotation encoding="application/x-tex">1/12</annotation></semantics></math> vs. <math id="S4.SS4.p1.4.m4" class="ltx_Math" alttext="0/3" display="inline" intent=":literal"><semantics><mrow><mn>0</mn><mo>/</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">0/3</annotation></semantics></math>). With <math id="S4.SS4.p1.5.m5" class="ltx_Math" alttext="n{=}3" display="inline" intent=":literal"><semantics><mrow><mi>n</mi><mo>=</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">n{=}3</annotation></semantics></math> on the CPU side this
+control is corroborative rather than independently decisive; the primary
+evidence that floating-point environments flip individual seeds but not rates
+is the prior fragility study <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib2" title="" class="ltx_ref">2</a>]</cite>, which this arm is
+consistent with. Together they isolate model scale as the manipulated variable
+in the arms above.</p>
+</div>
+</section>
+<section id="S4.SS5" class="ltx_subsection">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection">4.5 </span>Verdict summary</h3>
+
+<figure id="S4.T1" class="ltx_table">
+<table id="S4.T1.3" class="ltx_tabular ltx_centering ltx_guessed_headers ltx_align_middle">
+<thead class="ltx_thead">
+<tr id="S4.T1.3.4.1" class="ltx_tr">
+<th id="S4.T1.3.4.1.1" class="ltx_td ltx_align_left ltx_th ltx_th_column ltx_th_row ltx_border_tt"><span id="S4.T1.3.4.1.1.1" class="ltx_text" style="font-size:90%;">Law</span></th>
+<th id="S4.T1.3.4.1.2" class="ltx_td ltx_align_left ltx_th ltx_th_column ltx_border_tt"><span id="S4.T1.3.4.1.2.1" class="ltx_text" style="font-size:90%;">12K finding</span></th>
+<th id="S4.T1.3.4.1.3" class="ltx_td ltx_align_left ltx_th ltx_th_column ltx_border_tt"><span id="S4.T1.3.4.1.3.1" class="ltx_text" style="font-size:90%;">Cross-scale result</span></th>
+<th id="S4.T1.3.4.1.4" class="ltx_td ltx_align_left ltx_th ltx_th_column ltx_border_tt"><span id="S4.T1.3.4.1.4.1" class="ltx_text" style="font-size:90%;">Verdict</span></th>
+</tr>
+</thead>
+<tbody class="ltx_tbody">
+<tr id="S4.T1.1.1" class="ltx_tr">
+<th id="S4.T1.1.1.2" class="ltx_td ltx_align_left ltx_th ltx_th_row ltx_border_t"><span id="S4.T1.1.1.2.1" class="ltx_text" style="font-size:90%;">L1 ceiling</span></th>
+<td id="S4.T1.1.1.1" class="ltx_td ltx_align_left ltx_border_t">
+<math id="S4.T1.1.1.1.m1" class="ltx_Math" alttext="r{=}0.95" display="inline" intent=":literal"><semantics><mrow><mi mathsize="0.900em">r</mi><mo mathsize="0.900em">=</mo><mn mathsize="0.900em">0.95</mn></mrow><annotation encoding="application/x-tex">r{=}0.95</annotation></semantics></math><span id="S4.T1.1.1.1.1" class="ltx_text" style="font-size:90%;">; 0/36 excess</span>
+</td>
+<td id="S4.T1.1.1.3" class="ltx_td ltx_align_left ltx_border_t"><span id="S4.T1.1.1.3.1" class="ltx_text" style="font-size:90%;">0/144 excess; ordering monotone at all scales</span></td>
+<td id="S4.T1.1.1.4" class="ltx_td ltx_align_left ltx_border_t"><span id="S4.T1.1.1.4.1" class="ltx_text ltx_font_bold" style="font-size:90%;">conserved</span></td>
+</tr>
+<tr id="S4.T1.3.3" class="ltx_tr">
+<th id="S4.T1.3.3.3" class="ltx_td ltx_align_left ltx_th ltx_th_row"><span id="S4.T1.3.3.3.1" class="ltx_text" style="font-size:90%;">L2 role conflict</span></th>
+<td id="S4.T1.2.2.1" class="ltx_td ltx_align_left">
+<math id="S4.T1.2.2.1.m1" class="ltx_Math" alttext="\rho{=}0.77" display="inline" intent=":literal"><semantics><mrow><mi mathsize="0.900em">ρ</mi><mo mathsize="0.900em">=</mo><mn mathsize="0.900em">0.77</mn></mrow><annotation encoding="application/x-tex">\rho{=}0.77</annotation></semantics></math><span id="S4.T1.2.2.1.1" class="ltx_text" style="font-size:90%;"> (5-level grid)</span>
+</td>
+<td id="S4.T1.3.3.2" class="ltx_td ltx_align_left">
+<math id="S4.T1.3.3.2.m1" class="ltx_Math" alttext="\rho{=}0.75/0.85/0.84" display="inline" intent=":literal"><semantics><mrow><mi mathsize="0.900em">ρ</mi><mo mathsize="0.900em">=</mo><mrow><mn mathsize="0.900em">0.75</mn><mo maxsize="0.900em" minsize="0.900em" stretchy="true" symmetric="true">/</mo><mn mathsize="0.900em">0.85</mn><mo maxsize="0.900em" minsize="0.900em" stretchy="true" symmetric="true">/</mo><mn mathsize="0.900em">0.84</mn></mrow></mrow><annotation encoding="application/x-tex">\rho{=}0.75/0.85/0.84</annotation></semantics></math><span id="S4.T1.3.3.2.1" class="ltx_text" style="font-size:90%;"> (12K/1M/50M)</span>
+</td>
+<td id="S4.T1.3.3.4" class="ltx_td ltx_align_left"><span id="S4.T1.3.3.4.1" class="ltx_text ltx_font_bold" style="font-size:90%;">conserved</span></td>
+</tr>
+<tr id="S4.T1.3.5.1" class="ltx_tr">
+<th id="S4.T1.3.5.1.1" class="ltx_td ltx_align_left ltx_th ltx_th_row ltx_border_bb"><span id="S4.T1.3.5.1.1.1" class="ltx_text" style="font-size:90%;">L3 weight decay</span></th>
+<td id="S4.T1.3.5.1.2" class="ltx_td ltx_align_left ltx_border_bb"><span id="S4.T1.3.5.1.2.1" class="ltx_text" style="font-size:90%;">inverted-U</span></td>
+<td id="S4.T1.3.5.1.3" class="ltx_td ltx_align_left ltx_border_bb"><span id="S4.T1.3.5.1.3.1" class="ltx_text" style="font-size:90%;">left arm amplified; peak widens right</span></td>
+<td id="S4.T1.3.5.1.4" class="ltx_td ltx_align_left ltx_border_bb"><span id="S4.T1.3.5.1.4.1" class="ltx_text ltx_font_bold" style="font-size:90%;">deformed</span></td>
+</tr>
+</tbody>
+</table>
+<figcaption class="ltx_caption ltx_centering" style="font-size:90%;"><span class="ltx_tag ltx_tag_table">Table 1: </span>Preregistered verdicts. Two laws conserved, one systematically
+deformed, none broken; the exact ceiling is violated nowhere at any scale.</figcaption>
+</figure>
+</section>
+</section>
+<section id="S5" class="ltx_section">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section">5 </span>What the instrument makes possible</h2>
+
+<div id="S5.p1" class="ltx_para">
+<p id="S5.p1.3" class="ltx_p">Conservation converts the four capabilities from curiosities into leverage:
+quantities that can only be <em id="S5.p1.3.1" class="ltx_emph ltx_font_italic">computed</em> at 12K (exact ceilings,
+<math id="S5.p1.1.m1" class="ltx_Math" alttext="D_{\mathrm{role}}" display="inline" intent=":literal"><semantics><msub><mi>D</mi><mi>role</mi></msub><annotation encoding="application/x-tex">D_{\mathrm{role}}</annotation></semantics></math>, split identifiability) remain <em id="S5.p1.3.2" class="ltx_emph ltx_font_italic">predictive</em> at scales
+where computing them is impossible. The research program this enables is a
+predictive one: a task-side function <math id="S5.p1.2.m2" class="ltx_Math" alttext="\Phi(T,E,S,H)" display="inline" intent=":literal"><semantics><mrow><mi mathvariant="normal">Φ</mi><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><mi>T</mi><mo>,</mo><mi>E</mi><mo>,</mo><mi>S</mi><mo>,</mo><mi>H</mi><mo stretchy="false">)</mo></mrow></mrow><annotation encoding="application/x-tex">\Phi(T,E,S,H)</annotation></semantics></math> that outputs, before
+training, the expected ceiling, the grok probability within budget, and a
+predicted onset band. We commit to one concrete, falsifiable step rather than a
+prospectus: a preregistration of <math id="S5.p1.3.m3" class="ltx_Math" alttext="\Phi" display="inline" intent=":literal"><semantics><mi mathvariant="normal">Φ</mi><annotation encoding="application/x-tex">\Phi</annotation></semantics></math>—its functional form, coefficients
+calibrated on the existing task atlas, and its predictions for five task
+families never used in its construction, including one cross-domain family
+(compositional binding in enumerable worlds <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib8" title="" class="ltx_ref">8</a>]</cite>)—will
+be published with cryptographic hashes of the frozen predictions before the
+confirmation runs are executed. The present paper’s conservation map fixes the
+scales at which those predictions are licensed to apply.</p>
+</div>
+</section>
+<section id="S6" class="ltx_section">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section">6 </span>Related work</h2>
+
+<section id="S6.SS0.SSS0.Px1" class="ltx_paragraph">
+<h4 class="ltx_title ltx_title_paragraph">What we do not claim as new.</h4>
+
+<div id="S6.SS0.SSS0.Px1.p1" class="ltx_para">
+<p id="S6.SS0.SSS0.Px1.p1.2" class="ltx_p">Exhaustive evaluation of small
+algorithmic tasks is the standard grokking setting from its
+inception <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib1" title="" class="ltx_ref">1</a>, <a href="#bib.bib9" title="" class="ltx_ref">9</a>]</cite>. Complete
+mechanistic analyses of small models are
+established <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib3" title="" class="ltx_ref">3</a>, <a href="#bib.bib4" title="" class="ltx_ref">4</a>, <a href="#bib.bib10" title="" class="ltx_ref">10</a>]</cite>, grokking
+appears well beyond algorithmic data <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib11" title="" class="ltx_ref">11</a>]</cite>, and mechanistic
+accounts of the delay itself exist at the level of training
+dynamics <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib12" title="" class="ltx_ref">12</a>]</cite> and, most recently, as an exactly solvable
+late-time relaxation whose clock scales as
+<math id="S6.SS0.SSS0.Px1.p1.1.m1" class="ltx_Math" alttext="(1-\beta)/(\eta\lambda)" display="inline" intent=":literal"><semantics><mrow><mrow><mo stretchy="false">(</mo><mrow><mn>1</mn><mo>−</mo><mi>β</mi></mrow><mo stretchy="false">)</mo></mrow><mo>/</mo><mrow><mo stretchy="false">(</mo><mrow><mi>η</mi><mo lspace="0em" rspace="0em">​</mo><mi>λ</mi></mrow><mo stretchy="false">)</mo></mrow></mrow><annotation encoding="application/x-tex">(1-\beta)/(\eta\lambda)</annotation></semantics></math> <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib7" title="" class="ltx_ref">7</a>]</cite>. The model-organism framing has a
+distinguished precedent in muP hyperparameter transfer <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib5" title="" class="ltx_ref">5</a>]</cite>.
+Delayed-generalization curves have been traced in language models of
+35M–130M parameters <cite class="ltx_cite ltx_citemacro_citep">[<a href="#bib.bib13" title="" class="ltx_ref">13</a>]</cite>, establishing that the
+<em id="S6.SS0.SSS0.Px1.p1.2.1" class="ltx_emph ltx_font_italic">phenomenon</em> exists at scale; our question is different—whether
+<em id="S6.SS0.SSS0.Px1.p1.2.2" class="ltx_emph ltx_font_italic">quantitative task-side laws</em> transport—and to our knowledge no prior
+work has tested law conservation under a frozen protocol across three orders of
+magnitude. Closest to our L2 axis, <cite class="ltx_cite ltx_citemacro_citet">Howe [<a href="#bib.bib14" title="" class="ltx_ref">14</a>, <a href="#bib.bib15" title="" class="ltx_ref">15</a>]</cite>
+shows that structure-specific representational priors <em id="S6.SS0.SSS0.Px1.p1.2.3" class="ltx_emph ltx_font_italic">causally</em> control
+the grokking delay from the model side; our role-conflict law is the task-side
+counterpart (a structural distance computed before training), and the two are
+complementary rather than competing—a point the preregistered <math id="S6.SS0.SSS0.Px1.p1.2.m2" class="ltx_Math" alttext="\Phi" display="inline" intent=":literal"><semantics><mi mathvariant="normal">Φ</mi><annotation encoding="application/x-tex">\Phi</annotation></semantics></math> program
+(Section <a href="#S5" title="5 What the instrument makes possible ‣ Small Enough to Know Everything: The Fully-Enumerable Transformer as an Instrument for the Science of Delayed Generalization" class="ltx_ref"><span class="ltx_text ltx_ref_tag">5</span></a>) is designed to make quantitative.</p>
+</div>
+</section>
+<section id="S6.SS0.SSS0.Px2" class="ltx_paragraph">
+<h4 class="ltx_title ltx_title_paragraph">What is new here.</h4>
+
+<div id="S6.SS0.SSS0.Px2.p1" class="ltx_para">
+<p id="S6.SS0.SSS0.Px2.p1.1" class="ltx_p">(1) The explicit statement of the enumerable
+regime’s four capabilities as an instrument, with the enumerability/smallness
+attribution; (2) the treatment of generalization ceilings as computed,
+falsifiable bounds tested by exact statistics rather than as informal
+observations <cite class="ltx_cite ltx_citemacro_citep">[cf. <a href="#bib.bib16" title="" class="ltx_ref">16</a>]</cite>; (3) systematic
+invariant-preserving task surgery as a design pattern; (4) grokking as rate
+science—survival curves with right-censoring over tens to hundreds of seeds,
+which goes beyond the 1–5 seeds per configuration typical of the literature
+and beyond generic multi-seed reporting; and (5) the conservation map
+itself—the preregistered cross-scale test that licenses (1)–(4) beyond the
+regime that generated them.</p>
+</div>
+</section>
+</section>
+<section id="S7" class="ltx_section">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section">7 </span>Limitations</h2>
+
+<div id="S7.p1" class="ltx_para">
+<p id="S7.p1.1" class="ltx_p">The instrument’s writ runs exactly as far as enumeration does. Tasks whose input
+spaces cannot be enumerated—natural language above toy scale, vision—are
+outside it; the instrument’s role there is upstream, supplying calibrated laws
+and preregistered predictors, not direct measurement. Our scale series, while
+spanning <math id="S7.p1.1.m1" class="ltx_math_unparsed" alttext="4{,}000\times" display="inline" intent=":literal"><semantics><mrow><mn>4</mn><mo>,</mo><mn>000</mn><mo lspace="0.222em">×</mo></mrow><annotation encoding="application/x-tex">4{,}000\times</annotation></semantics></math> in parameters, uses one architecture family and one
+optimizer, with one learning rate and one budget in the main arms (the
+control arm varies both, for one task family); L3’s deformation shows that
+budget interacts with scale. The
+50M arm is a single hardware environment, though the 12K control and prior
+fragility results bound the plausible environment effect at the rate level.
+Finally, conservation of task-side laws does not imply conservation of
+mechanism; the L2 scale map (delay grows with scale) is a reminder that the
+mapping across scales is lawful but not trivial.</p>
+</div>
+</section>
+<section id="Sx1" class="ltx_section">
+<h2 class="ltx_title ltx_title_section">Acknowledgments and AI-use disclosure</h2>
+
+<div id="Sx1.p1" class="ltx_para">
+<p id="Sx1.p1.1" class="ltx_p">Claude (Anthropic) was used, under the author’s direction, in the preparation
+of this work: drafting and revising the manuscript text, implementing the
+experiment, analysis, and figure code, executing the preregistered runs, and
+checking literature and internal consistency. The research questions, study
+design, frozen prediction criteria, and interpretation of results are the
+author’s, and the author reviewed, verified, and takes full responsibility
+for all content, including every quantitative claim.</p>
+</div>
+</section>
+<section id="bib" class="ltx_bibliography">
+<h2 class="ltx_title ltx_title_bibliography">References</h2>
+
+<ul class="ltx_biblist">
+<li id="bib.bib1" class="ltx_bibitem">
+<span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">Power et al. [2022]</span>
+<span class="ltx_bibblock">
+Alethea Power, Yuri Burda, Harri Edwards, Igor Babuschkin, and Vedant Misra.
+
+</span>
+<span class="ltx_bibblock">Grokking: Generalization beyond overfitting on small algorithmic
+datasets.
+
+</span>
+<span class="ltx_bibblock"><em id="bib.bib1.1.1" class="ltx_emph ltx_font_italic">arXiv preprint arXiv:2201.02177</em>, 2022.
+
+</span>
+</li>
+<li id="bib.bib2" class="ltx_bibitem">
+<span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">Ootani [2026a]</span>
+<span class="ltx_bibblock">
+Yoshiyuki Ootani.
+
+</span>
+<span class="ltx_bibblock">Grokking is conditional and fragile: A fully-tractable, multi-seed
+study at 12K parameters.
+
+</span>
+<span class="ltx_bibblock"><em id="bib.bib2.1.1" class="ltx_emph ltx_font_italic">arXiv preprint arXiv:2607.05104</em>, 2026a.
+
+</span>
+</li>
+<li id="bib.bib3" class="ltx_bibitem">
+<span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">Nanda et al. [2023]</span>
+<span class="ltx_bibblock">
+Neel Nanda, Lawrence Chan, Tom Lieberum, Jess Smith, and Jacob Steinhardt.
+
+</span>
+<span class="ltx_bibblock">Progress measures for grokking via mechanistic interpretability.
+
+</span>
+<span class="ltx_bibblock">In <em id="bib.bib3.1.1" class="ltx_emph ltx_font_italic">International Conference on Learning Representations</em>, 2023.
+
+</span>
+</li>
+<li id="bib.bib4" class="ltx_bibitem">
+<span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">Zhong et al. [2023]</span>
+<span class="ltx_bibblock">
+Ziqian Zhong, Ziming Liu, Max Tegmark, and Jacob Andreas.
+
+</span>
+<span class="ltx_bibblock">The clock and the pizza: Two stories in mechanistic explanation of
+neural networks.
+
+</span>
+<span class="ltx_bibblock">In <em id="bib.bib4.1.1" class="ltx_emph ltx_font_italic">Advances in Neural Information Processing Systems</em>, 2023.
+
+</span>
+</li>
+<li id="bib.bib5" class="ltx_bibitem">
+<span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">Yang et al. [2021]</span>
+<span class="ltx_bibblock">
+Greg Yang, Edward J. Hu, Igor Babuschkin, Szymon Sidor, Xiaodong Liu, David
+Farhi, Nick Ryder, Jakub Pachocki, Weizhu Chen, and Jianfeng Gao.
+
+</span>
+<span class="ltx_bibblock">Tensor programs V: Tuning large neural networks via zero-shot
+hyperparameter transfer.
+
+</span>
+<span class="ltx_bibblock">In <em id="bib.bib5.1.1" class="ltx_emph ltx_font_italic">Advances in Neural Information Processing Systems</em>, 2021.
+
+</span>
+</li>
+<li id="bib.bib6" class="ltx_bibitem">
+<span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">Khanh [2026]</span>
+<span class="ltx_bibblock">
+Truong Xuan Khanh.
+
+</span>
+<span class="ltx_bibblock">At-grok is not converged: A measurement-validity audit for grokking
+representation metrics.
+
+</span>
+<span class="ltx_bibblock"><em id="bib.bib6.1.1" class="ltx_emph ltx_font_italic">arXiv preprint arXiv:2607.06639</em>, 2026.
+
+</span>
+</li>
+<li id="bib.bib7" class="ltx_bibitem">
+<span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">Kim [2026]</span>
+<span class="ltx_bibblock">
+Taeyoung Kim.
+
+</span>
+<span class="ltx_bibblock">Grokking on the weight-decay clock: A rate hierarchy from softly
+broken symmetries.
+
+</span>
+<span class="ltx_bibblock"><em id="bib.bib7.1.1" class="ltx_emph ltx_font_italic">arXiv preprint arXiv:2607.23967</em>, 2026.
+
+</span>
+</li>
+<li id="bib.bib8" class="ltx_bibitem">
+<span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">Ootani [2026b]</span>
+<span class="ltx_bibblock">
+Yoshiyuki Ootani.
+
+</span>
+<span class="ltx_bibblock">Input pathways shape few-shot, not zero-shot, binding in tiny
+transformers: A fully-enumerable study.
+
+</span>
+<span class="ltx_bibblock"><em id="bib.bib8.1.1" class="ltx_emph ltx_font_italic">arXiv preprint arXiv:2607.04926</em>, 2026b.
+
+</span>
+</li>
+<li id="bib.bib9" class="ltx_bibitem">
+<span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">Liu et al. [2022]</span>
+<span class="ltx_bibblock">
+Ziming Liu, Ouail Kitouni, Niklas Nolte, Eric J. Michaud, Max Tegmark, and Mike
+Williams.
+
+</span>
+<span class="ltx_bibblock">Towards understanding grokking: An effective theory of representation
+learning.
+
+</span>
+<span class="ltx_bibblock">In <em id="bib.bib9.1.1" class="ltx_emph ltx_font_italic">Advances in Neural Information Processing Systems</em>, 2022.
+
+</span>
+</li>
+<li id="bib.bib10" class="ltx_bibitem">
+<span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">Chughtai et al. [2023]</span>
+<span class="ltx_bibblock">
+Bilal Chughtai, Lawrence Chan, and Neel Nanda.
+
+</span>
+<span class="ltx_bibblock">A toy model of universality: Reverse engineering how networks learn
+group operations.
+
+</span>
+<span class="ltx_bibblock">In <em id="bib.bib10.1.1" class="ltx_emph ltx_font_italic">International Conference on Machine Learning</em>, 2023.
+
+</span>
+</li>
+<li id="bib.bib11" class="ltx_bibitem">
+<span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">Liu et al. [2023]</span>
+<span class="ltx_bibblock">
+Ziming Liu, Eric J. Michaud, and Max Tegmark.
+
+</span>
+<span class="ltx_bibblock">Omnigrok: Grokking beyond algorithmic data.
+
+</span>
+<span class="ltx_bibblock">In <em id="bib.bib11.1.1" class="ltx_emph ltx_font_italic">International Conference on Learning Representations</em>, 2023.
+
+</span>
+</li>
+<li id="bib.bib12" class="ltx_bibitem">
+<span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">Kumar et al. [2024]</span>
+<span class="ltx_bibblock">
+Tanishq Kumar, Blake Bordelon, Samuel J. Gershman, and Cengiz Pehlevan.
+
+</span>
+<span class="ltx_bibblock">Grokking as the transition from lazy to rich training dynamics.
+
+</span>
+<span class="ltx_bibblock">In <em id="bib.bib12.1.1" class="ltx_emph ltx_font_italic">International Conference on Learning Representations</em>, 2024.
+
+</span>
+</li>
+<li id="bib.bib13" class="ltx_bibitem">
+<span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">Muckatira et al. [2026]</span>
+<span class="ltx_bibblock">
+Sherin Muckatira, Namrata Shivagunde, Vijeta Deshpande, and Anna Rumshisky.
+
+</span>
+<span class="ltx_bibblock">A pre-training analogue of grokking in language models: Tracing
+delayed grammatical generalization.
+
+</span>
+<span class="ltx_bibblock"><em id="bib.bib13.1.1" class="ltx_emph ltx_font_italic">arXiv preprint arXiv:2606.00230</em>, 2026.
+
+</span>
+</li>
+<li id="bib.bib14" class="ltx_bibitem">
+<span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">Howe [2026a]</span>
+<span class="ltx_bibblock">
+Gunner Levi Howe.
+
+</span>
+<span class="ltx_bibblock">Structure-specific representational priors causally control the
+grokking delay.
+
+</span>
+<span class="ltx_bibblock"><em id="bib.bib14.1.1" class="ltx_emph ltx_font_italic">arXiv preprint arXiv:2607.04333</em>, 2026a.
+
+</span>
+</li>
+<li id="bib.bib15" class="ltx_bibitem">
+<span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">Howe [2026b]</span>
+<span class="ltx_bibblock">
+Gunner Levi Howe.
+
+</span>
+<span class="ltx_bibblock">What makes a representational prior work? Feature families,
+label-free invariances, and critical windows in grokking.
+
+</span>
+<span class="ltx_bibblock"><em id="bib.bib15.1.1" class="ltx_emph ltx_font_italic">arXiv preprint arXiv:2607.12735</em>, 2026b.
+
+</span>
+</li>
+<li id="bib.bib16" class="ltx_bibitem">
+<span class="ltx_tag ltx_role_refnum ltx_tag_bibitem">Varma et al. [2023]</span>
+<span class="ltx_bibblock">
+Vikrant Varma, Rohin Shah, Zachary Kenton, János Kramár, and Ramana
+Kumar.
+
+</span>
+<span class="ltx_bibblock">Explaining grokking through circuit efficiency.
+
+</span>
+<span class="ltx_bibblock"><em id="bib.bib16.1.1" class="ltx_emph ltx_font_italic">arXiv preprint arXiv:2309.02390</em>, 2023.
+
+</span>
+</li>
+</ul>
+</section>
+</article>
+</div>
+</div>
+<footer class="arxiv-html-footer">
+  <div class="ltx_page_logo">
+    Experimental support, please
+    <a href="./2609.20166v1/__stdout.txt" class="ltx_ref"
+    target="_blank" rel="nofollow">view the build logs</a>
+    for errors. Generated by
+    <a href="https://math.nist.gov/~BMiller/LaTeXML/" target="_blank" class="ltx_ref ltx_LaTeXML_logo">
+      <span style="letter-spacing: -0.2em; margin-right: 0.1em;">
+        L
+        <span style="font-size: 70%; position: relative; bottom: 2.2pt;">A</span>
+        T
+        <span style="position: relative; bottom: -0.4ex;">E</span>
+      </span>
+      <span class="ltx_font_smallcaps">xml</span>
+      <img alt="[LOGO]"
+        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAOCAYAAAD5YeaVAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9wKExQZLWTEaOUAAAAddEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIFRoZSBHSU1Q72QlbgAAAdpJREFUKM9tkL+L2nAARz9fPZNCKFapUn8kyI0e4iRHSR1Kb8ng0lJw6FYHFwv2LwhOpcWxTjeUunYqOmqd6hEoRDhtDWdA8ApRYsSUCDHNt5ul13vz4w0vWCgUnnEc975arX6ORqN3VqtVZbfbTQC4uEHANM3jSqXymFI6yWazP2KxWAXAL9zCUa1Wy2tXVxheKA9YNoR8Pt+aTqe4FVVVvz05O6MBhqUIBGk8Hn8HAOVy+T+XLJfLS4ZhTiRJgqIoVBRFIoric47jPnmeB1mW/9rr9ZpSSn3Lsmir1fJZlqWlUonKsvwWwD8ymc/nXwVBeLjf7xEKhdBut9Hr9WgmkyGEkJwsy5eHG5vN5g0AKIoCAEgkEkin0wQAfN9/cXPdheu6P33fBwB4ngcAcByHJpPJl+fn54mD3Gg0NrquXxeLRQAAwzAYj8cwTZPwPH9/sVg8PXweDAauqqr2cDjEer1GJBLBZDJBs9mE4zjwfZ85lAGg2+06hmGgXq+j3+/DsixYlgVN03a9Xu8jgCNCyIegIAgx13Vfd7vdu+FweG8YRkjXdWy329+dTgeSJD3ieZ7RNO0VAXAPwDEAO5VKndi2fWrb9jWl9Esul6PZbDY9Go1OZ7PZ9z/lyuD3OozU2wAAAABJRU5ErkJggg==">
+    </a>.
+  </div>
+  <div class="keyboard-glossary">
+    <h2>Instructions for reporting errors</h2>
+    <p>We are continuing to improve HTML versions of papers, and your feedback helps enhance accessibility and mobile
+      support. To report errors in the HTML that will help us improve conversion and rendering, choose any of the
+      methods listed below:</p>
+    <ul>
+      <li>Click the "Report Issue" <span class="mobile-only">(<svg role="presentation"
+            style="display: inline-block; vertical-align: middle; fill: var(--text-color);" aria-hidden="true"
+            height="1em" viewBox="0 0 640 640">
+            <path
+              d="M224 160C224 107 267 64 320 64C373 64 416 107 416 160L416 163.6C416 179.3 403.3 192 387.6 192L252.5 192C236.8 192 224.1 179.3 224.1 163.6L224.1 160zM569.6 172.8C580.2 186.9 577.3 207 563.2 217.6L465.4 290.9C470.7 299.8 474.7 309.6 477.2 320L576 320C593.7 320 608 334.3 608 352C608 369.7 593.7 384 576 384L480 384L480 416C480 418.6 479.9 421.3 479.8 423.9L563.2 486.4C577.3 497 580.2 517.1 569.6 531.2C559 545.3 538.9 548.2 524.8 537.6L461.7 490.3C438.5 534.5 395.2 566.5 344 574.2L344 344C344 330.7 333.3 320 320 320C306.7 320 296 330.7 296 344L296 574.2C244.8 566.5 201.5 534.5 178.3 490.3L115.2 537.6C101.1 548.2 81 545.3 70.4 531.2C59.8 517.1 62.7 497 76.8 486.4L160.2 423.9C160.1 421.3 160 418.7 160 416L160 384L64 384C46.3 384 32 369.7 32 352C32 334.3 46.3 320 64 320L162.8 320C165.3 309.6 169.3 299.8 174.6 290.9L76.8 217.6C62.7 207 59.8 186.9 70.4 172.8C81 158.7 101.1 155.8 115.2 166.4L224 248C236.3 242.9 249.8 240 264 240L376 240C390.2 240 403.7 242.8 416 248L524.8 166.4C538.9 155.8 559 158.7 569.6 172.8z" />
+          </svg>)</span> button, located in the page header.</li>
+    </ul>
+    <p><strong>Tip:</strong> You can select the relevant text first, to include it in your report.</p>
+    <p>Our team has already identified <a class="ltx_ref" href="https://github.com/arXiv/html_feedback/issues"
+        target="_blank">the following issues</a>. We appreciate your time reviewing and reporting rendering errors we
+      may not have found yet. Your efforts will help us improve the HTML versions for all readers, because disability
+      should not be a barrier to accessing research. Thank you for your continued support in championing open access for
+      all.</p>
+    <p>Have a free development cycle? Help support accessibility at arXiv! Our collaborators at LaTeXML maintain a <a
+        class="ltx_ref" href="https://github.com/brucemiller/LaTeXML/wiki/Porting-LaTeX-packages-for-LaTeXML"
+        target="_blank">list of packages that need conversion</a>, and welcome <a class="ltx_ref"
+        href="https://github.com/brucemiller/LaTeXML/issues" target="_blank">developer contributions</a>.</p>
+  </div>
+</footer><footer class="ds-site-footer">
+  <div class="ds-site-footer-grid">
+    <div class="ds-site-footer-main">
+      <div class="ds-site-footer-ack">
+        We gratefully acknowledge support from
+        our <strong>major funders</strong>,
+        <a href="https://info.arxiv.org/about/ourmembers.html"><strong>member institutions</strong></a><span class="ack-member-inline" hidden>, <strong></strong></span>,
+        and all contributors.
+      </div>
+      <nav class="ds-site-footer-links" aria-label="Site navigation">
+        <a href="https://info.arxiv.org/about">About</a>
+        <span class="ds-site-footer-sep" aria-hidden="true">&middot;</span>
+        <a href="https://info.arxiv.org/help">Help</a>
+        <span class="ds-site-footer-sep" aria-hidden="true">&middot;</span>
+        <a href="https://info.arxiv.org/help/contact.html">Contact</a>
+        <span class="ds-site-footer-sep" aria-hidden="true">&middot;</span>
+        <a href="https://info.arxiv.org/help/subscribe">Subscribe</a>
+        <span class="ds-site-footer-sep" aria-hidden="true">&middot;</span>
+        <a href="https://info.arxiv.org/help/license/index.html">Copyright</a>
+        <span class="ds-site-footer-sep" aria-hidden="true">&middot;</span>
+        <a href="https://info.arxiv.org/help/policies/privacy_policy.html">Privacy</a>
+        <span class="ds-site-footer-sep" aria-hidden="true">&middot;</span>
+        <a href="https://info.arxiv.org/help/web_accessibility.html">Accessibility</a>
+        <span class="ds-site-footer-sep" aria-hidden="true">&middot;</span>
+        <a href="https://status.arxiv.org" target="_blank" rel="noopener noreferrer">Operational Status<span class="is-sr-only"> (opens in new tab)</span></a>
+      </nav>
+    </div>
+
+    <div class="ds-site-footer-funders" aria-label="Major funders">
+      <div class="ds-site-footer-funders-label">Major funding support from</div>
+      <div class="ds-site-footer-funders-logos">
+        <a class="ds-funder-link" href="https://www.simonsfoundation.org/" target="_blank" rel="noopener noreferrer">
+          <img class="ds-funder-logo" src="/static/base/1.0.1/images/funders/simons-foundation.png" alt="Simons Foundation">
+        </a>
+        <a class="ds-funder-link" href="https://www.sfi.org.bm/" target="_blank" rel="noopener noreferrer">
+          <img class="ds-funder-logo" src="/static/base/1.0.1/images/funders/simons-foundation-international.png" alt="Simons Foundation International">
+        </a>
+        <a class="ds-funder-link" href="https://www.schmidtsciences.org/" target="_blank" rel="noopener noreferrer">
+          <img class="ds-funder-logo" src="/static/base/1.0.1/images/funders/schmidt-sciences.png" alt="Schmidt Sciences">
+        </a>
+      </div>
+    </div>
+  </div>
+</footer><div id="fixed-buttons-container">
+  <a id="disable-reading-mode-btn" class="header-button" href="javascript:toggleReadingMode();"
+    title="Disable reading mode, show header and footer">
+    <svg role="presentation" height="1.25rem"
+      viewBox="0 0 448 512"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.-->
+      <path
+        d="M0 96C0 78.3 14.3 64 32 64l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 128C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 288c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32L32 448c-17.7 0-32-14.3-32-32s14.3-32 32-32l384 0c17.7 0 32 14.3 32 32z" />
+    </svg>
+  </a>
+</div></body>
+</html>

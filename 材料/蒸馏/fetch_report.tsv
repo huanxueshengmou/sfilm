@@ -1,0 +1,63 @@
+01	OK	32308	1	https://arxiv.org/html/2201.02177v1
+15	OK	8408	0	https://pair.withgoogle.com/explorables/grokking/
+02	OK	121264	18	https://arxiv.org/html/2301.05217v1
+29	OK	1047	0	https://blog.aicoco.net/2023/08/08/grokking/
+30	OK	3150	15	https://www.36kr.com/p/2437259014263168
+30	OK	3168	15	https://www.36kr.com/p/2437259014263168
+30	OK	3178	15	https://www.36kr.com/p/2437259014263168
+21	OK	9120	2	https://blog.csdn.net/weixin_54607024/article/details/148411515
+22	OK	2724	6	https://blog.csdn.net/qq_37148940/article/details/141947800
+28	OK	575	2	https://blog.csdn.net/weixin_42547335/article/details/160724600
+37	OK	1678	0	https://transformer-circuits.pub/2022/in-context-learning-and-induction-heads/index.html
+38	OK	2998	32	https://distill.pub/2020/circuits/zoom-in/
+37	OK	1678	0	https://transformer-circuits.pub/2022/in-context-learning-and-induction-heads/index.html
+01	OK	32308	12	https://arxiv.org/html/2201.02177v1
+02	OK	121264	18	https://arxiv.org/html/2301.05217v1
+03	OK	48373	13	https://arxiv.org/html/2210.01117v1
+04	OK	68190	21	https://arxiv.org/html/2205.10343v1
+05	OK	186567	11	https://arxiv.org/html/2207.08799v1
+06	OK	26315	2	https://arxiv.org/html/2303.11873v1
+07	OK	102620	11	https://arxiv.org/html/2309.02390v1
+08	OK	27502	3	https://arxiv.org/html/2303.06173v1
+09	OK	73559	5	https://arxiv.org/html/2310.06110v1
+10	OK	93254	3	https://arxiv.org/html/2309.07311v1
+11	OK	44077	4	https://arxiv.org/html/2502.01774v1
+12	OK	56490	1	https://arxiv.org/html/2206.07682v1
+13	OK	48901	9	https://arxiv.org/html/2304.15004v1
+14	OK	48331	5	https://arxiv.org/html/2205.05055v1
+15	OK	8408	0	https://pair.withgoogle.com/explorables/grokking/
+16	OK	106965	4	https://arxiv.org/html/2609.26679v1
+17	OK	56084	7	https://arxiv.org/html/2606.12966v1
+18	OK	61272	11	https://arxiv.org/html/2606.00230v1
+19	OK	52477	3	https://arxiv.org/html/2606.18465v1
+20	OK	31834	3	https://arxiv.org/html/2609.20166v1
+37	OK	124562	0	https://transformer-circuits.pub/2022/in-context-learning-and-induction-heads/index.html
+38	OK	59672	32	https://distill.pub/2020/circuits/zoom-in/
+23	OK	3910	14	https://blog.csdn.net/2301_80239908/article/details/154192271
+24	OK	2805	12	https://blog.csdn.net/2401_85390073/article/details/153398536
+25	ERR:'ascii' codec can't encode characters in position 5-8: ordinal not in 	0	0	https://blog.csdn.net/数学基础/article/details/166612103
+26	ERR:HTTP Error 404: Not Found	0	0	https://blog.csdn.net/python/article/details/162378215
+27	OK	703	2	https://blog.csdn.net/weixin_36829761/article/details/156151098
+31	OK	5689	3	https://blog.csdn.net/transformer_WSZ/article/details/164146375
+32	OK	3355	4	https://blog.csdn.net/qq_16242613/article/details/149134614
+33	OK	8577	2	https://blog.csdn.net/weixin_49122920/article/details/165491623
+34	OK	5737	7	https://blog.csdn.net/cyril_ki/article/details/153819664
+35	ERR:'ascii' codec can't encode characters in position 5-9: ordinal not in 	0	0	https://blog.csdn.net/评估与验证/article/details/157342040
+36	OK	17197	3	https://blog.csdn.net/tsh2005974tsh/article/details/163198133
+30	OK	1288	15	https://www.36kr.com/p/2437259014263168
+29	OK	1047	0	https://blog.aicoco.net/2023/08/08/grokking/
+30	OK	1288	15	https://www.36kr.com/p/2437259014263168
+41	ERR:HTTP Error 404: Not Found	0	0	https://blog.csdn.net/深度学习/article/details/158983625
+42	ERR:HTTP Error 521: 	0	0	https://blog.csdn.net/pytorch/article/details/158780898
+41	ERR:HTTP Error 404: Not Found	0	0	https://blog.csdn.net/深度学习/article/details/158983625
+43	OK	2095	1	https://blog.csdn.net/weixin_29168153/article/details/159631309
+44	ERR:HTTP Error 404: Not Found	0	0	https://blog.csdn.net/数学基础/article/details/98293836
+45	OK	2612	2	https://blog.csdn.net/weixin_42544663/article/details/162378216
+46	OK	10780	1	https://blog.csdn.net/weixin_33724570/article/details/86334239
+47	ERR:HTTP Error 404: Not Found	0	0	https://blog.csdn.net/深度学习/article/details/158449093
+48	OK	1824	0	https://blog.csdn.net/gitblog_00601/article/details/141552086
+49	OK	5281	0	https://blog.csdn.net/gitblog_00601/article/details/163664694
+50	ERR:HTTP Error 404: Not Found	0	0	https://blog.csdn.net/深度学习/article/details/95274869
+51	ERR:HTTP Error 404: Not Found	0	0	https://blog.csdn.net/weixin_42544663/article/details/159631310
+52	OK	8691	13	https://blog.csdn.net/xian_ren008/article/details/148923484
+42	ERR:HTTP Error 404: Not Found	0	0	https://blog.csdn.net/pytorch/article/details/158780898

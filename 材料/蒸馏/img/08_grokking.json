@@ -1,0 +1,26 @@
+[
+ {
+  "file": "08_grokking_01.png",
+  "w": 1477,
+  "h": 381,
+  "bytes": 86355,
+  "src": "https://arxiv.org/html/2303.06173v1/heatmap-loss.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "08_grokking_02.png",
+  "w": 1500,
+  "h": 381,
+  "bytes": 94114,
+  "src": "https://arxiv.org/html/2303.06173v1/heatmap-accuracy.png",
+  "alt": "Refer to caption"
+ },
+ {
+  "file": "08_grokking_03.png",
+  "w": 1500,
+  "h": 375,
+  "bytes": 33443,
+  "src": "https://arxiv.org/static/base/1.0.1/images/funders/simons-foundation-international.png",
+  "alt": "Simons Foundation International"
+ }
+]
