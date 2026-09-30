@@ -1,0 +1,14 @@
+# 本片工程的生成物（体积大、可重新生成）
+/.venv/
+/render/
+/output/
+/audio/build/
+/audio/tts/raw/
+__pycache__/
+*.pyc
+
+# 密钥：绝不入库
+.env
+*.env
+*.raw.wav
+*.tmp
